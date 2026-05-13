@@ -1,6 +1,6 @@
 export const config = {
   api: {
-    bodyParser: { sizeLimit: '5mb' },
+    bodyParser: { sizeLimit: '2mb' },
   },
 };
 
@@ -14,14 +14,16 @@ function cleanInputText(text) {
       if (/^Phone\s*:/i.test(t)) return false;
       if (/^FTE\s*:/i.test(t)) return false;
       if (/^Pattern\s*:/i.test(t)) return false;
+      if (/^EMPLOYEE INDEX$/i.test(t)) return false;
+      if (/^\d+\.\s+.+\[[^\]]+\]\s*$/i.test(t)) return false;
       return true;
     })
     .join('\n')
     .trim();
 }
 
-function extractJsonFromResponse(payload) {
-  const outputText =
+function extractJsonFromPayload(payload) {
+  const text =
     typeof payload?.output_text === 'string'
       ? payload.output_text
       : Array.isArray(payload?.output)
@@ -33,11 +35,11 @@ function extractJsonFromResponse(payload) {
             .trim()
         : '';
 
-  if (!outputText) {
+  if (!text) {
     throw new Error('OpenAI returned an empty response.');
   }
 
-  return JSON.parse(outputText);
+  return JSON.parse(text);
 }
 
 function normalizeEmployee(emp) {
@@ -84,46 +86,6 @@ export default async function handler(req, res) {
 
   const text = cleanInputText(originalText);
 
-  const systemPrompt = `
-You are a hospital staff schedule parser.
-
-Return ONLY valid JSON matching the schema exactly.
-No markdown.
-No explanation.
-No code fences.
-
-Rules:
-- D = day shift
-- N = night shift
-- ANNUAL / annual leave / vacation = AL
-- Request Off / Req Off / RO = RO
-- REST DAY / REST / OFF = X
-- EDU ON / EDU / training / study = D
-- "-" means blank, not a shift
-- Support:
-  1) YYYY-MM-DD
-  2) MM/DD/YYYY
-  3) MM/DD with year inferred from the schedule period
-- Convert all output dates to YYYY-MM-DD
-- Include all employees found
-- If role is missing, return empty string
-- If unit is missing, return "—"
-- Deduplicate employees by name
-- Expand date ranges if present
-
-Examples you must understand:
-- Period: 04/26/2026 - 06/06/2026
-- 01. OMAR, SADAL [AHN]
-- QUICK SECTION - ALSHAMMARI, NAWAF
-- Skill   : SN I
-- 04/26 Sun    : D 12 SN I
-- 05/25 Mon    : ANNUAL
-- 05/26 Tue    : Request Off
-- 05/22 Fri    : REST DAY
-- 05/06 Wed    : EDU ON
-- 04/28 Tue    : -
-`.trim();
-
   const schema = {
     type: 'object',
     additionalProperties: false,
@@ -143,53 +105,63 @@ Examples you must understand:
             N: { type: 'array', items: { type: 'string' } },
             AL: { type: 'array', items: { type: 'string' } },
             RO: { type: 'array', items: { type: 'string' } },
-            X: { type: 'array', items: { type: 'string' } },
+            X: { type: 'array', items: { type: 'string' } }
           },
-          required: ['name', 'role', 'D', 'N', 'AL', 'RO', 'X'],
-        },
-      },
+          required: ['name', 'role', 'D', 'N', 'AL', 'RO', 'X']
+        }
+      }
     },
-    required: ['unit', 'start', 'end', 'employees'],
+    required: ['unit', 'start', 'end', 'employees']
   };
+
+  const systemText = [
+    'You are a hospital staff schedule parser.',
+    'Return only valid JSON that matches the schema.',
+    'No markdown. No explanation. No code fences.',
+    'Map codes as follows:',
+    'D = day shift',
+    'N = night shift',
+    'ANNUAL / annual leave / vacation = AL',
+    'Request Off / Req Off / RO = RO',
+    'REST DAY / REST / OFF = X',
+    'EDU ON / EDU / training / study = D',
+    '"-" means blank, not a shift.',
+    'Support dates in YYYY-MM-DD, MM/DD/YYYY, and MM/DD with year inferred from the schedule period.',
+    'Convert all output dates to YYYY-MM-DD.',
+    'Deduplicate employees by name.',
+    'If role is missing, return empty string.',
+    'If unit is missing, return "—".'
+  ].join('\n');
 
   try {
     const openaiRes = await fetch('https://api.openai.com/v1/responses', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
-        Authorization: `Bearer ${apiKey}`,
+        Authorization: `Bearer ${apiKey}`
       },
       body: JSON.stringify({
-        model: 'gpt-5.5',
+        model: 'gpt-4.1-mini',
         input: [
           {
             role: 'system',
-            content: [
-              {
-                type: 'input_text',
-                text: systemPrompt,
-              },
-            ],
+            content: [{ type: 'input_text', text: systemText }]
           },
           {
             role: 'user',
-            content: [
-              {
-                type: 'input_text',
-                text: text,
-              },
-            ],
-          },
+            content: [{ type: 'input_text', text }]
+          }
         ],
         text: {
           format: {
             type: 'json_schema',
             name: 'schedule_parse',
             strict: true,
-            schema,
-          },
+            schema
+          }
         },
-      }),
+        max_output_tokens: 5000
+      })
     });
 
     const payload = await openaiRes.json().catch(() => ({}));
@@ -204,19 +176,15 @@ Examples you must understand:
 
     let parsed;
     try {
-      parsed = extractJsonFromResponse(payload);
+      parsed = extractJsonFromPayload(payload);
     } catch (e) {
-      return res.status(500).json({
-        error: 'OpenAI returned invalid JSON.',
-      });
+      return res.status(500).json({ error: 'OpenAI returned invalid JSON.' });
     }
 
     const result = normalizeResult(parsed);
 
     if (!result.employees.length) {
-      return res.status(500).json({
-        error: 'OpenAI returned no employees.',
-      });
+      return res.status(500).json({ error: 'OpenAI returned no employees.' });
     }
 
     return res.status(200).json(result);
