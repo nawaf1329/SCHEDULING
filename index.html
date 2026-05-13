@@ -1,0 +1,285 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Schedule Grid Gemini</title>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#0b0e14;--s1:#111520;--s2:#171c2b;--border:#252d45;--border2:#2e3a58;--accent:#4f8ef7;--accent2:#7c5ce8;--green:#00c98d;--amber:#f0a030;--red:#e85c5c;--text:#dde4f5;--sub:#6a7a9e;--muted:#3a4460;--cD:#4f8ef7;--cD-bg:#0f1f3e;--cN:#9b8af0;--cN-bg:#1a1540;--cAL:#f0a030;--cAL-bg:#2a1a04;--cRO:#6a7a9e;--cRO-bg:#141b2e;--cX:#e85c5c;--cX-bg:#2a0f0f}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}body{font-family:'Space Grotesk',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;font-size:14px}nav{position:sticky;top:0;z-index:20;background:rgba(11,14,20,.96);backdrop-filter:blur(12px);border-bottom:1px solid var(--border);display:flex;align-items:center;padding:0 22px;height:56px;gap:12px}.nav-logo{display:flex;align-items:center;gap:10px;font-size:15px;font-weight:700;margin-right:auto}.nav-logo-icon{width:30px;height:30px;background:linear-gradient(135deg,var(--accent),var(--accent2));border-radius:8px;display:flex;align-items:center;justify-content:center}.nav-meta{font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--sub);padding:0 12px;border-right:1px solid var(--border)}.nav-meta:last-of-type{border-right:none}.nav-meta span{color:var(--accent)}.wrap{max-width:950px;margin:42px auto;padding:0 20px}.eyebrow{font-size:11px;letter-spacing:3px;text-transform:uppercase;color:var(--accent);font-weight:600;margin-bottom:12px;font-family:'JetBrains Mono',monospace}h1{font-size:34px;line-height:1.15;margin-bottom:10px}h1 em{font-style:normal;color:var(--accent)}.desc{font-size:14px;color:var(--sub);margin-bottom:14px;line-height:1.65}.note{font-size:11px;color:var(--muted);font-family:'JetBrains Mono',monospace;line-height:1.7;margin-bottom:22px}.drop-zone{border:1.5px dashed var(--border2);border-radius:14px;padding:36px 28px;text-align:center;cursor:pointer;position:relative;background:var(--s1);transition:all .2s}.drop-zone:hover,.drop-zone.over{border-color:var(--accent);background:#0d1526}.drop-zone input[type=file]{position:absolute;inset:0;opacity:0;cursor:pointer;width:100%;height:100%}.dz-icon{font-size:34px;margin-bottom:12px;display:block}.dz-title{font-size:16px;font-weight:600;margin-bottom:6px}.dz-sub{font-size:12px;color:var(--sub);font-family:'JetBrains Mono',monospace}.dz-file{margin-top:12px;font-size:12px;color:var(--green);font-family:'JetBrains Mono',monospace;display:none}.paste-label{font-size:12px;color:var(--muted);margin-top:14px;margin-bottom:6px;font-family:'JetBrains Mono',monospace}textarea{width:100%;height:210px;background:var(--bg);border:1px solid var(--border);border-radius:12px;color:var(--text);font-family:'JetBrains Mono',monospace;font-size:11.5px;line-height:1.6;padding:14px 16px;resize:vertical;outline:none}textarea:focus{border-color:var(--accent)}textarea::placeholder{color:var(--muted)}.btn-row{display:flex;gap:10px;margin-top:16px;align-items:center;flex-wrap:wrap}.btn{padding:10px 22px;border-radius:10px;border:none;cursor:pointer;font-family:'Space Grotesk',sans-serif;font-size:13.5px;font-weight:600;transition:all .15s}.btn-primary{background:linear-gradient(135deg,var(--accent),var(--accent2));color:#fff}.btn-primary:disabled{opacity:.3;cursor:not-allowed}.btn-ghost{background:var(--s2);color:var(--sub);border:1px solid var(--border)}.pill{display:inline-flex;align-items:center;padding:7px 12px;border:1px solid var(--border);border-radius:999px;background:var(--s1);font-size:11px;color:var(--sub);font-family:'JetBrains Mono',monospace}.prog-wrap{margin-top:18px;display:none}.prog-track{height:3px;background:#1d2535;border-radius:2px;overflow:hidden;margin-bottom:8px}.prog-fill{height:100%;width:0;background:linear-gradient(90deg,var(--accent),var(--accent2));transition:width .35s}.prog-log{font-size:12px;color:var(--sub);font-family:'JetBrains Mono',monospace;min-height:16px}.prog-log.ok{color:var(--green)}.prog-log.err{color:var(--red)}#output{display:none}.header{background:linear-gradient(135deg,#0d1526,#111a30,#0f1620);border-bottom:1px solid var(--border);padding:22px 26px;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:14px}.hdr-small{font-size:10px;letter-spacing:2.5px;text-transform:uppercase;color:var(--accent);font-weight:600;margin-bottom:5px;font-family:'JetBrains Mono',monospace}.hdr-title{font-size:20px;font-weight:700}.hdr-box{text-align:right;background:rgba(79,142,247,.08);border:1px solid rgba(79,142,247,.2);border-radius:10px;padding:10px 16px}.hdr-box .label{font-size:9px;letter-spacing:2px;text-transform:uppercase;color:var(--sub);margin-bottom:3px}.hdr-box .val{font-size:15px;font-weight:700;font-family:'JetBrains Mono',monospace;color:var(--accent)}.hdr-box .sub{font-size:11px;color:var(--sub);margin-top:2px}.summary-grid{display:grid;grid-template-columns:repeat(4,minmax(180px,1fr));gap:12px;padding:18px 24px;background:var(--s1);border-bottom:1px solid var(--border)}.summary-card{background:var(--bg);border:1px solid var(--border);border-radius:14px;padding:14px}.summary-card h3{font-size:12px;color:var(--sub);margin-bottom:8px;letter-spacing:1px;text-transform:uppercase}.summary-count{font-size:28px;font-weight:700;font-family:'JetBrains Mono',monospace;margin-bottom:10px}.summary-list{font-size:12px;line-height:1.55;max-height:120px;overflow:auto}.chip{display:inline-block;padding:4px 8px;border-radius:999px;background:var(--s2);margin:0 6px 6px 0;font-size:11px}.legend{display:flex;gap:10px;flex-wrap:wrap;padding:10px 24px;border-bottom:1px solid var(--border);background:var(--s1);align-items:center}.leg{display:flex;align-items:center;gap:5px;font-size:11px;color:var(--sub)}.leg-chip{padding:2px 7px;border-radius:4px;font-size:9.5px;font-weight:700;font-family:'JetBrains Mono',monospace}.today-badge{margin-left:auto;font-size:10px;font-family:'JetBrains Mono',monospace;color:#8ed632;background:#0f1e04;border:1px solid #3a6010;border-radius:6px;padding:3px 10px}.stats{display:flex;flex-wrap:wrap;background:var(--s1);border-bottom:1px solid var(--border)}.stat{padding:12px 20px;border-right:1px solid var(--border);display:flex;flex-direction:column;gap:3px}.stat-val{font-size:22px;font-weight:700;line-height:1;font-family:'JetBrains Mono',monospace}.stat-lbl{font-size:9.5px;color:var(--sub);letter-spacing:1px;text-transform:uppercase}#gridWrap{overflow:auto;padding-bottom:60px}.table{border-collapse:collapse;font-size:11px}.th-month{background:#0a111e;color:var(--accent);text-align:center;padding:6px 4px;font-size:9.5px;font-weight:700;letter-spacing:2px;text-transform:uppercase;border-bottom:1px solid var(--border)}.th-dow{background:#070c17;padding:3px 1px;font-size:8.5px;text-align:center;color:var(--muted);min-width:30px;max-width:30px;font-family:'JetBrains Mono',monospace}.th-dow.fri,.th-dow.sat,.th-day.fri,.th-day.sat{color:#9a6820}.th-dow.today-hdr,.th-day.today-hdr{color:#8ed632!important;background:#0c1a02!important}.th-day{background:#070c17;padding:3px 1px;font-size:10px;font-weight:700;text-align:center;color:#3a4a6e;min-width:30px;max-width:30px;border-bottom:2px solid var(--border);font-family:'JetBrains Mono',monospace}.th-fixed{position:sticky;background:var(--s1);z-index:10;padding:5px 9px;font-size:9px;font-weight:600;color:var(--sub);letter-spacing:.5px;text-transform:uppercase;border-right:1px solid var(--border);border-bottom:2px solid var(--border);white-space:nowrap}.td-fixed{position:sticky;background:inherit;z-index:5;padding:4px 9px;white-space:nowrap;border-bottom:1px solid #0f1526;border-right:1px solid #151e35;font-size:11.5px}.td-num{text-align:center;padding:4px 5px;font-family:'JetBrains Mono',monospace;font-size:11px;border-bottom:1px solid #0f1526;border-right:1px solid #151e35}.td-cell{text-align:center;padding:3px 1px;font-size:9.5px;font-weight:700;font-family:'JetBrains Mono',monospace;border-bottom:1px solid #0c1020;min-width:30px;max-width:30px}.td-cell.today-col{background:#162400!important;outline:1px solid #4a8010;outline-offset:-1px}.role-pill{display:inline-block;padding:1px 7px;border-radius:4px;font-size:9.5px;font-weight:700;font-family:'JetBrains Mono',monospace;background:#1a2240;color:var(--accent)}.c-D{background:var(--cD-bg);color:var(--cD)}.c-N{background:var(--cN-bg);color:var(--cN)}.c-AL{background:var(--cAL-bg);color:var(--cAL)}.c-RO{background:var(--cRO-bg);color:var(--cRO)}.c-X{background:var(--cX-bg);color:var(--cX)}@media (max-width:980px){.summary-grid{grid-template-columns:1fr 1fr}}@media (max-width:720px){.summary-grid{grid-template-columns:1fr}h1{font-size:28px}.wrap{padding:0 14px}}
+</style>
+</head>
+<body>
+<nav><div class="nav-logo"><div class="nav-logo-icon">📅</div>Schedule Grid Gemini</div><div class="nav-meta">Unit: <span id="navUnit">—</span></div><div class="nav-meta">Period: <span id="navPeriod">—</span></div></nav>
+
+<div class="wrap" id="uploadSection">
+  <div class="eyebrow">Staff Schedule Viewer</div>
+  <h1>Upload your schedule,<br>get an <em>instant grid</em></h1>
+  <p class="desc">Local parser first. If the schedule text is messy, the page falls back to Gemini through your backend.</p>
+  <p class="note">Do not put your API key inside this HTML file. Keep it only in a server environment variable.</p>
+  <div class="drop-zone" id="dzTxt">
+    <input type="file" id="txtFile" accept=".txt,.csv,.text" onchange="onTxtFile(this)">
+    <span class="dz-icon">📄</span>
+    <div class="dz-title">Drop your schedule file here</div>
+    <div class="dz-sub">.txt · .csv · or click to browse</div>
+    <div class="dz-file" id="txtBadge"></div>
+  </div>
+  <div class="paste-label">Or paste schedule text directly:</div>
+  <textarea id="txtArea" placeholder="Paste schedule text here. The app will try local parsing first, then AI fallback if needed."></textarea>
+  <div class="btn-row">
+    <button class="btn btn-primary" id="genBtn" onclick="generate()">⚡ Build Grid</button>
+    <button class="btn btn-ghost" onclick="resetAll()">↺ Reset</button>
+    <span class="pill">AI fallback: Gemini</span>
+  </div>
+  <div class="prog-wrap" id="progWrap"><div class="prog-track"><div class="prog-fill" id="pFill"></div></div><div class="prog-log" id="pLog"></div></div>
+</div>
+
+<div id="output">
+  <div class="header"><div><div class="hdr-small" id="rhUnit"></div><div class="hdr-title">Staff Schedule Report</div></div><div class="hdr-box"><div class="label">Schedule Period</div><div class="val" id="rhPeriod"></div><div class="sub" id="rhDays"></div></div></div>
+  <div class="summary-grid">
+    <div class="summary-card"><h3>Working Today</h3><div class="summary-count" id="sumWorking">0</div><div class="summary-list" id="listWorking"></div></div>
+    <div class="summary-card"><h3>On Leave Today</h3><div class="summary-count" id="sumLeave">0</div><div class="summary-list" id="listLeave"></div></div>
+    <div class="summary-card"><h3>Off Today</h3><div class="summary-count" id="sumOff">0</div><div class="summary-list" id="listOff"></div></div>
+    <div class="summary-card"><h3>No Assignment Today</h3><div class="summary-count" id="sumBlank">0</div><div class="summary-list" id="listBlank"></div></div>
+  </div>
+  <div class="legend">
+    <span class="leg"><span class="leg-chip" style="background:var(--cD-bg);color:var(--cD)">D</span>Day</span>
+    <span class="leg"><span class="leg-chip" style="background:var(--cN-bg);color:var(--cN)">N</span>Night</span>
+    <span class="leg"><span class="leg-chip" style="background:var(--cAL-bg);color:var(--cAL)">AL</span>Annual Leave</span>
+    <span class="leg"><span class="leg-chip" style="background:var(--cRO-bg);color:var(--cRO)">RO</span>Request Off</span>
+    <span class="leg"><span class="leg-chip" style="background:var(--cX-bg);color:var(--cX)">X</span>Off / Rest</span>
+    <span class="leg"><span class="leg-chip" style="background:var(--s2);color:var(--muted)">—</span>No assignment</span>
+    <span class="today-badge" id="todayBadge"></span>
+    <button onclick="showUpload()" class="btn btn-ghost" style="padding:5px 14px;font-size:12px">↑ Upload another</button>
+  </div>
+  <div class="stats">
+    <div class="stat"><div class="stat-val" id="stEmp">0</div><div class="stat-lbl">Employees</div></div>
+    <div class="stat"><div class="stat-val" id="stDays">0</div><div class="stat-lbl">Days</div></div>
+    <div class="stat"><div class="stat-val" style="color:var(--cD)" id="stD">0</div><div class="stat-lbl">Day Shifts</div></div>
+    <div class="stat"><div class="stat-val" style="color:var(--cN)" id="stN">0</div><div class="stat-lbl">Night Shifts</div></div>
+    <div class="stat"><div class="stat-val" style="color:var(--cAL)" id="stAL">0</div><div class="stat-lbl">Annual Leave</div></div>
+    <div class="stat"><div class="stat-val" style="color:var(--cRO)" id="stRO">0</div><div class="stat-lbl">Request Off</div></div>
+    <div class="stat"><div class="stat-val" style="color:var(--red)" id="stX">0</div><div class="stat-lbl">Off / Rest</div></div>
+  </div>
+  <div id="gridWrap"></div>
+</div>
+
+<script>
+const TODAY = new Date().toISOString().slice(0,10);
+let txtData = null;
+const DOW = ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
+
+const dz = document.getElementById('dzTxt');
+dz.addEventListener('dragover', e => { e.preventDefault(); dz.classList.add('over'); });
+dz.addEventListener('dragleave', () => dz.classList.remove('over'));
+dz.addEventListener('drop', e => { e.preventDefault(); dz.classList.remove('over'); const f = e.dataTransfer.files[0]; if (!f) return; const fi = document.getElementById('txtFile'); const dt = new DataTransfer(); dt.items.add(f); fi.files = dt.files; onTxtFile(fi); });
+
+function onTxtFile(input){ const f = input.files[0]; if (!f) return; const r = new FileReader(); r.onload = e => { txtData = String(e.target.result || ''); const b = document.getElementById('txtBadge'); b.textContent = '✓ ' + f.name; b.style.display = 'block'; document.getElementById('txtArea').value = ''; }; r.readAsText(f); }
+function prog(pct,msg,cls){ document.getElementById('progWrap').style.display='block'; document.getElementById('pFill').style.width=pct+'%'; const el=document.getElementById('pLog'); el.textContent=msg; el.className='prog-log '+(cls||''); }
+
+async function generate(){
+  const btn = document.getElementById('genBtn');
+  btn.disabled = true;
+  try {
+    const text = (txtData || document.getElementById('txtArea').value || '').trim();
+    if (!text) throw new Error('Please upload a file or paste schedule text.');
+    prog(18,'Trying local parser...');
+    let data = parseTXT(text);
+    if (!isUsable(data)) {
+      prog(45,'Local parser was not enough. Trying Gemini fallback...');
+      data = await parseWithAI(text);
+    }
+    if (!isUsable(data)) throw new Error('The schedule could not be converted into a usable grid.');
+    normalizeData(data);
+    prog(78,'Building grid...');
+    renderAll(data);
+    prog(100,'✓ Grid built successfully','ok');
+  } catch (err) {
+    prog(0,'✕ ' + (err && err.message ? err.message : 'Unknown error'),'err');
+    console.error(err);
+  } finally {
+    btn.disabled = false;
+  }
+}
+
+function isUsable(data){ return !!(data && Array.isArray(data.employees) && data.employees.length && data.start && data.end); }
+async function parseWithAI(text){ const res = await fetch('/api/parse-schedule',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({text})}); const payload = await res.json().catch(()=>({})); if(!res.ok) throw new Error(payload.error || 'AI parsing failed.'); return payload.data; }
+function normalizeData(data){ data.unit = (data.unit || '—').trim(); data.employees = dedupeEmployees((data.employees || []).map(emp => ({ name:(emp.name||'').trim(), role:(emp.role||'').trim(), D:uniqueDates(emp.D||[]), N:uniqueDates(emp.N||[]), AL:uniqueDates(emp.AL||[]), RO:uniqueDates(emp.RO||[]), X:uniqueDates(emp.X||[]) })).filter(emp => emp.name && (emp.D.length||emp.N.length||emp.AL.length||emp.RO.length||emp.X.length))); }
+
+function parseTXT(text){
+  text = String(text || '').replace(/\r/g,'');
+  const res = { unit:'—', start:null, end:null, employees:[] };
+  const meta = extractMetadata(text);
+  res.unit = meta.unit || '—'; res.start = meta.start; res.end = meta.end;
+  const roles = parseEmployeeIndex(text);
+  const strategies = [
+    () => parseScheduleBlocks(text, meta, roles),
+    () => parseLegacyBlocks(text),
+    () => parseGenericSections(text, meta, roles),
+    () => parseTableFormat(text, meta)
+  ];
+  for (const s of strategies) { const out = s() || []; if (out.length) { res.employees = dedupeEmployees(out); break; } }
+  if ((!res.start || !res.end) && res.employees.length) { const all=[]; res.employees.forEach(emp => ['D','N','AL','RO','X'].forEach(code => (emp[code]||[]).forEach(d => { if(isISODate(d)) all.push(d); }))); all.sort(); if(all.length){ if(!res.start) res.start = all[0]; if(!res.end) res.end = all[all.length-1]; } }
+  return res;
+}
+
+function extractMetadata(text){
+  const meta = { unit:'—', start:null, end:null };
+  const first = (text.split('\n')[0] || '').trim();
+  const fromTitle = first.match(/^(.+?)\s+SCHEDULE\b/i); if (fromTitle) meta.unit = fromTitle[1].trim();
+  const unitLine = text.match(/[Uu]nit\s*:\s*([^\n]+)/); if (unitLine) meta.unit = unitLine[1].trim();
+  let period = text.match(/[Pp]eriod\s*:\s*(\d{2}\/\d{2}\/\d{4})\s*[-–]\s*(\d{2}\/\d{2}\/\d{4})/); if (period) { meta.start = normalizeDate(period[1],null,null); meta.end = normalizeDate(period[2],null,null); return meta; }
+  period = text.match(/[Pp]eriod\s*:\s*(\d{4}-\d{2}-\d{2})\s*(?:to|[-–])\s*(\d{4}-\d{2}-\d{2})/); if (period) { meta.start = period[1]; meta.end = period[2]; return meta; }
+  const dates = collectAllDates(text, null, null).sort(); if (dates.length) { meta.start = dates[0]; meta.end = dates[dates.length-1]; }
+  return meta;
+}
+
+function parseEmployeeIndex(text){ const map = {}; const m = text.match(/EMPLOYEE INDEX([\s\S]*?)(?:\n={10,}|\nQUICK SECTION|\n\d+\.\s+)/i); if(!m) return map; m[1].split('\n').forEach(line => { const x = line.trim().match(/^\d+\.\s+(.+?)\s+\[([^\]]+)\]\s*$/); if(x) map[cleanEmployeeName(x[1])] = x[2].trim(); }); return map; }
+
+function parseScheduleBlocks(text, meta, roles){
+  const employees = [];
+  const rx = /(?:^|\n)={10,}\n([^\n]+)\n={10,}\n([\s\S]*?)(?=(?:\n={10,}\n[^\n]+\n={10,}\n)|$)/g;
+  let m;
+  while ((m = rx.exec(text)) !== null) {
+    const header = (m[1] || '').trim(); const body = (m[2] || '').trim(); if (!header || !body) continue;
+    let name = null;
+    if (/^QUICK SECTION\s*-\s*/i.test(header)) name = header.replace(/^QUICK SECTION\s*-\s*/i,'').trim();
+    else { const n = header.match(/^\d+\.\s+(.+)$/); if (n) name = n[1].trim(); }
+    if (!name) continue;
+    const emp = parseEmployeeBlock(name, body, meta, roles); if (emp) employees.push(emp);
+  }
+  return employees;
+}
+
+function parseEmployeeBlock(rawName, body, meta, roles){
+  const name = cleanEmployeeName(rawName);
+  const skill = ((body.match(/^Skill\s*:\s*(.+)$/im) || [null,''])[1] || '').trim() || roles[name] || '';
+  const dateMap = {};
+  body.split('\n').forEach(line => parseScheduleLine(line, dateMap, meta.start, meta.end));
+  const emp = { name, role: skill, D:[], N:[], AL:[], RO:[], X:[] };
+  Object.keys(dateMap).sort().forEach(date => { const code = dateMap[date]; if (emp[code]) emp[code].push(date); });
+  return (emp.D.length||emp.N.length||emp.AL.length||emp.RO.length||emp.X.length) ? emp : null;
+}
+
+function parseScheduleLine(line, dateMap, startISO, endISO){
+  const t = String(line||'').trim(); if(!t) return;
+  let m = t.match(/^(\d{2}\/\d{2}(?:\/\d{4})?|\d{4}-\d{2}-\d{2})\s+[A-Za-z]{3}\s*:\s*(.+)$/);
+  if (!m) m = t.match(/^(\d{2}\/\d{2}(?:\/\d{4})?|\d{4}-\d{2}-\d{2})\s*:\s*(.+)$/);
+  if (!m) return;
+  const iso = normalizeDate(m[1], startISO, endISO); const code = mapStatusToCode(m[2]);
+  if (iso && code) dateMap[iso] = code;
+}
+
+function parseLegacyBlocks(text){
+  const employees = [];
+  text.split(/={3,}/).map(x => x.trim()).filter(Boolean).forEach(block => {
+    const lines = block.split('\n'); const nameMatch = (lines[0]||'').match(/^EMPLOYEE:\s*(.+)$/i); if(!nameMatch) return;
+    const roleMatch = block.match(/Skill\/Role:\s*([^\n|]+)/i);
+    const emp = { name: cleanEmployeeName(nameMatch[1]), role: roleMatch ? roleMatch[1].trim() : '', D:[], N:[], AL:[], RO:[], X:[] };
+    let mode = null;
+    lines.forEach(line => { const t = line.trim(); const label = legacyLabelToCode(t); if (label) { mode = label; return; } if (!mode || !t.startsWith('-')) return; const raw = t.slice(1).trim(); if (!raw || /^none$/i.test(raw)) return; const dates = raw.match(/\d{4}-\d{2}-\d{2}/g) || []; if (mode === 'D' || mode === 'N') dates.forEach(d => emp[mode].push(d)); else { if (dates.length >= 2 && /->|to|[-–]/.test(raw)) drange(dates[0], dates[1]).forEach(d => emp[mode].push(d)); else dates.forEach(d => emp[mode].push(d)); } });
+    if (emp.D.length||emp.N.length||emp.AL.length||emp.RO.length||emp.X.length) employees.push(emp);
+  });
+  return employees;
+}
+
+function parseGenericSections(text, meta, roles){
+  const employees = [];
+  const sections = text.split(/(?:\n{2,}|={3,}|-{3,}|\*{3,}|_{3,})/).map(x => x.trim()).filter(Boolean);
+  sections.forEach(section => {
+    const lines = section.split('\n').map(x => x.trim()).filter(Boolean); if (lines.length < 2) return;
+    let name = null, role = '', start = 1;
+    for (let i=0;i<Math.min(lines.length,6);i++) {
+      const line = lines[i];
+      if (/^(source|unit|period|notes?|employee index|skill|fte|pattern|phone|quick section|schedule)\b/i.test(line)) continue;
+      const labeled = line.match(/^(?:EMPLOYEE|Name|Staff|Person)\s*:\s*(.+)$/i);
+      if (labeled) { name = cleanEmployeeName(labeled[1]); role = extractRole(labeled[1]) || roles[name] || ''; start = i + 1; break; }
+      if (looksLikeName(line)) { name = cleanEmployeeName(line); role = extractRole(line) || roles[name] || ''; start = i + 1; break; }
+    }
+    if (!name) return;
+    const dateMap = {};
+    lines.slice(start).forEach(line => parseScheduleLine(line, dateMap, meta.start, meta.end));
+    if (!Object.keys(dateMap).length) return;
+    const emp = { name, role, D:[], N:[], AL:[], RO:[], X:[] };
+    Object.keys(dateMap).sort().forEach(date => { const code = dateMap[date]; if (emp[code]) emp[code].push(date); });
+    employees.push(emp);
+  });
+  return employees;
+}
+
+function parseTableFormat(text, meta){
+  const employees = []; const lines = text.split('\n').map(x => x.trim()).filter(Boolean); let headerDates = []; let headerIndex = -1;
+  for (let i=0;i<lines.length;i++){ const iso = lines[i].match(/\d{4}-\d{2}-\d{2}/g) || []; if (iso.length >= 3) { headerDates = iso; headerIndex = i; break; } }
+  if (headerIndex === -1) return employees;
+  for (let i=headerIndex+1;i<lines.length;i++) { const cells = lines[i].includes('|') ? lines[i].split('|').map(x => x.trim()) : lines[i].split(/\t+|\s{2,}/).map(x => x.trim()); if (cells.length < 2) continue; const name = cleanEmployeeName(cells[0]); if (!looksLikeName(name)) continue; const emp = { name, role:'', D:[], N:[], AL:[], RO:[], X:[] }; for (let j=0;j<headerDates.length;j++) { const code = mapStatusToCode(cells[j+1] || ''); if (code) emp[code].push(headerDates[j]); } if (emp.D.length||emp.N.length||emp.AL.length||emp.RO.length||emp.X.length) employees.push(emp); }
+  return employees;
+}
+
+function mapStatusToCode(raw){ const s = String(raw||'').trim().toUpperCase(); if (!s || s === '-') return null; if (/^D\b/.test(s) || /\bEDU\b/.test(s)) return 'D'; if (/^N\b/.test(s)) return 'N'; if (/ANNUAL|\bAL\b|VACATION/.test(s)) return 'AL'; if (/REQUEST\s*OFF|REQ\s*OFF|\bRO\b/.test(s)) return 'RO'; if (/REST\s*DAY|\bOFF\b|\bREST\b|\bX\b/.test(s)) return 'X'; return null; }
+function normalizeDate(value,startISO,endISO){ const v = String(value||'').trim(); if (/^\d{4}-\d{2}-\d{2}$/.test(v)) return v; let m = v.match(/^(\d{2})\/(\d{2})\/(\d{4})$/); if (m) return `${m[3]}-${m[1]}-${m[2]}`; m = v.match(/^(\d{2})\/(\d{2})$/); if (m) { const year = inferYear(m[1], startISO, endISO); return `${year}-${m[1]}-${m[2]}`; } return null; }
+function inferYear(month,startISO,endISO){ const mm = parseInt(month,10); const sy = startISO ? parseInt(startISO.slice(0,4),10) : new Date().getFullYear(); const ey = endISO ? parseInt(endISO.slice(0,4),10) : sy; const sm = startISO ? parseInt(startISO.slice(5,7),10) : 1; if (sy !== ey && mm < sm) return ey; return sy; }
+function collectAllDates(text,startISO,endISO){ const out = []; const rx = /(\d{4}-\d{2}-\d{2}|\d{2}\/\d{2}\/\d{4}|\d{2}\/\d{2})/g; let m; while((m=rx.exec(text))!==null){ const iso = normalizeDate(m[1], startISO, endISO); if (iso) out.push(iso); } return uniqueDates(out); }
+function isISODate(v){ return /^\d{4}-\d{2}-\d{2}$/.test(v); }
+function cleanEmployeeName(v){ return String(v||'').replace(/^\d+\.\s+/,'').replace(/\s*\[[^\]]+\]\s*$/,'').replace(/\s*\|.*$/,'').trim(); }
+function extractRole(v){ const sq = String(v||'').match(/\[([^\]]+)\]/); if (sq) return sq[1].trim(); const m = String(v||'').match(/[|\-–]\s*([A-Za-z ]{2,12})$/); return m ? m[1].trim() : ''; }
+function looksLikeName(v){ const s = String(v||'').trim(); if (s.length < 3 || s.length > 90) return false; if (/^(source|unit|period|notes?|employee index|skill|fte|pattern|phone|quick section|schedule)\b/i.test(s)) return false; if (!/[A-Za-z]/.test(s)) return false; return s.split(/[\s,]+/).filter(Boolean).length >= 2; }
+function uniqueDates(arr){ return Array.from(new Set((arr||[]).filter(isISODate))).sort(); }
+function dedupeEmployees(list){ const map = new Map(); (list||[]).forEach(emp => { const key = (emp.name||'').trim().toUpperCase(); if (!key) return; if (!map.has(key)) { map.set(key,{ name:emp.name.trim(), role:(emp.role||'').trim(), D:uniqueDates(emp.D||[]), N:uniqueDates(emp.N||[]), AL:uniqueDates(emp.AL||[]), RO:uniqueDates(emp.RO||[]), X:uniqueDates(emp.X||[]) }); return; } const t = map.get(key); ['D','N','AL','RO','X'].forEach(code => t[code] = uniqueDates(t[code].concat(emp[code] || []))); if (!t.role && emp.role) t.role = emp.role.trim(); }); return Array.from(map.values()).sort((a,b) => a.name.localeCompare(b.name)); }
+function drange(from,to){ const res=[]; const s=new Date(from+'T00:00:00'); const e=new Date(to+'T00:00:00'); for(const d=new Date(s); d<=e; d.setDate(d.getDate()+1)) res.push(d.toISOString().slice(0,10)); return res; }
+function buildDates(start,end){ const res=[]; const s=new Date(start+'T00:00:00'); const e=new Date(end+'T00:00:00'); for(const d=new Date(s); d<=e; d.setDate(d.getDate()+1)) res.push(new Date(d)); return res; }
+function legacyLabelToCode(line){ const t = line.toLowerCase(); if(t.startsWith('day shift')) return 'D'; if(t.startsWith('night shift')) return 'N'; if(t.startsWith('annual leave')) return 'AL'; if(t.startsWith('request-off')||t.startsWith('request off')) return 'RO'; if(t.startsWith('other off')||t.startsWith('off/rest')) return 'X'; return null; }
+
+function renderAll(data){
+  const dates = buildDates(data.start, data.end);
+  document.getElementById('navUnit').textContent = data.unit || '—';
+  document.getElementById('navPeriod').textContent = `${data.start} → ${data.end}`;
+  document.getElementById('rhUnit').textContent = `Unit ${data.unit || '—'}`;
+  document.getElementById('rhPeriod').textContent = `${data.start} → ${data.end}`;
+  document.getElementById('rhDays').textContent = `${dates.length} calendar days`;
+  document.getElementById('todayBadge').textContent = dates.some(d => d.toISOString().slice(0,10) === TODAY) ? `▶ Today: ${TODAY}` : `Today: ${TODAY} (outside range)`;
+
+  const counts = {D:0,N:0,AL:0,RO:0,X:0};
+  data.employees.forEach(emp => { emp._map = {}; ['D','N','AL','RO','X'].forEach(code => (emp[code]||[]).forEach(date => { emp._map[date] = code; counts[code]++; })); });
+  document.getElementById('stEmp').textContent = data.employees.length; document.getElementById('stDays').textContent = dates.length; document.getElementById('stD').textContent = counts.D; document.getElementById('stN').textContent = counts.N; document.getElementById('stAL').textContent = counts.AL; document.getElementById('stRO').textContent = counts.RO; document.getElementById('stX').textContent = counts.X;
+  renderTodaySummary(data.employees);
+
+  const months = {}; dates.forEach(d => { const key = `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}`; if(!months[key]) months[key]=[]; months[key].push(d); });
+  const table = document.createElement('table'); table.className = 'table';
+  const thead = document.createElement('thead'); const tbody = document.createElement('tbody');
+  const fixedCols = [['#',36],['Name',220],['Role',80],['Today',60],['D',36],['N',36],['AL',42]]; const fixedLeft = [0,36,256,336,396,432,468];
+
+  const r1 = document.createElement('tr');
+  fixedCols.forEach((col,i) => { const th = document.createElement('th'); th.rowSpan = 3; th.textContent = col[0]; th.className = 'th-fixed'; th.style.cssText = `left:${fixedLeft[i]}px;min-width:${col[1]}px;text-align:${col[0]==='Name'?'left':'center'};${i===fixedCols.length-1?'border-right:2px solid #3a4a6a':''}`; r1.appendChild(th); });
+  const monthKeys = Object.keys(months); monthKeys.forEach((key,i) => { const th = document.createElement('th'); th.colSpan = months[key].length; th.className = 'th-month'; th.textContent = `${new Date(months[key][0]).toLocaleString('en',{month:'long'}).toUpperCase()} ${key.slice(0,4)}`; if (i < monthKeys.length-1) th.style.borderRight = '2px solid #2a3a5a'; r1.appendChild(th); }); thead.appendChild(r1);
+  const r2 = document.createElement('tr'); dates.forEach((d,i) => { const th = document.createElement('th'); const key = d.toISOString().slice(0,10); const day = d.getDay(); th.textContent = DOW[day].slice(0,3); th.className = `th-dow${day===5?' fri':day===6?' sat':''}${key===TODAY?' today-hdr':''}`; if(i<dates.length-1 && dates[i+1].getMonth() !== d.getMonth()) th.style.borderRight = '2px solid #2a3a5a'; r2.appendChild(th); }); thead.appendChild(r2);
+  const r3 = document.createElement('tr'); dates.forEach((d,i) => { const th = document.createElement('th'); const key = d.toISOString().slice(0,10); const day = d.getDay(); th.textContent = d.getDate(); th.className = `th-day${day===5?' fri':day===6?' sat':''}${key===TODAY?' today-hdr':''}`; if(i<dates.length-1 && dates[i+1].getMonth() !== d.getMonth()) th.style.borderRight = '2px solid #2a3a5a'; r3.appendChild(th); }); thead.appendChild(r3); table.appendChild(thead);
+
+  data.employees.forEach((emp,index) => {
+    const tr = document.createElement('tr'); tr.style.background = index % 2 === 0 ? '#0d1020' : '#0b0e1a';
+    const todayCode = emp._map[TODAY] || '';
+    const fixed = [
+      {val:String(index+1),left:0,w:36,center:true,color:'var(--muted)',mono:true},
+      {html:`<strong>${escapeHtml(emp.name)}</strong>`,left:36,w:220},
+      {html:`<span class="role-pill">${escapeHtml(emp.role || '—')}</span>`,left:256,w:80,center:true},
+      {val:todayCode || '—',left:336,w:60,center:true,color:todayCode?'var(--text)':'var(--muted)',mono:true,cls:todayCode?` c-${todayCode}`:''},
+      {val:String(emp.D.length),left:396,w:36,center:true,color:'var(--cD)',mono:true},
+      {val:String(emp.N.length),left:432,w:36,center:true,color:'var(--cN)',mono:true},
+      {val:String(emp.AL.length),left:468,w:42,center:true,color:emp.AL.length?'var(--cAL)':'var(--muted)',mono:true,br:'2px solid #3a4a6a'}
+    ];
+    fixed.forEach(cell => { const td = document.createElement('td'); td.className = `${cell.mono?'td-num ':' '}td-fixed${cell.cls||''}`; if(cell.html) td.innerHTML = cell.html; else td.textContent = cell.val; td.style.cssText = `left:${cell.left}px;min-width:${cell.w}px;text-align:${cell.center?'center':'left'};color:${cell.color||'var(--text)'};border-right:${cell.br||'1px solid #151e35'}`; tr.appendChild(td); });
+    dates.forEach((d,i) => { const key = d.toISOString().slice(0,10); const code = emp._map[key] || ''; const td = document.createElement('td'); td.className = `td-cell${code?` c-${code}`:''}${key===TODAY?' today-col':''}`; td.textContent = code || '—'; if(i<dates.length-1 && dates[i+1].getMonth() !== d.getMonth()) td.style.borderRight = '2px solid #2a3a5a'; tr.appendChild(td); });
+    tbody.appendChild(tr);
+  });
+  table.appendChild(tbody); document.getElementById('gridWrap').innerHTML=''; document.getElementById('gridWrap').appendChild(table); document.getElementById('uploadSection').style.display='none'; document.getElementById('output').style.display='block';
+}
+
+function renderTodaySummary(employees){ const working=[], leave=[], off=[], blank=[]; employees.forEach(emp => { const code = emp._map ? emp._map[TODAY] : ''; if (code==='D'||code==='N') working.push(emp); else if (code==='AL') leave.push(emp); else if (code==='RO'||code==='X') off.push(emp); else blank.push(emp); }); fillSummary('sumWorking','listWorking',working,true); fillSummary('sumLeave','listLeave',leave,false); fillSummary('sumOff','listOff',off,false); fillSummary('sumBlank','listBlank',blank,false); }
+function fillSummary(countId,listId,items,showCode){ document.getElementById(countId).textContent = items.length; const el = document.getElementById(listId); if(!items.length){ el.innerHTML = '<small>None</small>'; return; } el.innerHTML = items.map(emp => `<span class="chip">${escapeHtml(emp.name)}${showCode ? ` <small>(${emp._map[TODAY]||'—'})</small>` : emp.role ? ` <small>${escapeHtml(emp.role)}</small>` : ''}</span>`).join(''); }
+function showUpload(){ document.getElementById('uploadSection').style.display='block'; document.getElementById('output').style.display='none'; }
+function resetAll(){ txtData=null; document.getElementById('txtFile').value=''; document.getElementById('txtArea').value=''; document.getElementById('txtBadge').style.display='none'; document.getElementById('progWrap').style.display='none'; }
+function escapeHtml(v){ return String(v).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;'); }
+document.addEventListener('keydown', e => { if((e.ctrlKey||e.metaKey) && e.key==='Enter') generate(); });
+</script>
+</body>
+</html>

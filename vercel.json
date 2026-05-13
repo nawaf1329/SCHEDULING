@@ -1,0 +1,7 @@
+{
+  "functions": {
+    "api/parse-schedule.js": {
+      "maxDuration": 30
+    }
+  }
+}
