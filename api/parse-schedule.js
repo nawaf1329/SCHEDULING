@@ -1,124 +1,125 @@
 export const config = {
   api: {
-    bodyParser: {
-      sizeLimit: '2mb',
-    },
+    bodyParser: { sizeLimit: '5mb' },
   },
 };
 
-function extractGeminiText(payload) {
-  const parts = payload?.candidates?.[0]?.content?.parts;
-  if (!Array.isArray(parts)) return '';
-  return parts
-    .map((part) => (typeof part?.text === 'string' ? part.text : ''))
-    .join('\n')
-    .trim();
-}
-
-function safeJsonParse(raw) {
-  const text = String(raw || '')
-    .trim()
-    .replace(/^```json\s*/i, '')
-    .replace(/^```\s*/i, '')
-    .replace(/```$/i, '')
-    .trim();
-
-  try {
-    return JSON.parse(text);
-  } catch {
-    const start = text.indexOf('{');
-    const end = text.lastIndexOf('}');
-    if (start !== -1 && end !== -1 && end > start) {
-      return JSON.parse(text.slice(start, end + 1));
-    }
-    throw new Error('Model did not return valid JSON.');
-  }
-}
-
 export default async function handler(req, res) {
   if (req.method !== 'POST') {
-    return res.status(405).json({ error: 'Method not allowed.' });
+    return res.status(405).json({ error: 'Method not allowed' });
   }
 
   const apiKey = process.env.GEMINI_API_KEY;
   if (!apiKey) {
-    return res.status(500).json({ error: 'GEMINI_API_KEY is missing on the server.' });
+    console.error('GEMINI_API_KEY environment variable is not set');
+    return res.status(500).json({ error: 'Server not configured: GEMINI_API_KEY missing' });
   }
 
-  const text = String(req.body?.text || '').trim();
-  if (!text) {
-    return res.status(400).json({ error: 'Missing schedule text.' });
+  const { text } = req.body || {};
+  if (!text || !text.trim()) {
+    return res.status(400).json({ error: 'Missing schedule text' });
   }
 
-  if (text.length > 180000) {
-    return res.status(400).json({ error: 'Schedule text is too large for one AI parsing request.' });
-  }
+  const prompt = `You are a hospital staff schedule parser. Parse the schedule text below and return ONLY a valid JSON object — no markdown, no explanation, no code blocks.
 
-  const prompt = [
-    'You convert messy hospital staff schedule text into strict JSON.',
-    'Return JSON only. No markdown. No explanation.',
-    'Use this exact shape:',
-    '{"unit":"string","start":"YYYY-MM-DD","end":"YYYY-MM-DD","employees":[{"name":"string","role":"string","D":["YYYY-MM-DD"],"N":["YYYY-MM-DD"],"AL":["YYYY-MM-DD"],"RO":["YYYY-MM-DD"],"X":["YYYY-MM-DD"]}]}',
-    'Rules:',
-    '- D = working day shift.',
-    '- N = working night shift.',
-    '- ANNUAL or annual leave = AL.',
-    '- Request Off = RO.',
-    '- REST DAY or off/rest states = X.',
-    '- EDU ON counts as D.',
-    '- Ignore empty cells or bare dashes.',
-    '- Support YYYY-MM-DD, MM/DD/YYYY, and MM/DD with year inferred from period.',
-    '- Deduplicate employees by name.',
-    '- If role is unknown, use an empty string.',
-    '- If unit is unknown, use "—".',
-    '- Return every date in ISO format YYYY-MM-DD.',
-    '',
-    'Schedule text:',
-    text,
-  ].join('\n');
+Output structure:
+{
+  "unit": "string — unit/ward name, or — if not found",
+  "start": "YYYY-MM-DD",
+  "end": "YYYY-MM-DD",
+  "employees": [
+    {
+      "name": "LAST, FIRST",
+      "role": "role code e.g. SN I, AHN, CA",
+      "D":  ["YYYY-MM-DD", ...],
+      "N":  ["YYYY-MM-DD", ...],
+      "AL": ["YYYY-MM-DD", ...],
+      "RO": ["YYYY-MM-DD", ...],
+      "X":  ["YYYY-MM-DD", ...]
+    }
+  ]
+}
+
+Field definitions:
+- D  = day shift
+- N  = night shift
+- AL = annual leave / vacation (any: ANNUAL, VACATION, LEAVE, AL)
+- RO = request off / day off (any: REQUEST OFF, REQ OFF, RO, DAY OFF)
+- X  = rest day / off / other (any: REST DAY, REST, OFF, -, EDU ON, EDU, STUDY, TRAINING)
+
+Date format rules:
+- All output dates must be YYYY-MM-DD
+- Input may use MM/DD (e.g. 04/26) — infer year from the period line or nearby full dates
+- Input may use MM/DD/YYYY (e.g. 04/26/2026) — use that year
+- Expand ALL date ranges to individual dates
+
+Common input patterns to handle:
+- Period lines like: "Period: 04/26/2026 - 06/06/2026" or "04/26/2026 to 06/06/2026"
+- Employee index lines like: "01. OMAR, SADAL [AHN]" or "EMPLOYEE: SMITH, JOHN"
+- Skill/role lines like: "Skill : SN I" or "Role: AHN"
+- Daily schedule rows like:
+    "04/26 Sun : D 12 SN I"   → date 04/26, code D
+    "05/25 Mon : ANNUAL"      → date 05/25, code AL
+    "05/26 Tue : Request Off" → date 05/26, code RO
+    "05/22 Fri : REST DAY"    → date 05/22, code X
+    "05/06 Wed : EDU ON"      → date 05/06, code X
+    "04/28 Tue : -"           → date 04/28, code X
+    "04/27 Mon : N"           → date 04/27, code N
+- Employee sections separated by ==== or --- or blank lines
+- Quick section headers like: "QUICK SECTION - SMITH, JOHN"
+
+Include ALL employees found. Return ONLY the JSON object.
+
+Schedule text:
+${text}`;
 
   try {
-    const response = await fetch(
-      'https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent',
+    const geminiRes = await fetch(
+      `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${apiKey}`,
       {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'x-goog-api-key': apiKey,
-        },
+        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          contents: [
-            {
-              parts: [
-                {
-                  text: prompt,
-                },
-              ],
-            },
-          ],
+          contents: [{ parts: [{ text: prompt }] }],
           generationConfig: {
-            temperature: 0.1,
             responseMimeType: 'application/json',
+            temperature: 0.1,
+            maxOutputTokens: 16384,
           },
         }),
       }
     );
 
-    const payload = await response.json().catch(() => ({}));
-    if (!response.ok) {
-      return res.status(response.status).json({
-        error: payload?.error?.message || payload?.message || `Gemini API error ${response.status}`,
-      });
+    if (!geminiRes.ok) {
+      const errBody = await geminiRes.json().catch(() => ({}));
+      const msg = errBody?.error?.message || `Gemini API error ${geminiRes.status}`;
+      console.error('Gemini error:', msg);
+      return res.status(geminiRes.status).json({ error: msg });
     }
 
-    const outputText = extractGeminiText(payload);
-    if (!outputText) {
-      return res.status(500).json({ error: 'Gemini returned an empty response.' });
+    const geminiData = await geminiRes.json();
+    const raw = geminiData?.candidates?.[0]?.content?.parts?.[0]?.text || '';
+
+    if (!raw.trim()) {
+      return res.status(500).json({ error: 'Gemini returned an empty response. Try a more structured schedule format.' });
     }
 
-    const data = safeJsonParse(outputText);
-    return res.status(200).json({ data });
-  } catch (error) {
-    return res.status(500).json({ error: error.message || 'Unexpected server error.' });
+    let parsed;
+    try {
+      parsed = JSON.parse(raw.replace(/```json|```/g, '').trim());
+    } catch (e) {
+      console.error('JSON parse failed. Raw:', raw.slice(0, 300));
+      return res.status(500).json({ error: 'Could not parse AI response. The schedule format may be too complex — try simplifying it.' });
+    }
+
+    /* Basic validation */
+    if (!parsed.employees || !Array.isArray(parsed.employees)) {
+      return res.status(500).json({ error: 'Unexpected response structure from AI.' });
+    }
+
+    return res.status(200).json(parsed);
+  } catch (err) {
+    console.error('Handler error:', err);
+    return res.status(500).json({ error: 'Failed to reach AI service: ' + err.message });
   }
 }
