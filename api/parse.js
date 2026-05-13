@@ -75,7 +75,7 @@ ${text}`;
 
   try {
     const geminiRes = await fetch(
-      `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${apiKey}`,
+      `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${apiKey}`,
       {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -112,7 +112,6 @@ ${text}`;
       return res.status(500).json({ error: 'Could not parse AI response. The schedule format may be too complex — try simplifying it.' });
     }
 
-    /* Basic validation */
     if (!parsed.employees || !Array.isArray(parsed.employees)) {
       return res.status(500).json({ error: 'Unexpected response structure from AI.' });
     }
