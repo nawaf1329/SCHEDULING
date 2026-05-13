@@ -4,6 +4,68 @@ export const config = {
   },
 };
 
+function cleanInputText(text) {
+  return String(text || '')
+    .replace(/\r/g, '')
+    .split('\n')
+    .filter((line) => {
+      const t = line.trim();
+      if (!t) return true;
+      if (/^Phone\s*:/i.test(t)) return false;
+      if (/^FTE\s*:/i.test(t)) return false;
+      if (/^Pattern\s*:/i.test(t)) return false;
+      return true;
+    })
+    .join('\n')
+    .trim();
+}
+
+function extractJson(text) {
+  const raw = String(text || '')
+    .replace(/^```json\s*/i, '')
+    .replace(/^```\s*/i, '')
+    .replace(/```$/i, '')
+    .trim();
+
+  try {
+    return JSON.parse(raw);
+  } catch (_) {
+    const start = raw.indexOf('{');
+    const end = raw.lastIndexOf('}');
+    if (start !== -1 && end !== -1 && end > start) {
+      return JSON.parse(raw.slice(start, end + 1));
+    }
+    throw new Error('Model did not return valid JSON.');
+  }
+}
+
+function normalizeEmployee(emp) {
+  const out = {
+    name: String(emp?.name || '').trim(),
+    role: String(emp?.role || '').trim(),
+    D: Array.isArray(emp?.D) ? emp.D : [],
+    N: Array.isArray(emp?.N) ? emp.N : [],
+    AL: Array.isArray(emp?.AL) ? emp.AL : [],
+    RO: Array.isArray(emp?.RO) ? emp.RO : [],
+    X: Array.isArray(emp?.X) ? emp.X : [],
+  };
+
+  ['D', 'N', 'AL', 'RO', 'X'].forEach((k) => {
+    out[k] = [...new Set(out[k].map((x) => String(x).trim()).filter(Boolean))].sort();
+  });
+
+  return out;
+}
+
+function normalizeResult(data) {
+  return {
+    unit: String(data?.unit || '—').trim() || '—',
+    start: String(data?.start || '').trim(),
+    end: String(data?.end || '').trim(),
+    employees: Array.isArray(data?.employees) ? data.employees.map(normalizeEmployee) : [],
+  };
+}
+
 export default async function handler(req, res) {
   if (req.method !== 'POST') {
     return res.status(405).json({ error: 'Method not allowed' });
@@ -11,114 +73,136 @@ export default async function handler(req, res) {
 
   const apiKey = process.env.GEMINI_API_KEY;
   if (!apiKey) {
-    console.error('GEMINI_API_KEY environment variable is not set');
     return res.status(500).json({ error: 'Server not configured: GEMINI_API_KEY missing' });
   }
 
-  const { text } = req.body || {};
-  if (!text || !text.trim()) {
+  const originalText = String(req.body?.text || '').trim();
+  if (!originalText) {
     return res.status(400).json({ error: 'Missing schedule text' });
   }
 
-  const prompt = `You are a hospital staff schedule parser. Parse the schedule text below and return ONLY a valid JSON object — no markdown, no explanation, no code blocks.
+  const text = cleanInputText(originalText);
 
-Output structure:
+  const prompt = `
+You are a hospital staff schedule parser.
+
+Return ONLY one valid JSON object.
+No markdown.
+No code fences.
+No explanation.
+
+Required JSON format:
 {
-  "unit": "string — unit/ward name, or — if not found",
+  "unit": "string",
   "start": "YYYY-MM-DD",
   "end": "YYYY-MM-DD",
   "employees": [
     {
-      "name": "LAST, FIRST",
-      "role": "role code e.g. SN I, AHN, CA",
-      "D":  ["YYYY-MM-DD", ...],
-      "N":  ["YYYY-MM-DD", ...],
-      "AL": ["YYYY-MM-DD", ...],
-      "RO": ["YYYY-MM-DD", ...],
-      "X":  ["YYYY-MM-DD", ...]
+      "name": "string",
+      "role": "string",
+      "D": ["YYYY-MM-DD"],
+      "N": ["YYYY-MM-DD"],
+      "AL": ["YYYY-MM-DD"],
+      "RO": ["YYYY-MM-DD"],
+      "X": ["YYYY-MM-DD"]
     }
   ]
 }
 
-Field definitions:
-- D  = day shift
-- N  = night shift
-- AL = annual leave / vacation (any: ANNUAL, VACATION, LEAVE, AL)
-- RO = request off / day off (any: REQUEST OFF, REQ OFF, RO, DAY OFF)
-- X  = rest day / off / other (any: REST DAY, REST, OFF, -, EDU ON, EDU, STUDY, TRAINING)
+Rules:
+- D = day shift
+- N = night shift
+- ANNUAL / annual leave / vacation = AL
+- Request Off / Req Off / RO = RO
+- REST DAY / REST / OFF = X
+- EDU ON / EDU / training / study = D
+- "-" means blank, not a shift
+- Support:
+  1) YYYY-MM-DD
+  2) MM/DD/YYYY
+  3) MM/DD with year inferred from the schedule period
+- Convert all output dates to YYYY-MM-DD
+- Include all employees found
+- If role is missing, return empty string
+- If unit is missing, return "—"
+- Deduplicate employees by name
+- Expand date ranges if present
 
-Date format rules:
-- All output dates must be YYYY-MM-DD
-- Input may use MM/DD (e.g. 04/26) — infer year from the period line or nearby full dates
-- Input may use MM/DD/YYYY (e.g. 04/26/2026) — use that year
-- Expand ALL date ranges to individual dates
-
-Common input patterns to handle:
-- Period lines like: "Period: 04/26/2026 - 06/06/2026" or "04/26/2026 to 06/06/2026"
-- Employee index lines like: "01. OMAR, SADAL [AHN]" or "EMPLOYEE: SMITH, JOHN"
-- Skill/role lines like: "Skill : SN I" or "Role: AHN"
-- Daily schedule rows like:
-    "04/26 Sun : D 12 SN I"   → date 04/26, code D
-    "05/25 Mon : ANNUAL"      → date 05/25, code AL
-    "05/26 Tue : Request Off" → date 05/26, code RO
-    "05/22 Fri : REST DAY"    → date 05/22, code X
-    "05/06 Wed : EDU ON"      → date 05/06, code X
-    "04/28 Tue : -"           → date 04/28, code X
-    "04/27 Mon : N"           → date 04/27, code N
-- Employee sections separated by ==== or --- or blank lines
-- Quick section headers like: "QUICK SECTION - SMITH, JOHN"
-
-Include ALL employees found. Return ONLY the JSON object.
+Examples you must understand:
+- Period: 04/26/2026 - 06/06/2026
+- 01. OMAR, SADAL [AHN]
+- QUICK SECTION - ALSHAMMARI, NAWAF
+- Skill   : SN I
+- 04/26 Sun    : D 12 SN I
+- 05/25 Mon    : ANNUAL
+- 05/26 Tue    : Request Off
+- 05/22 Fri    : REST DAY
+- 05/06 Wed    : EDU ON
+- 04/28 Tue    : -
 
 Schedule text:
-${text}`;
+${text}
+  `.trim();
 
   try {
     const geminiRes = await fetch(
-  `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${apiKey}`,
-  {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({
-      contents: [{ parts: [{ text: prompt }] }],
-      generationConfig: {
-        responseMimeType: 'application/json',
-        temperature: 0.1,
-        maxOutputTokens: 16384,
-      },
-    }),
-  }
-);
+      `https://generativelanguage.googleapis.com/v1beta/models/gemini-3-flash-preview:generateContent?key=${apiKey}`,
+      {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          contents: [
+            {
+              parts: [{ text: prompt }],
+            },
+          ],
+          generationConfig: {
+            temperature: 0.1,
+            responseMimeType: 'application/json',
+            maxOutputTokens: 8192,
+          },
+        }),
+      }
+    );
+
+    const payload = await geminiRes.json().catch(() => ({}));
 
     if (!geminiRes.ok) {
-      const errBody = await geminiRes.json().catch(() => ({}));
-      const msg = errBody?.error?.message || `Gemini API error ${geminiRes.status}`;
-      console.error('Gemini error:', msg);
+      const msg =
+        payload?.error?.message ||
+        payload?.message ||
+        `Gemini API error ${geminiRes.status}`;
       return res.status(geminiRes.status).json({ error: msg });
     }
 
-    const geminiData = await geminiRes.json();
-    const raw = geminiData?.candidates?.[0]?.content?.parts?.[0]?.text || '';
+    const rawText =
+      payload?.candidates?.[0]?.content?.parts?.map((p) => p?.text || '').join('\n').trim() || '';
 
-    if (!raw.trim()) {
-      return res.status(500).json({ error: 'Gemini returned an empty response. Try a more structured schedule format.' });
+    if (!rawText) {
+      return res.status(500).json({ error: 'Gemini returned an empty response.' });
     }
 
     let parsed;
     try {
-      parsed = JSON.parse(raw.replace(/```json|```/g, '').trim());
+      parsed = extractJson(rawText);
     } catch (e) {
-      console.error('JSON parse failed. Raw:', raw.slice(0, 300));
-      return res.status(500).json({ error: 'Could not parse AI response. The schedule format may be too complex — try simplifying it.' });
+      return res.status(500).json({
+        error: 'Gemini returned invalid JSON.',
+        raw_preview: rawText.slice(0, 500),
+      });
     }
 
-    if (!parsed.employees || !Array.isArray(parsed.employees)) {
-      return res.status(500).json({ error: 'Unexpected response structure from AI.' });
+    const result = normalizeResult(parsed);
+
+    if (!result.employees.length) {
+      return res.status(500).json({
+        error: 'Gemini returned no employees.',
+        raw_preview: rawText.slice(0, 500),
+      });
     }
 
-    return res.status(200).json(parsed);
+    return res.status(200).json(result);
   } catch (err) {
-    console.error('Handler error:', err);
-    return res.status(500).json({ error: 'Failed to reach AI service: ' + err.message });
+    return res.status(500).json({ error: 'Failed to reach Gemini: ' + err.message });
   }
 }
