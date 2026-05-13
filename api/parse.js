@@ -20,23 +20,24 @@ function cleanInputText(text) {
     .trim();
 }
 
-function extractJson(text) {
-  const raw = String(text || '')
-    .replace(/^```json\s*/i, '')
-    .replace(/^```\s*/i, '')
-    .replace(/```$/i, '')
-    .trim();
+function extractJsonFromResponse(payload) {
+  const outputText =
+    typeof payload?.output_text === 'string'
+      ? payload.output_text
+      : Array.isArray(payload?.output)
+        ? payload.output
+            .flatMap((item) => Array.isArray(item?.content) ? item.content : [])
+            .filter((c) => c?.type === 'output_text' && typeof c?.text === 'string')
+            .map((c) => c.text)
+            .join('\n')
+            .trim()
+        : '';
 
-  try {
-    return JSON.parse(raw);
-  } catch (_) {
-    const start = raw.indexOf('{');
-    const end = raw.lastIndexOf('}');
-    if (start !== -1 && end !== -1 && end > start) {
-      return JSON.parse(raw.slice(start, end + 1));
-    }
-    throw new Error('Model did not return valid JSON.');
+  if (!outputText) {
+    throw new Error('OpenAI returned an empty response.');
   }
+
+  return JSON.parse(outputText);
 }
 
 function normalizeEmployee(emp) {
@@ -71,9 +72,9 @@ export default async function handler(req, res) {
     return res.status(405).json({ error: 'Method not allowed' });
   }
 
-  const apiKey = process.env.GEMINI_API_KEY;
+  const apiKey = process.env.OPENAI_API_KEY;
   if (!apiKey) {
-    return res.status(500).json({ error: 'Server not configured: GEMINI_API_KEY missing' });
+    return res.status(500).json({ error: 'Server not configured: OPENAI_API_KEY missing' });
   }
 
   const originalText = String(req.body?.text || '').trim();
@@ -83,31 +84,13 @@ export default async function handler(req, res) {
 
   const text = cleanInputText(originalText);
 
-  const prompt = `
+  const systemPrompt = `
 You are a hospital staff schedule parser.
 
-Return ONLY one valid JSON object.
+Return ONLY valid JSON matching the schema exactly.
 No markdown.
-No code fences.
 No explanation.
-
-Required JSON format:
-{
-  "unit": "string",
-  "start": "YYYY-MM-DD",
-  "end": "YYYY-MM-DD",
-  "employees": [
-    {
-      "name": "string",
-      "role": "string",
-      "D": ["YYYY-MM-DD"],
-      "N": ["YYYY-MM-DD"],
-      "AL": ["YYYY-MM-DD"],
-      "RO": ["YYYY-MM-DD"],
-      "X": ["YYYY-MM-DD"]
-    }
-  ]
-}
+No code fences.
 
 Rules:
 - D = day shift
@@ -139,56 +122,92 @@ Examples you must understand:
 - 05/22 Fri    : REST DAY
 - 05/06 Wed    : EDU ON
 - 04/28 Tue    : -
+`.trim();
 
-Schedule text:
-${text}
-  `.trim();
+  const schema = {
+    type: 'object',
+    additionalProperties: false,
+    properties: {
+      unit: { type: 'string' },
+      start: { type: 'string' },
+      end: { type: 'string' },
+      employees: {
+        type: 'array',
+        items: {
+          type: 'object',
+          additionalProperties: false,
+          properties: {
+            name: { type: 'string' },
+            role: { type: 'string' },
+            D: { type: 'array', items: { type: 'string' } },
+            N: { type: 'array', items: { type: 'string' } },
+            AL: { type: 'array', items: { type: 'string' } },
+            RO: { type: 'array', items: { type: 'string' } },
+            X: { type: 'array', items: { type: 'string' } },
+          },
+          required: ['name', 'role', 'D', 'N', 'AL', 'RO', 'X'],
+        },
+      },
+    },
+    required: ['unit', 'start', 'end', 'employees'],
+  };
 
   try {
-    const geminiRes = await fetch(
-      `https://generativelanguage.googleapis.com/v1beta/models/gemini-3-flash-preview:generateContent?key=${apiKey}`,
-      {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          contents: [
-            {
-              parts: [{ text: prompt }],
-            },
-          ],
-          generationConfig: {
-            temperature: 0.1,
-            responseMimeType: 'application/json',
-            maxOutputTokens: 8192,
+    const openaiRes = await fetch('https://api.openai.com/v1/responses', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${apiKey}`,
+      },
+      body: JSON.stringify({
+        model: 'gpt-5.5',
+        input: [
+          {
+            role: 'system',
+            content: [
+              {
+                type: 'input_text',
+                text: systemPrompt,
+              },
+            ],
           },
-        }),
-      }
-    );
+          {
+            role: 'user',
+            content: [
+              {
+                type: 'input_text',
+                text: text,
+              },
+            ],
+          },
+        ],
+        text: {
+          format: {
+            type: 'json_schema',
+            name: 'schedule_parse',
+            strict: true,
+            schema,
+          },
+        },
+      }),
+    });
 
-    const payload = await geminiRes.json().catch(() => ({}));
+    const payload = await openaiRes.json().catch(() => ({}));
 
-    if (!geminiRes.ok) {
+    if (!openaiRes.ok) {
       const msg =
         payload?.error?.message ||
         payload?.message ||
-        `Gemini API error ${geminiRes.status}`;
-      return res.status(geminiRes.status).json({ error: msg });
-    }
-
-    const rawText =
-      payload?.candidates?.[0]?.content?.parts?.map((p) => p?.text || '').join('\n').trim() || '';
-
-    if (!rawText) {
-      return res.status(500).json({ error: 'Gemini returned an empty response.' });
+        `OpenAI API error ${openaiRes.status}`;
+      return res.status(openaiRes.status).json({ error: msg });
     }
 
     let parsed;
     try {
-      parsed = extractJson(rawText);
+      parsed = extractJsonFromResponse(payload);
     } catch (e) {
       return res.status(500).json({
-        error: 'Gemini returned invalid JSON.',
-        raw_preview: rawText.slice(0, 500),
+        error: 'OpenAI returned invalid JSON.',
       });
     }
 
@@ -196,13 +215,12 @@ ${text}
 
     if (!result.employees.length) {
       return res.status(500).json({
-        error: 'Gemini returned no employees.',
-        raw_preview: rawText.slice(0, 500),
+        error: 'OpenAI returned no employees.',
       });
     }
 
     return res.status(200).json(result);
   } catch (err) {
-    return res.status(500).json({ error: 'Failed to reach Gemini: ' + err.message });
+    return res.status(500).json({ error: 'Failed to reach OpenAI: ' + err.message });
   }
 }
