@@ -1,14 +1,9 @@
 {
   "version": 2,
-  "buildCommand": "",
   "outputDirectory": "public",
   "functions": {
     "api/parse.js": {
       "maxDuration": 60
     }
-  },
-  "routes": [
-    { "src": "/api/parse", "dest": "/api/parse.js" },
-    { "src": "/(.*)", "dest": "/$1" }
-  ]
+  }
 }
