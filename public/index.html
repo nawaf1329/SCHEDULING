@@ -199,6 +199,7 @@ h1 em{font-style:normal;color:var(--accent)}
 .tag-al{background:var(--cAL-bg);color:var(--cAL)}
 .tag-ro{background:var(--cRO-bg);color:var(--cRO)}
 .tag-x{background:var(--cX-bg);color:var(--cX)}
+.tag-blank{background:var(--s2);color:var(--muted)}
 .today-name-none{font-size:12px;color:var(--muted);font-style:italic;padding:6px 0}
 
 /* grid jump bar */
@@ -351,7 +352,7 @@ tr.data-row:active td{filter:brightness(1.35)}
 <div class="upload-section" id="uploadSection">
   <div class="eyebrow">Staff Schedule Viewer</div>
   <h1>Paste your schedule,<br>see an <em>instant grid</em></h1>
-  <p class="desc">Upload or paste any schedule text. AI parses it instantly — see who is working today, who is off, and the full schedule at a glance.</p>
+  <p class="desc">Upload or paste a schedule TXT. The backend parser builds the grid and blocks incomplete results instead of guessing.</p>
 
   <div class="drop-zone" id="dzTxt">
     <input type="file" id="txtFile" accept=".txt,.csv,.text" onchange="onTxtFile(this)">
@@ -362,7 +363,7 @@ tr.data-row:active td{filter:brightness(1.35)}
   </div>
 
   <div class="paste-label">Or paste schedule text directly:</div>
-  <textarea id="txtArea" placeholder="Paste schedule text here — any format accepted"></textarea>
+  <textarea id="txtArea" placeholder="Paste schedule text here"></textarea>
 
   <div class="btn-row">
     <button class="btn btn-primary" id="genBtn" onclick="generate()">⚡ Build Grid</button>
@@ -410,7 +411,7 @@ tr.data-row:active td{filter:brightness(1.35)}
     <div class="stat"><div class="stat-val" style="color:var(--cD)" id="stD">0</div><div class="stat-lbl">Day Shifts</div></div>
     <div class="stat"><div class="stat-val" style="color:var(--cN)" id="stN">0</div><div class="stat-lbl">Night Shifts</div></div>
     <div class="stat"><div class="stat-val" style="color:var(--cAL)" id="stAL">0</div><div class="stat-lbl">AL Days</div></div>
-    <div class="stat"><div class="stat-val" style="color:var(--red)" id="stX">0</div><div class="stat-lbl">OFF/REST</div></div>
+    <div class="stat"><div class="stat-val" style="color:var(--red)" id="stX">0</div><div class="stat-lbl">OFF/REQ</div></div>
   </div>
 
   <!-- TODAY SECTION -->
@@ -512,33 +513,38 @@ function prog(pct, msg, cls){
   el.textContent = msg; el.className = 'prog-log ' + (cls || '');
 }
 
-/* ── GENERATE — sends directly to Gemini backend ── */
+/* ── GENERATE — sends to /api/parse backend ── */
 async function generate(){
   var text = txtData || document.getElementById('txtArea').value.trim();
   if (!text){ prog(0,'Please upload a file or paste schedule text.','err'); return; }
 
   document.getElementById('genBtn').disabled = true;
-  prog(10, '🤖 Sending to AI parser…');
+  prog(10, 'Parsing schedule…');
 
   try {
     /* Animate progress while waiting */
     var progTimer = animateProgress(15, 80, 18000);
 
+    var controller = new AbortController();
+    var timeoutId = setTimeout(function(){ controller.abort(); }, 55000);
+
     var res = await fetch('/api/parse', {
       method: 'POST',
       headers: {'Content-Type':'application/json'},
-      body: JSON.stringify({text: text})
+      body: JSON.stringify({text: text}),
+      signal: controller.signal
     });
 
+    clearTimeout(timeoutId);
     clearInterval(progTimer);
 
+    var data = await res.json().catch(function(){return null;});
+
     if (!res.ok){
-      var err = await res.json().catch(function(){return{};});
-      throw new Error(err.error || 'Server error ' + res.status);
+      throw new Error((data && data.error) || 'Server error ' + res.status);
     }
 
     prog(82, 'Building grid…');
-    var data = await res.json();
 
     if (!data.employees || !data.employees.length)
       throw new Error('No staff records found. Check your schedule text.');
@@ -551,7 +557,13 @@ async function generate(){
     renderAll(data);
     prog(100, '✓ ' + data.employees.length + ' staff · ' + data.start + ' → ' + data.end, 'ok');
   } catch(err){
-    prog(0, '✕ ' + err.message, 'err');
+    if (typeof timeoutId !== 'undefined') clearTimeout(timeoutId);
+    if (typeof progTimer !== 'undefined') clearInterval(progTimer);
+
+    var msg = err && err.name === 'AbortError'
+      ? 'Request timed out before Vercel limit. Try a cleaner/smaller TXT file.'
+      : (err.message || 'Unexpected error');
+    prog(0, '✕ ' + msg, 'err');
     console.error(err);
   }
   document.getElementById('genBtn').disabled = false;
@@ -571,14 +583,23 @@ function tick(){ return new Promise(function(r){setTimeout(r, 30);}); }
 /* ── SHARE ── */
 function buildShareText(){
   if (!lastData) return '';
+  var inRange = TODAY >= lastData.start && TODAY <= lastData.end;
   var lines = ['📅 Staff Schedule — Today (' + TODAY + ')', 'Unit: ' + lastData.unit, ''];
+  if (!inRange){
+    lines.push('');
+    lines.push('Today is outside this schedule period: ' + lastData.start + ' → ' + lastData.end);
+    return lines.join('\n');
+  }
+
   var duty=[], leave=[], off=[];
   (lastData.employees || []).forEach(function(emp){
     var code = emp._map && emp._map[TODAY];
     if (code === 'D') duty.push(emp.name + ' (Day)');
     else if (code === 'N') duty.push(emp.name + ' (Night)');
     else if (code === 'AL') leave.push(emp.name);
-    else if (code === 'RO' || code === 'X') off.push(emp.name);
+    else if (code === 'RO') off.push(emp.name + ' (RO)');
+    else if (code === 'X') off.push(emp.name + ' (X)');
+    else off.push(emp.name + ' (Blank)');
   });
   lines.push('🟢 ON DUTY (' + duty.length + ')');
   duty.forEach(function(n){ lines.push('• ' + n); });
@@ -664,6 +685,7 @@ function renderTodaySection(data, allDates){
     else if (code === 'AL') leave.push({name:emp.name, code:'AL'});
     else if (code === 'RO') off.push({name:emp.name, code:'RO'});
     else if (code === 'X')  off.push({name:emp.name, code:'X'});
+    else                   off.push({name:emp.name, code:'blank', label:'—'});
   });
 
   function fillCard(containerId, countId, items){
@@ -679,7 +701,7 @@ function renderTodaySection(data, allDates){
       div.className = 'today-name-item';
       var tag = document.createElement('span');
       tag.className = 'today-name-tag tag-' + item.code.toLowerCase();
-      tag.textContent = item.code;
+      tag.textContent = item.label || item.code;
       var name = document.createElement('span');
       name.textContent = item.name;
       div.appendChild(tag);
@@ -715,7 +737,12 @@ function renderAll(data){
 
   /* stats */
   var td=0,tn=0,ta=0,tx=0;
-  data.employees.forEach(function(emp){ td+=(emp.D||[]).length; tn+=(emp.N||[]).length; ta+=(emp.AL||[]).length; tx+=(emp.X||[]).length; });
+  data.employees.forEach(function(emp){
+    td+=(emp.D||[]).length;
+    tn+=(emp.N||[]).length;
+    ta+=(emp.AL||[]).length;
+    tx+=(emp.X||[]).length + (emp.RO||[]).length;
+  });
   document.getElementById('stEmp').textContent  = data.employees.length;
   document.getElementById('stDays').textContent = allDates.length;
   document.getElementById('stD').textContent    = td;
