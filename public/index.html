@@ -19,55 +19,42 @@
       --border-strong: #cbd5e1;
       --primary: #4f46e5;
       --primary-light: #eef2ff;
+      --success: #059669;
+      --warning: #f59e0b;
+      --danger: #dc2626;
       --shadow-sm: 0 1px 2px rgba(0,0,0,0.05);
-      --shadow-md: 0 4px 14px rgba(0,0,0,0.08);
       --shadow-lg: 0 16px 40px rgba(0,0,0,0.14);
-
-      --d-bg: #d1fae5;  --d-fg: #065f46;
-      --n-bg: #dbeafe;  --n-fg: #1e3a8a;
+      --d-bg: #d1fae5; --d-fg: #065f46;
+      --n-bg: #dbeafe; --n-fg: #1e3a8a;
       --al-bg: #fef3c7; --al-fg: #92400e;
       --ro-bg: #fee2e2; --ro-fg: #991b1b;
       --x-bg:  #e2e8f0; --x-fg:  #475569;
-
       --weekend-bg: #f1f5f9;
       --today-ring: #4f46e5;
     }
-
     @media (prefers-color-scheme: dark) {
       :root {
-        --bg: #0b1220;
-        --bg-card: #131c2e;
-        --bg-elev: #1d2840;
-        --text: #f1f5f9;
-        --text-muted: #94a3b8;
-        --border: #1f2a44;
-        --border-strong: #2a3756;
-        --primary: #818cf8;
-        --primary-light: #312e81;
-
-        --d-bg: #064e3b;  --d-fg: #6ee7b7;
-        --n-bg: #1e3a8a;  --n-fg: #93c5fd;
+        --bg: #0b1220; --bg-card: #131c2e; --bg-elev: #1d2840;
+        --text: #f1f5f9; --text-muted: #94a3b8;
+        --border: #1f2a44; --border-strong: #2a3756;
+        --primary: #818cf8; --primary-light: #312e81;
+        --success: #10b981; --warning: #fbbf24; --danger: #f87171;
+        --d-bg: #064e3b; --d-fg: #6ee7b7;
+        --n-bg: #1e3a8a; --n-fg: #93c5fd;
         --al-bg: #78350f; --al-fg: #fcd34d;
         --ro-bg: #7f1d1d; --ro-fg: #fca5a5;
         --x-bg:  #1e293b; --x-fg:  #94a3b8;
-
-        --weekend-bg: #0f1729;
-        --today-ring: #a5b4fc;
+        --weekend-bg: #0f1729; --today-ring: #a5b4fc;
       }
     }
-
     * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
     html { font-size: 16px; }
     body {
       font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI", Roboto, sans-serif;
-      background: var(--bg);
-      color: var(--text);
-      line-height: 1.5;
-      height: 100vh;
-      height: 100dvh;
+      background: var(--bg); color: var(--text); line-height: 1.5;
+      height: 100vh; height: 100dvh;
       overflow: hidden;
-      display: flex;
-      flex-direction: column;
+      display: flex; flex-direction: column;
       overscroll-behavior: none;
     }
 
@@ -76,21 +63,15 @@
       flex-shrink: 0;
       background: var(--bg-card);
       border-bottom: 1px solid var(--border);
-      padding: 10px 14px;
+      padding: 10px 12px;
       padding-top: calc(10px + env(safe-area-inset-top));
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      gap: 10px;
+      display: flex; align-items: center; justify-content: space-between;
+      gap: 8px;
     }
-    .app-title { font-size: 17px; font-weight: 700; display: flex; align-items: center; gap: 8px; min-width: 0; }
+    .app-title { font-size: 17px; font-weight: 700; display: flex; align-items: center; gap: 8px; min-width: 0; flex: 1; }
     .app-title .emoji { font-size: 20px; flex-shrink: 0; }
-    .app-title .txt {
-      overflow: hidden;
-      text-overflow: ellipsis;
-      white-space: nowrap;
-    }
-    .header-actions { display: flex; gap: 4px; flex-shrink: 0; }
+    .app-title .txt { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+    .header-actions { display: flex; gap: 2px; flex-shrink: 0; }
     .icon-btn {
       width: 40px; height: 40px;
       border: none; background: transparent;
@@ -101,23 +82,17 @@
       transition: background 0.15s;
     }
     .icon-btn:active { background: var(--border); }
+    .icon-btn.primary-tint { color: var(--primary); }
 
-    /* ===== MAIN ===== */
-    .screen {
-      flex: 1;
-      min-height: 0;
-      display: none;
-    }
+    /* ===== SCREENS ===== */
+    .screen { flex: 1; min-height: 0; display: none; }
     .screen.show { display: flex; flex-direction: column; }
+    #uploadScreen.show { display: block; overflow-y: auto; }
 
-    /* ===== UPLOAD SCREEN ===== */
-    #uploadScreen { overflow-y: auto; }
-    #uploadScreen.show { display: block; }
+    /* ===== UPLOAD ===== */
     .upload-inner {
-      max-width: 480px;
-      margin: 0 auto;
-      padding: 32px 20px;
-      padding-bottom: calc(32px + env(safe-area-inset-bottom));
+      max-width: 480px; margin: 0 auto;
+      padding: 32px 20px calc(32px + env(safe-area-inset-bottom));
     }
     .hero { text-align: center; margin-bottom: 28px; }
     .hero .icon-box {
@@ -125,37 +100,28 @@
       background: var(--primary-light);
       border-radius: 20px;
       display: flex; align-items: center; justify-content: center;
-      margin: 0 auto 16px;
-      font-size: 36px;
+      margin: 0 auto 16px; font-size: 36px;
     }
     .hero h1 { font-size: 22px; font-weight: 700; margin-bottom: 6px; }
     .hero p { color: var(--text-muted); font-size: 14px; }
-
     .upload-tabs {
       display: flex; gap: 4px;
       background: var(--bg-card);
-      border-radius: 12px;
-      padding: 4px;
-      margin-bottom: 16px;
+      border-radius: 12px; padding: 4px; margin-bottom: 16px;
       border: 1px solid var(--border);
     }
     .upload-tab {
       flex: 1; padding: 10px;
-      background: transparent; border: none;
-      border-radius: 9px;
-      color: var(--text-muted);
-      font-size: 14px; font-weight: 600;
-      cursor: pointer;
+      background: transparent; border: none; border-radius: 9px;
+      color: var(--text-muted); font-size: 14px; font-weight: 600; cursor: pointer;
     }
     .upload-tab.active { background: var(--primary); color: white; }
     .tab-pane { display: none; }
     .tab-pane.active { display: block; }
-
     .drop-zone {
       width: 100%; padding: 36px 20px;
       border: 2px dashed var(--border-strong);
-      border-radius: 14px;
-      background: var(--bg-card);
+      border-radius: 14px; background: var(--bg-card);
       text-align: center; cursor: pointer;
       transition: all 0.2s;
     }
@@ -163,30 +129,33 @@
     .drop-zone .file-icon { font-size: 32px; margin-bottom: 10px; }
     .drop-zone .label { font-weight: 600; font-size: 15px; margin-bottom: 4px; }
     .drop-zone .hint { font-size: 12px; color: var(--text-muted); }
-
     .text-area {
       width: 100%; min-height: 200px;
       padding: 12px; font-size: 16px;
       background: var(--bg-card);
-      border: 1px solid var(--border);
-      border-radius: 12px;
+      border: 1px solid var(--border); border-radius: 12px;
       color: var(--text);
       font-family: ui-monospace, "SF Mono", Consolas, monospace;
       resize: vertical;
     }
     .text-area:focus { outline: none; border-color: var(--primary); }
-
     .btn-primary {
       width: 100%; padding: 13px;
-      background: var(--primary);
-      color: white; border: none;
+      background: var(--primary); color: white; border: none;
       border-radius: 12px;
-      font-size: 15px; font-weight: 600;
-      cursor: pointer; margin-top: 10px;
+      font-size: 15px; font-weight: 600; cursor: pointer;
+      margin-top: 10px;
     }
     .btn-primary:active { transform: scale(0.99); }
+    .btn-danger {
+      width: 100%; padding: 11px;
+      background: transparent; color: var(--danger); border: 1px solid var(--danger);
+      border-radius: 12px;
+      font-size: 14px; font-weight: 600; cursor: pointer;
+      margin-top: 8px;
+    }
 
-    /* ===== SCHEDULE SCREEN ===== */
+    /* ===== SCHEDULE: INFO + TOOLBAR ===== */
     .info-bar {
       flex-shrink: 0;
       padding: 10px 14px;
@@ -201,8 +170,7 @@
     .info-item { flex-shrink: 0; }
     .info-label {
       font-size: 10px; color: var(--text-muted);
-      text-transform: uppercase; letter-spacing: 0.5px;
-      font-weight: 600;
+      text-transform: uppercase; letter-spacing: 0.5px; font-weight: 600;
     }
     .info-value { font-size: 14px; font-weight: 600; margin-top: 2px; }
 
@@ -220,7 +188,7 @@
       border: 1px solid var(--border);
       background: var(--bg-card);
       border-radius: 10px;
-      font-size: 15px;
+      font-size: 16px;
       color: var(--text);
       -webkit-appearance: none;
     }
@@ -242,129 +210,121 @@
       display: flex; align-items: center; gap: 6px;
     }
     .pill-btn.active {
-      border-color: var(--primary);
-      color: var(--primary);
-      background: var(--primary-light);
+      border-color: var(--primary); color: var(--primary); background: var(--primary-light);
     }
     .pill-btn .badge {
-      background: var(--primary);
-      color: white;
-      font-size: 10px;
-      padding: 1px 6px;
-      border-radius: 6px;
-      min-width: 18px;
-      text-align: center;
+      background: var(--primary); color: white;
+      font-size: 10px; padding: 1px 6px; border-radius: 6px;
+      min-width: 18px; text-align: center;
     }
 
-    /* ===== GRID ===== */
+    /* ===== THE GRID — sticky setup ===== */
     .grid-wrap {
-      flex: 1;
-      min-height: 0;
+      flex: 1; min-height: 0;
       overflow: auto;
       -webkit-overflow-scrolling: touch;
       background: var(--bg-card);
       position: relative;
+      isolation: isolate;          /* fresh stacking context — prevents iOS layer bleed */
     }
     .grid-table {
-      border-collapse: separate;   /* required for sticky */
+      border-collapse: separate;    /* REQUIRED for sticky to work */
       border-spacing: 0;
       font-size: 12px;
     }
-    .grid-table th, .grid-table td {
+    .grid-table th,
+    .grid-table td {
       padding: 0; margin: 0;
       vertical-align: middle;
       text-align: center;
-      border-right: 1px solid var(--border);
-      border-bottom: 1px solid var(--border);
-      background: var(--bg-card);
+      background-color: var(--bg-card);
       white-space: nowrap;
+      box-shadow: inset -1px -1px 0 var(--border);  /* internal grid lines, no gaps */
     }
-    .grid-table thead th {
+
+    /* date headers: sticky to top */
+    .grid-table thead th.date-cell {
+      position: -webkit-sticky;
       position: sticky;
       top: 0;
-      z-index: 10;
-      background: var(--bg-card);
-      font-weight: 600;
-    }
-    .date-cell {
-      min-width: 40px; width: 40px;
+      z-index: 30;
+      background-color: var(--bg-card);
+      min-width: 42px; width: 42px;
       padding: 6px 0;
       font-size: 11px; line-height: 1.2;
+      font-weight: 600;
     }
-    .date-cell .dow { font-weight: 700; }
-    .date-cell .md  { font-size: 10px; color: var(--text-muted); margin-top: 1px; }
-    .date-cell.weekend { background: var(--weekend-bg); }
-    .date-cell.today {
-      background: var(--primary-light) !important;
+    .grid-table thead th.date-cell .dow { font-weight: 700; }
+    .grid-table thead th.date-cell .md  { font-size: 10px; color: var(--text-muted); margin-top: 1px; }
+    .grid-table thead th.date-cell.weekend { background-color: var(--weekend-bg); }
+    .grid-table thead th.date-cell.today {
+      background-color: var(--primary-light);
       color: var(--primary);
-      box-shadow: inset 0 -3px 0 var(--today-ring);
+      box-shadow: inset -1px -1px 0 var(--border), inset 0 -3px 0 var(--today-ring);
     }
-    .date-cell.today .md { color: var(--primary); font-weight: 700; }
+    .grid-table thead th.date-cell.today .md { color: var(--primary); font-weight: 700; }
 
-    .name-cell {
+    /* employee name column: sticky to left */
+    .grid-table tbody th.name-cell {
+      position: -webkit-sticky;
       position: sticky;
       left: 0;
-      z-index: 5;
-      background: var(--bg-card) !important;
-      min-width: 132px; max-width: 132px;
+      z-index: 20;
+      background-color: var(--bg-card);
+      min-width: 134px; max-width: 134px;
       text-align: left;
       padding: 8px 10px;
       font-weight: 500;
-      box-shadow: 1px 0 0 var(--border);
       cursor: pointer;
+      box-shadow: inset -1px -1px 0 var(--border), 2px 0 4px -2px rgba(0,0,0,0.08);
     }
-    .name-cell:active { background: var(--bg) !important; }
-    .name-cell .nm {
+    .grid-table tbody th.name-cell:active { background-color: var(--bg); }
+    .grid-table tbody th.name-cell .nm {
       font-size: 12px; line-height: 1.25;
       white-space: normal;
       overflow: hidden; text-overflow: ellipsis;
-      display: -webkit-box;
-      -webkit-line-clamp: 2;
-      -webkit-box-orient: vertical;
+      display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical;
     }
-    .name-cell .rl {
-      font-size: 10px;
-      color: var(--text-muted);
-      margin-top: 2px; font-weight: 400;
+    .grid-table tbody th.name-cell .rl {
+      font-size: 10px; color: var(--text-muted); margin-top: 2px; font-weight: 400;
     }
 
-    .corner-cell {
-      position: sticky !important;
-      left: 0; top: 0;
-      z-index: 20 !important;
-      background: var(--bg-card) !important;
-      box-shadow: 1px 1px 0 var(--border);
+    /* corner: sticky in both directions, on top of all */
+    .grid-table thead th.corner-cell {
+      position: -webkit-sticky;
+      position: sticky;
+      top: 0; left: 0;
+      z-index: 40;
+      background-color: var(--bg-card);
+      min-width: 134px; max-width: 134px;
       text-align: left;
       padding: 8px 10px;
       font-size: 10px; color: var(--text-muted);
-      text-transform: uppercase;
-      letter-spacing: 0.5px;
-      font-weight: 700;
+      text-transform: uppercase; letter-spacing: 0.5px; font-weight: 700;
+      box-shadow: inset -1px -1px 0 var(--border), 2px 2px 4px -2px rgba(0,0,0,0.08);
     }
 
-    .stat-cell {
-      height: 40px;
-      font-weight: 700;
-      font-size: 12px;
-      cursor: pointer;
+    /* data cells */
+    .stat-cell { height: 40px; font-weight: 700; font-size: 12px; cursor: pointer; }
+    .stat-cell.weekend { background-color: var(--weekend-bg); }
+    .stat-cell.today {
+      box-shadow: inset -1px -1px 0 var(--border), inset 0 -2px 0 var(--today-ring);
     }
-    .stat-cell.weekend { background: var(--weekend-bg); }
-    .stat-cell.today   { box-shadow: inset 0 -2px 0 var(--today-ring); }
-    .stat-cell.s-D  { background: var(--d-bg);  color: var(--d-fg); }
-    .stat-cell.s-N  { background: var(--n-bg);  color: var(--n-fg); }
-    .stat-cell.s-AL { background: var(--al-bg); color: var(--al-fg); }
-    .stat-cell.s-RO { background: var(--ro-bg); color: var(--ro-fg); }
-    .stat-cell.s-X  { background: var(--x-bg);  color: var(--x-fg); }
+    .stat-cell.s-D  { background-color: var(--d-bg);  color: var(--d-fg); }
+    .stat-cell.s-N  { background-color: var(--n-bg);  color: var(--n-fg); }
+    .stat-cell.s-AL { background-color: var(--al-bg); color: var(--al-fg); }
+    .stat-cell.s-RO { background-color: var(--ro-bg); color: var(--ro-fg); }
+    .stat-cell.s-X  { background-color: var(--x-bg);  color: var(--x-fg); }
     .stat-cell.empty { color: var(--text-muted); opacity: 0.35; }
 
     /* compact mode */
-    .grid-wrap.compact .date-cell { min-width: 30px; width: 30px; padding: 4px 0; font-size: 10px; }
-    .grid-wrap.compact .date-cell .md { font-size: 9px; }
+    .grid-wrap.compact .grid-table thead th.date-cell { min-width: 30px; width: 30px; padding: 4px 0; font-size: 10px; }
+    .grid-wrap.compact .grid-table thead th.date-cell .md { font-size: 9px; }
     .grid-wrap.compact .stat-cell { height: 32px; font-size: 11px; }
-    .grid-wrap.compact .name-cell { min-width: 104px; max-width: 104px; padding: 6px 8px; }
-    .grid-wrap.compact .name-cell .nm { font-size: 11px; }
-    .grid-wrap.compact .name-cell .rl { font-size: 9px; }
-    .grid-wrap.compact .corner-cell { padding: 6px 8px; font-size: 9px; }
+    .grid-wrap.compact .grid-table tbody th.name-cell { min-width: 104px; max-width: 104px; padding: 6px 8px; }
+    .grid-wrap.compact .grid-table tbody th.name-cell .nm { font-size: 11px; }
+    .grid-wrap.compact .grid-table tbody th.name-cell .rl { font-size: 9px; }
+    .grid-wrap.compact .grid-table thead th.corner-cell { min-width: 104px; max-width: 104px; padding: 6px 8px; font-size: 9px; }
 
     /* legend */
     .legend {
@@ -379,14 +339,9 @@
       scrollbar-width: none;
     }
     .legend::-webkit-scrollbar { display: none; }
-    .leg-item {
-      flex-shrink: 0;
-      display: flex; align-items: center; gap: 6px;
-      font-size: 12px; color: var(--text-muted);
-    }
+    .leg-item { flex-shrink: 0; display: flex; align-items: center; gap: 6px; font-size: 12px; color: var(--text-muted); }
     .leg-box {
-      width: 20px; height: 20px;
-      border-radius: 5px;
+      width: 20px; height: 20px; border-radius: 5px;
       font-size: 11px; font-weight: 700;
       display: flex; align-items: center; justify-content: center;
     }
@@ -399,24 +354,22 @@
     /* ===== BOTTOM SHEETS ===== */
     .sheet-backdrop {
       position: fixed; inset: 0;
-      background: rgba(0,0,0,0.4);
+      background: rgba(0,0,0,0.45);
       opacity: 0; pointer-events: none;
-      transition: opacity 0.2s;
-      z-index: 40;
+      transition: opacity 0.22s;
+      z-index: 50;
     }
     .sheet-backdrop.show { opacity: 1; pointer-events: auto; }
     .sheet {
-      position: fixed;
-      left: 0; right: 0; bottom: 0;
+      position: fixed; left: 0; right: 0; bottom: 0;
       background: var(--bg-card);
       border-radius: 18px 18px 0 0;
       padding: 8px 18px calc(20px + env(safe-area-inset-bottom));
-      max-height: 80vh;
-      max-height: 80dvh;
+      max-height: 86vh; max-height: 86dvh;
       overflow-y: auto;
       transform: translateY(100%);
       transition: transform 0.26s cubic-bezier(0.32, 0.72, 0, 1);
-      z-index: 45;
+      z-index: 55;
       box-shadow: var(--shadow-lg);
     }
     .sheet.show { transform: translateY(0); }
@@ -426,41 +379,25 @@
       border-radius: 2px;
       margin: 6px auto 14px;
     }
-    .sheet h3 {
-      font-size: 17px; font-weight: 700;
-      margin-bottom: 4px;
-    }
+    .sheet h3 { font-size: 17px; font-weight: 700; margin-bottom: 4px; }
     .sheet .sub { font-size: 13px; color: var(--text-muted); margin-bottom: 16px; }
     .sheet-section { margin-bottom: 18px; }
     .sheet-section-label {
-      font-size: 10px;
-      text-transform: uppercase;
-      letter-spacing: 0.5px;
-      color: var(--text-muted);
-      font-weight: 700;
-      margin-bottom: 8px;
+      font-size: 10px; text-transform: uppercase; letter-spacing: 0.5px;
+      color: var(--text-muted); font-weight: 700; margin-bottom: 8px;
     }
-    .chip-row {
-      display: flex; gap: 6px;
-      flex-wrap: wrap;
-    }
+    .chip-row { display: flex; gap: 6px; flex-wrap: wrap; }
     .chip {
       padding: 7px 12px;
       background: var(--bg);
       border: 1px solid var(--border);
       border-radius: 18px;
-      font-size: 13px; font-weight: 500;
-      cursor: pointer;
+      font-size: 13px; font-weight: 500; cursor: pointer;
       color: var(--text);
     }
-    .chip.active {
-      background: var(--primary);
-      border-color: var(--primary);
-      color: white;
-    }
+    .chip.active { background: var(--primary); border-color: var(--primary); color: white; }
     .toggle-row {
-      display: flex; align-items: center;
-      justify-content: space-between;
+      display: flex; align-items: center; justify-content: space-between;
       padding: 12px 0;
       border-bottom: 1px solid var(--border);
       gap: 12px;
@@ -469,10 +406,8 @@
     .toggle-row .lbl { font-size: 15px; font-weight: 500; }
     .toggle-row .desc { font-size: 12px; color: var(--text-muted); margin-top: 2px; }
     .switch {
-      flex-shrink: 0;
-      width: 48px; height: 28px;
-      background: var(--border-strong);
-      border-radius: 14px;
+      flex-shrink: 0; width: 48px; height: 28px;
+      background: var(--border-strong); border-radius: 14px;
       position: relative; cursor: pointer;
       transition: background 0.2s;
     }
@@ -480,8 +415,7 @@
       content: ""; position: absolute;
       top: 2px; left: 2px;
       width: 24px; height: 24px;
-      background: white;
-      border-radius: 50%;
+      background: white; border-radius: 50%;
       transition: transform 0.2s;
       box-shadow: var(--shadow-sm);
     }
@@ -490,16 +424,9 @@
 
     /* employee detail */
     .emp-stats {
-      display: grid;
-      grid-template-columns: repeat(5, 1fr);
-      gap: 5px;
-      margin-bottom: 16px;
+      display: grid; grid-template-columns: repeat(5, 1fr); gap: 5px; margin-bottom: 16px;
     }
-    .emp-stat {
-      padding: 8px 4px;
-      border-radius: 9px;
-      text-align: center;
-    }
+    .emp-stat { padding: 8px 4px; border-radius: 9px; text-align: center; }
     .emp-stat .v { font-size: 18px; font-weight: 700; line-height: 1.1; }
     .emp-stat .l { font-size: 10px; opacity: 0.8; margin-top: 2px; }
     .emp-stat.s-D  { background: var(--d-bg);  color: var(--d-fg); }
@@ -507,27 +434,16 @@
     .emp-stat.s-AL { background: var(--al-bg); color: var(--al-fg); }
     .emp-stat.s-RO { background: var(--ro-bg); color: var(--ro-fg); }
     .emp-stat.s-X  { background: var(--x-bg);  color: var(--x-fg); }
-
-    .cal-grid {
-      display: grid;
-      grid-template-columns: repeat(7, 1fr);
-      gap: 4px;
-    }
+    .cal-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 4px; }
     .cal-grid .dow-hd {
-      font-size: 10px;
-      font-weight: 700;
-      color: var(--text-muted);
-      text-align: center;
-      padding: 4px 0;
-      text-transform: uppercase;
+      font-size: 10px; font-weight: 700; color: var(--text-muted);
+      text-align: center; padding: 4px 0; text-transform: uppercase;
     }
     .cal-cell {
       aspect-ratio: 1;
       border-radius: 8px;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
+      display: flex; flex-direction: column;
+      align-items: center; justify-content: center;
       font-size: 11px;
       background: var(--bg);
       border: 1px solid var(--border);
@@ -543,6 +459,85 @@
     .cal-cell.s-X  { background: var(--x-bg);  color: var(--x-fg);  border-color: transparent; }
     .cal-cell.today { box-shadow: 0 0 0 2px var(--today-ring); }
 
+    /* ===== SWAP FINDER ===== */
+    .input-field {
+      width: 100%; padding: 11px 14px;
+      border: 1px solid var(--border);
+      background: var(--bg);
+      border-radius: 10px;
+      font-size: 16px; color: var(--text);
+      -webkit-appearance: none;
+    }
+    .input-field:focus { outline: none; border-color: var(--primary); }
+    .name-results { max-height: 230px; overflow-y: auto; margin-top: 8px; }
+    .emp-result {
+      padding: 10px 12px;
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      margin-top: 6px;
+      cursor: pointer;
+      background: var(--bg);
+      display: flex; justify-content: space-between; align-items: center; gap: 10px;
+    }
+    .emp-result:active { background: var(--primary-light); border-color: var(--primary); }
+    .emp-result .nm { font-size: 14px; font-weight: 600; }
+    .emp-result .rl { font-size: 11px; color: var(--text-muted); margin-top: 2px; }
+    .me-selected {
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 12px 14px;
+      background: var(--primary-light);
+      border-radius: 10px;
+      gap: 10px;
+    }
+    .me-selected .who { display: flex; flex-direction: column; min-width: 0; }
+    .me-selected .who .nm { font-weight: 600; font-size: 14px; color: var(--primary); }
+    .me-selected .who .rl { font-size: 11px; color: var(--text-muted); margin-top: 2px; }
+    .link-btn {
+      background: none; border: none;
+      color: var(--primary);
+      font-size: 13px; font-weight: 600;
+      cursor: pointer; padding: 6px 10px; border-radius: 6px;
+    }
+    .link-btn:active { background: var(--bg-card); }
+    .empty-hint {
+      color: var(--text-muted); font-size: 13px;
+      padding: 16px; text-align: center; display: block;
+    }
+    .swap-card {
+      padding: 12px 14px;
+      border-radius: 12px;
+      background: var(--bg);
+      border: 1px solid var(--border);
+      border-left-width: 4px;
+      margin-bottom: 10px;
+    }
+    .swap-card.full-match    { border-left-color: var(--success); }
+    .swap-card.partial-match { border-left-color: var(--warning); }
+    .swap-card-head {
+      display: flex; justify-content: space-between; align-items: baseline;
+      gap: 10px; margin-bottom: 6px;
+    }
+    .swap-name { font-weight: 600; font-size: 14px; }
+    .swap-role {
+      font-size: 11px;
+      color: var(--text-muted);
+      background: var(--bg-card);
+      padding: 2px 8px;
+      border-radius: 6px;
+      flex-shrink: 0;
+    }
+    .swap-summary {
+      font-size: 13px;
+      font-weight: 600;
+      margin-bottom: 8px;
+    }
+    .swap-card.full-match    .swap-summary { color: var(--success); }
+    .swap-card.partial-match .swap-summary { color: var(--warning); }
+    .swap-coverage { font-size: 12px; display: flex; flex-direction: column; gap: 3px; }
+    .cov-row { display: flex; gap: 6px; align-items: center; }
+    .cov-row.ok { color: var(--success); }
+    .cov-row.no { color: var(--danger); }
+
     /* ===== TOAST ===== */
     .toast {
       position: fixed;
@@ -550,19 +545,17 @@
       left: 50%; transform: translate(-50%, 20px);
       padding: 11px 18px;
       border-radius: 12px;
-      background: var(--text);
-      color: var(--bg);
+      background: var(--text); color: var(--bg);
       font-size: 14px; font-weight: 500;
       box-shadow: var(--shadow-lg);
-      z-index: 60;
+      z-index: 70;
       opacity: 0; pointer-events: none;
       transition: opacity 0.22s, transform 0.22s;
-      max-width: 92vw;
-      text-align: center;
+      max-width: 92vw; text-align: center;
     }
     .toast.show { opacity: 1; transform: translate(-50%, 0); }
-    .toast.error { background: #dc2626; color: white; }
-    .toast.success { background: #059669; color: white; }
+    .toast.error { background: var(--danger); color: white; }
+    .toast.success { background: var(--success); color: white; }
   </style>
 </head>
 <body>
@@ -573,35 +566,32 @@
       <span class="txt" id="appTitleText">Schedule</span>
     </div>
     <div class="header-actions">
-      <button class="icon-btn" id="todayBtn" title="Today" style="display:none" aria-label="Jump to today">📍</button>
+      <button class="icon-btn primary-tint" id="todayBtn" style="display:none" aria-label="Jump to today">📍</button>
+      <button class="icon-btn" id="swapBtn" style="display:none" aria-label="Find a swap">🔁</button>
       <button class="icon-btn" id="settingsBtn" aria-label="Settings">⚙️</button>
-      <button class="icon-btn" id="resetBtn" style="display:none" aria-label="Reset">🔄</button>
     </div>
   </header>
 
-  <!-- UPLOAD SCREEN -->
+  <!-- ====== UPLOAD ====== -->
   <div id="uploadScreen" class="screen show">
     <div class="upload-inner">
       <div class="hero">
         <div class="icon-box">📋</div>
         <h1>Schedule Viewer</h1>
-        <p>Upload your hospital schedule PDF to view it as a clean, interactive grid.</p>
+        <p>Upload your hospital schedule PDF and view it as a clean interactive grid.</p>
       </div>
-
       <div class="upload-tabs">
         <button class="upload-tab active" data-tab="pdf">📄 PDF</button>
         <button class="upload-tab" data-tab="text">📝 Text</button>
       </div>
-
       <div class="tab-pane active" data-pane="pdf">
         <div class="drop-zone" id="dropZone">
           <div class="file-icon">📤</div>
           <div class="label">Tap to choose PDF</div>
-          <div class="hint">or drag &amp; drop here • max 4 MB</div>
+          <div class="hint">or drag &amp; drop here · max 4 MB</div>
           <input type="file" id="pdfInput" accept=".pdf" hidden>
         </div>
       </div>
-
       <div class="tab-pane" data-pane="text">
         <textarea class="text-area" id="textInput" placeholder="Paste schedule text here…"></textarea>
         <button class="btn-primary" id="textSubmitBtn">Parse Text</button>
@@ -609,7 +599,7 @@
     </div>
   </div>
 
-  <!-- SCHEDULE SCREEN -->
+  <!-- ====== SCHEDULE ====== -->
   <div id="scheduleScreen" class="screen">
     <div class="info-bar">
       <div class="info-item"><div class="info-label">Unit</div><div class="info-value" id="infoUnit">—</div></div>
@@ -641,7 +631,7 @@
     </div>
   </div>
 
-  <!-- SHEETS -->
+  <!-- ====== SHEETS ====== -->
   <div class="sheet-backdrop" id="sheetBackdrop"></div>
 
   <div class="sheet" id="settingsSheet">
@@ -663,6 +653,10 @@
         </div>
         <div class="switch on" id="todayToggle" role="switch"></div>
       </div>
+    </div>
+    <div class="sheet-section">
+      <div class="sheet-section-label">Schedule</div>
+      <button class="btn-danger" id="resetBtn">Upload a different schedule</button>
     </div>
   </div>
 
@@ -697,6 +691,52 @@
     </div>
   </div>
 
+  <!-- ====== SWAP FINDER ====== -->
+  <div class="sheet" id="swapSheet">
+    <div class="handle"></div>
+    <h3>Find a Swap</h3>
+    <div class="sub">See who could realistically cover your shift.</div>
+
+    <div class="sheet-section">
+      <div class="sheet-section-label">Step 1 · Your name</div>
+      <div id="swapMePickerWrap">
+        <input type="search" id="swapMeSearch" class="input-field" placeholder="Start typing your name…" autocomplete="off">
+        <div class="name-results" id="swapMeResults"></div>
+      </div>
+      <div id="swapMeSelected" class="me-selected" style="display:none"></div>
+    </div>
+
+    <div class="sheet-section" id="swapDatesSection" style="display:none">
+      <div class="sheet-section-label">Step 2 · Working days to swap</div>
+      <div class="chip-row" id="swapDateChips"></div>
+    </div>
+
+    <div class="sheet-section" id="swapOptionsSection" style="display:none">
+      <div class="sheet-section-label">Step 3 · Preferences</div>
+      <div class="toggle-row">
+        <div>
+          <div class="lbl">Same role only</div>
+          <div class="desc">Only suggest people with your job role</div>
+        </div>
+        <div class="switch on" id="swapSameRoleToggle" role="switch"></div>
+      </div>
+      <div class="toggle-row">
+        <div>
+          <div class="lbl">Exclude annual leave</div>
+          <div class="desc">Skip people who are on annual leave</div>
+        </div>
+        <div class="switch on" id="swapExcludeAlToggle" role="switch"></div>
+      </div>
+    </div>
+
+    <button class="btn-primary" id="swapFindBtn" style="display:none">Find candidates</button>
+
+    <div class="sheet-section" id="swapResultsSection" style="display:none; margin-top:16px">
+      <div class="sheet-section-label">Suggestions · <span id="swapResultCount">0</span></div>
+      <div id="swapResults"></div>
+    </div>
+  </div>
+
   <div class="toast" id="toast"></div>
 
   <script>
@@ -711,11 +751,16 @@
       filter: { search: '', roles: new Set(), statuses: new Set() },
       ui: { compact: false, showToday: true },
     };
+    const swap = {
+      me: null,
+      dates: new Set(),
+      sameRole: true,
+      excludeAL: true,
+    };
 
     // ===== UTILS =====
-    const $ = sel => document.querySelector(sel);
+    const $  = sel => document.querySelector(sel);
     const $$ = sel => [...document.querySelectorAll(sel)];
-
     const DOW_NAMES = ['Su', 'Mo', 'Tu', 'We', 'Th', 'Fr', 'Sa'];
     const DOW_FULL  = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
     const STATUS_NAMES = { D: 'Day shift', N: 'Night shift', AL: 'Annual leave', RO: 'Request off', X: 'Rest / Off' };
@@ -728,10 +773,13 @@
       clearTimeout(t._tid);
       t._tid = setTimeout(() => t.classList.remove('show'), 2600);
     }
-
+    function escapeHtml(s) {
+      return String(s).replace(/[&<>"']/g, c => ({ '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;' }[c]));
+    }
     function getDow(iso) { return new Date(iso + 'T00:00:00').getDay(); }
-    function isWeekend(iso) { const d = getDow(iso); return d === 5 || d === 6; }  // Fri/Sat
-
+    function isWeekend(iso) { const d = getDow(iso); return d === 5 || d === 6; }
+    function fmtMd(iso) { return iso.slice(5).replace('-', '/'); }
+    function fmtDateLabel(iso) { return `${DOW_NAMES[getDow(iso)]} ${fmtMd(iso)}`; }
     function expandDates(start, end) {
       const out = [];
       const cur = new Date(start + 'T00:00:00');
@@ -742,7 +790,6 @@
       }
       return out;
     }
-
     function statusOf(emp, date) {
       for (const k of ['D', 'N', 'AL', 'RO', 'X']) if (emp[k].includes(date)) return k;
       return null;
@@ -759,7 +806,7 @@
     }
     $('#sheetBackdrop').addEventListener('click', closeAllSheets);
 
-    // ===== TABS =====
+    // ===== UPLOAD TABS =====
     $$('.upload-tab').forEach(btn => {
       btn.addEventListener('click', () => {
         $$('.upload-tab').forEach(b => b.classList.remove('active'));
@@ -781,7 +828,6 @@
       if (e.dataTransfer.files[0]) { pdfInput.files = e.dataTransfer.files; handlePdf(); }
     });
     pdfInput.addEventListener('change', handlePdf);
-
     $('#textSubmitBtn').addEventListener('click', () => {
       const txt = $('#textInput').value.trim();
       if (!txt) { toast('Paste some schedule text first', 'error'); return; }
@@ -832,7 +878,7 @@
           console.error('Parse error:', j);
           return;
         }
-        if (!j.start || !j.end) { toast('No period information found in source', 'error'); return; }
+        if (!j.start || !j.end) { toast('No period information found', 'error'); return; }
         loadData(j);
         toast(`Loaded ${j.employees.length} staff`, 'success');
       } catch (e) {
@@ -840,7 +886,7 @@
       }
     }
 
-    // ===== LOAD DATA =====
+    // ===== LOAD =====
     function loadData(data) {
       state.data = data;
       state.dates = expandDates(data.start, data.end);
@@ -848,16 +894,25 @@
 
       try { localStorage.setItem('schedule_data_v1', JSON.stringify(data)); } catch {}
 
+      // restore "me" if name still exists in new data
+      try {
+        const meName = localStorage.getItem('me_name_v1');
+        if (meName) {
+          const me = data.employees.find(e => e.name === meName);
+          swap.me = me || null;
+        } else { swap.me = null; }
+      } catch { swap.me = null; }
+      swap.dates.clear();
+
       $('#infoUnit').textContent   = data.unit || '—';
       $('#infoPeriod').textContent = `${data.start} → ${data.end}`;
       $('#infoCount').textContent  = data.employees.length;
       $('#infoDays').textContent   = state.dates.length;
 
-      // role chips
       const roles = [...new Set(data.employees.map(e => e.role).filter(Boolean))].sort();
       $('#roleChips').innerHTML = roles.length
-        ? roles.map(r => `<button class="chip" data-role="${r}">${r}</button>`).join('')
-        : '<span style="color:var(--text-muted);font-size:13px">No roles found</span>';
+        ? roles.map(r => `<button class="chip" data-role="${escapeHtml(r)}">${escapeHtml(r)}</button>`).join('')
+        : '<span class="empty-hint">No roles found</span>';
       $$('#roleChips .chip').forEach(c => {
         c.addEventListener('click', () => {
           c.classList.toggle('active');
@@ -871,11 +926,10 @@
       $('#searchInput').value = '';
       updateFilterBadge();
 
-      // show schedule screen
       $('#uploadScreen').classList.remove('show');
       $('#scheduleScreen').classList.add('show');
-      $('#resetBtn').style.display = '';
       $('#todayBtn').style.display = state.dates.includes(state.todayISO) ? '' : 'none';
+      $('#swapBtn').style.display = '';
       $('#appTitleText').textContent = data.unit || 'Schedule';
 
       render();
@@ -889,13 +943,13 @@
       const target = cells[idx];
       if (!target) return;
       const wrap = $('#gridWrap');
-      const nameW = $('.name-cell')?.offsetWidth || 132;
+      const nameW = $('.name-cell')?.offsetWidth || 134;
       const left = target.offsetLeft - nameW - 8;
       wrap.scrollTo({ left: Math.max(0, left), behavior: 'smooth' });
     }
     $('#todayBtn').addEventListener('click', scrollToToday);
 
-    // ===== RENDER =====
+    // ===== RENDER GRID =====
     function getFiltered() {
       const q = state.filter.search.toLowerCase().trim();
       return state.data.employees.filter(emp => {
@@ -908,29 +962,22 @@
         return true;
       });
     }
-
-    function escapeHtml(s) {
-      return String(s).replace(/[&<>"']/g, c => ({ '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;' }[c]));
-    }
-
     function render() {
       if (!state.data) return;
       const employees = getFiltered();
       const dates = state.dates;
-
       let html = '<thead><tr>';
-      html += `<th class="corner-cell">Employee · ${employees.length}</th>`;
+      html += `<th class="corner-cell">Staff · ${employees.length}</th>`;
       for (const d of dates) {
         const wknd = isWeekend(d);
         const today = state.ui.showToday && d === state.todayISO;
-        const md = d.slice(5).replace('-', '/');
+        const md = fmtMd(d);
         const cls = ['date-cell'];
         if (wknd) cls.push('weekend');
         if (today) cls.push('today');
         html += `<th class="${cls.join(' ')}" data-date="${d}"><div class="dow">${DOW_NAMES[getDow(d)]}</div><div class="md">${md}</div></th>`;
       }
       html += '</tr></thead><tbody>';
-
       for (const emp of employees) {
         const safeName = escapeHtml(emp.name);
         html += '<tr>';
@@ -949,7 +996,6 @@
         html += '</tr>';
       }
       html += '</tbody>';
-
       $('#gridTable').innerHTML = html;
       $('#gridWrap').classList.toggle('compact', state.ui.compact);
 
@@ -959,7 +1005,7 @@
           const name = c.dataset.emp;
           const date = c.dataset.date;
           const dow  = DOW_FULL[getDow(date)];
-          const md   = date.slice(5).replace('-', '/');
+          const md   = fmtMd(date);
           const label = code ? STATUS_NAMES[code] : 'No entry';
           toast(`${name} · ${dow} ${md} · ${label}`);
         });
@@ -975,18 +1021,12 @@
       if (!emp) return;
       $('#empSheetName').textContent = emp.name;
       $('#empSheetRole').textContent = emp.role || '—';
-
       $('#empStats').innerHTML = ['D','N','AL','RO','X'].map(k => `
-        <div class="emp-stat s-${k}">
-          <div class="v">${emp[k].length}</div>
-          <div class="l">${STATUS_LETTER[k]}</div>
-        </div>
+        <div class="emp-stat s-${k}"><div class="v">${emp[k].length}</div><div class="l">${STATUS_LETTER[k]}</div></div>
       `).join('');
-
-      // calendar
       const dates = state.dates;
       const first = new Date(dates[0] + 'T00:00:00');
-      const padStart = first.getDay(); // 0..6
+      const padStart = first.getDay();
       let html = '';
       for (const n of DOW_NAMES) html += `<div class="dow-hd">${n}</div>`;
       for (let i = 0; i < padStart; i++) html += `<div class="cal-cell pad"></div>`;
@@ -1010,7 +1050,6 @@
       const v = e.target.value;
       searchDebounce = setTimeout(() => { state.filter.search = v; render(); }, 100);
     });
-
     $('#filterBtn').addEventListener('click', () => openSheet('#filterSheet'));
     $$('#statusChips .chip').forEach(c => {
       c.addEventListener('click', () => {
@@ -1024,10 +1063,9 @@
     $('#clearFiltersBtn').addEventListener('click', () => {
       state.filter = { search: '', roles: new Set(), statuses: new Set() };
       $('#searchInput').value = '';
-      $$('.chip.active').forEach(c => c.classList.remove('active'));
+      $$('#roleChips .chip.active, #statusChips .chip.active').forEach(c => c.classList.remove('active'));
       render(); updateFilterBadge(); closeAllSheets();
     });
-
     function updateFilterBadge() {
       const total = state.filter.roles.size + state.filter.statuses.size;
       const btn = $('#filterBtn'), b = $('#filterBadge');
@@ -1064,14 +1102,197 @@
       try { localStorage.removeItem('schedule_data_v1'); } catch {}
       state.data = null; state.dates = [];
       state.filter = { search: '', roles: new Set(), statuses: new Set() };
+      swap.me = null; swap.dates.clear();
       $('#scheduleScreen').classList.remove('show');
       $('#uploadScreen').classList.add('show');
-      $('#resetBtn').style.display = 'none';
       $('#todayBtn').style.display = 'none';
+      $('#swapBtn').style.display = 'none';
       $('#appTitleText').textContent = 'Schedule';
       pdfInput.value = '';
       $('#textInput').value = '';
+      closeAllSheets();
     });
+
+    // ===== SWAP FINDER =====
+    $('#swapBtn').addEventListener('click', () => {
+      if (!state.data) return;
+      renderSwapForm();
+      openSheet('#swapSheet');
+    });
+
+    function renderSwapForm() {
+      if (swap.me) {
+        $('#swapMePickerWrap').style.display = 'none';
+        $('#swapMeSelected').style.display = '';
+        $('#swapMeSelected').innerHTML = `
+          <div class="who">
+            <div class="nm">${escapeHtml(swap.me.name)}</div>
+            <div class="rl">${escapeHtml(swap.me.role || '—')}</div>
+          </div>
+          <button class="link-btn" id="swapChangeBtn">Change</button>
+        `;
+        $('#swapChangeBtn').addEventListener('click', changeSwapMe);
+        renderSwapDateChips();
+        $('#swapDatesSection').style.display = '';
+        $('#swapOptionsSection').style.display = '';
+        $('#swapFindBtn').style.display = '';
+      } else {
+        $('#swapMePickerWrap').style.display = '';
+        $('#swapMeSearch').value = '';
+        $('#swapMeResults').innerHTML = '';
+        $('#swapMeSelected').style.display = 'none';
+        $('#swapDatesSection').style.display = 'none';
+        $('#swapOptionsSection').style.display = 'none';
+        $('#swapFindBtn').style.display = 'none';
+        $('#swapResultsSection').style.display = 'none';
+      }
+    }
+
+    function renderSwapDateChips() {
+      const me = swap.me;
+      const workingDates = state.dates.filter(d => {
+        const s = statusOf(me, d);
+        return s === 'D' || s === 'N';
+      });
+      if (!workingDates.length) {
+        $('#swapDateChips').innerHTML = '<span class="empty-hint">No working days found for this person in the schedule.</span>';
+        return;
+      }
+      $('#swapDateChips').innerHTML = workingDates.map(d => {
+        const s = statusOf(me, d);
+        const active = swap.dates.has(d) ? 'active' : '';
+        return `<button class="chip ${active}" data-date="${d}">${fmtDateLabel(d)} · ${s}</button>`;
+      }).join('');
+      $$('#swapDateChips .chip').forEach(c => {
+        c.addEventListener('click', () => {
+          c.classList.toggle('active');
+          const d = c.dataset.date;
+          if (swap.dates.has(d)) swap.dates.delete(d); else swap.dates.add(d);
+        });
+      });
+    }
+
+    function changeSwapMe() {
+      swap.me = null;
+      swap.dates.clear();
+      try { localStorage.removeItem('me_name_v1'); } catch {}
+      $('#swapResults').innerHTML = '';
+      $('#swapResultsSection').style.display = 'none';
+      renderSwapForm();
+    }
+
+    $('#swapMeSearch').addEventListener('input', e => {
+      const q = e.target.value.toLowerCase().trim();
+      if (!q) { $('#swapMeResults').innerHTML = ''; return; }
+      const matches = state.data.employees
+        .filter(emp => emp.name.toLowerCase().includes(q))
+        .slice(0, 10);
+      if (!matches.length) {
+        $('#swapMeResults').innerHTML = '<span class="empty-hint">No staff match that name.</span>';
+        return;
+      }
+      $('#swapMeResults').innerHTML = matches.map(emp => `
+        <div class="emp-result" data-name="${escapeHtml(emp.name)}">
+          <div><div class="nm">${escapeHtml(emp.name)}</div><div class="rl">${escapeHtml(emp.role || '—')}</div></div>
+          <span style="color:var(--primary);font-size:18px">→</span>
+        </div>
+      `).join('');
+      $$('#swapMeResults .emp-result').forEach(el => {
+        el.addEventListener('click', () => {
+          const name = el.dataset.name;
+          const emp = state.data.employees.find(x => x.name === name);
+          if (!emp) return;
+          swap.me = emp;
+          swap.dates.clear();
+          try { localStorage.setItem('me_name_v1', name); } catch {}
+          renderSwapForm();
+        });
+      });
+    });
+
+    $('#swapSameRoleToggle').addEventListener('click', e => {
+      e.currentTarget.classList.toggle('on');
+      swap.sameRole = e.currentTarget.classList.contains('on');
+    });
+    $('#swapExcludeAlToggle').addEventListener('click', e => {
+      e.currentTarget.classList.toggle('on');
+      swap.excludeAL = e.currentTarget.classList.contains('on');
+    });
+
+    $('#swapFindBtn').addEventListener('click', () => {
+      if (!swap.me) { toast('Pick yourself first', 'error'); return; }
+      if (swap.dates.size === 0) { toast('Pick at least one date', 'error'); return; }
+      const results = findSwapCandidates();
+      renderSwapResults(results);
+      // scroll the sheet to results
+      setTimeout(() => {
+        $('#swapResultsSection').scrollIntoView({ behavior: 'smooth', block: 'start' });
+      }, 50);
+    });
+
+    function findSwapCandidates() {
+      const dates = [...swap.dates];
+      return state.data.employees
+        .filter(emp => emp.name !== swap.me.name)
+        .filter(emp => !swap.sameRole || (emp.role || '') === (swap.me.role || ''))
+        .map(person => {
+          const coverage = dates.map(d => {
+            const status = statusOf(person, d);
+            const dateLabel = fmtDateLabel(d);
+            if (status === 'D' || status === 'N') return { date: d, dateLabel, ok: false, reason: `Working ${status}` };
+            if (status === 'AL') {
+              if (swap.excludeAL) return { date: d, dateLabel, ok: false, reason: 'On annual leave' };
+              return { date: d, dateLabel, ok: true, reason: 'Annual leave' };
+            }
+            if (status === 'RO') return { date: d, dateLabel, ok: true, reason: 'Requested off' };
+            if (status === 'X')  return { date: d, dateLabel, ok: true, reason: 'Rest day' };
+            return { date: d, dateLabel, ok: true, reason: 'Free' };
+          });
+          const okCount = coverage.filter(c => c.ok).length;
+          return { person, coverage, okCount };
+        })
+        .filter(r => r.okCount > 0)
+        .sort((a, b) => {
+          if (b.okCount !== a.okCount) return b.okCount - a.okCount;
+          // tiebreak: same role first
+          const aRole = (a.person.role || '') === (swap.me.role || '') ? 0 : 1;
+          const bRole = (b.person.role || '') === (swap.me.role || '') ? 0 : 1;
+          if (aRole !== bRole) return aRole - bRole;
+          return a.person.name.localeCompare(b.person.name);
+        });
+    }
+
+    function renderSwapResults(results) {
+      $('#swapResultCount').textContent = results.length;
+      $('#swapResultsSection').style.display = '';
+      if (!results.length) {
+        $('#swapResults').innerHTML = '<div class="empty-hint">No candidates found. Try turning off "Same role only" or "Exclude annual leave".</div>';
+        return;
+      }
+      const total = swap.dates.size;
+      $('#swapResults').innerHTML = results.slice(0, 30).map(r => {
+        const full = r.okCount === total;
+        const matchClass = full ? 'full-match' : 'partial-match';
+        const summary = full
+          ? (total > 1 ? `✓ Can cover all ${total} days` : '✓ Can cover this day')
+          : `⚠ Covers ${r.okCount} of ${total} days`;
+        const items = r.coverage.map(c => `
+          <div class="cov-row ${c.ok ? 'ok' : 'no'}">
+            ${c.ok ? '✓' : '✗'} ${c.dateLabel} — ${c.reason}
+          </div>
+        `).join('');
+        return `
+          <div class="swap-card ${matchClass}">
+            <div class="swap-card-head">
+              <div class="swap-name">${escapeHtml(r.person.name)}</div>
+              <div class="swap-role">${escapeHtml(r.person.role || '—')}</div>
+            </div>
+            <div class="swap-summary">${summary}</div>
+            <div class="swap-coverage">${items}</div>
+          </div>
+        `;
+      }).join('');
+    }
 
     // ===== BOOT =====
     loadUI();
