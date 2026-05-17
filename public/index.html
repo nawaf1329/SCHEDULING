@@ -10,18 +10,11 @@
   <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
   <style>
     :root {
-      --bg: #f6f7fb;
-      --bg-card: #ffffff;
-      --bg-elev: #ffffff;
-      --text: #0f172a;
-      --text-muted: #64748b;
-      --border: #e2e8f0;
-      --border-strong: #cbd5e1;
-      --primary: #4f46e5;
-      --primary-light: #eef2ff;
-      --success: #059669;
-      --warning: #f59e0b;
-      --danger: #dc2626;
+      --bg: #f6f7fb; --bg-card: #ffffff; --bg-elev: #ffffff;
+      --text: #0f172a; --text-muted: #64748b;
+      --border: #e2e8f0; --border-strong: #cbd5e1;
+      --primary: #4f46e5; --primary-light: #eef2ff;
+      --success: #059669; --warning: #d97706; --danger: #dc2626; --info: #2563eb;
       --shadow-sm: 0 1px 2px rgba(0,0,0,0.05);
       --shadow-lg: 0 16px 40px rgba(0,0,0,0.14);
       --d-bg: #d1fae5; --d-fg: #065f46;
@@ -31,6 +24,10 @@
       --x-bg:  #e2e8f0; --x-fg:  #475569;
       --weekend-bg: #f1f5f9;
       --today-ring: #4f46e5;
+      --excellent-bg: #d1fae5; --excellent-fg: #065f46;
+      --good-bg: #dbeafe;      --good-fg: #1e40af;
+      --possible-bg: #fef3c7;  --possible-fg: #92400e;
+      --weak-bg: #fee2e2;      --weak-fg: #991b1b;
     }
     @media (prefers-color-scheme: dark) {
       :root {
@@ -38,13 +35,17 @@
         --text: #f1f5f9; --text-muted: #94a3b8;
         --border: #1f2a44; --border-strong: #2a3756;
         --primary: #818cf8; --primary-light: #312e81;
-        --success: #10b981; --warning: #fbbf24; --danger: #f87171;
+        --success: #10b981; --warning: #fbbf24; --danger: #f87171; --info: #60a5fa;
         --d-bg: #064e3b; --d-fg: #6ee7b7;
         --n-bg: #1e3a8a; --n-fg: #93c5fd;
         --al-bg: #78350f; --al-fg: #fcd34d;
         --ro-bg: #7f1d1d; --ro-fg: #fca5a5;
         --x-bg:  #1e293b; --x-fg:  #94a3b8;
         --weekend-bg: #0f1729; --today-ring: #a5b4fc;
+        --excellent-bg: #064e3b; --excellent-fg: #6ee7b7;
+        --good-bg: #1e3a8a;     --good-fg: #93c5fd;
+        --possible-bg: #78350f; --possible-fg: #fcd34d;
+        --weak-bg: #7f1d1d;     --weak-fg: #fca5a5;
       }
     }
     * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
@@ -58,15 +59,14 @@
       overscroll-behavior: none;
     }
 
-    /* ===== HEADER ===== */
+    /* HEADER */
     .app-header {
       flex-shrink: 0;
       background: var(--bg-card);
       border-bottom: 1px solid var(--border);
       padding: 10px 12px;
       padding-top: calc(10px + env(safe-area-inset-top));
-      display: flex; align-items: center; justify-content: space-between;
-      gap: 8px;
+      display: flex; align-items: center; justify-content: space-between; gap: 8px;
     }
     .app-title { font-size: 17px; font-weight: 700; display: flex; align-items: center; gap: 8px; min-width: 0; flex: 1; }
     .app-title .emoji { font-size: 20px; flex-shrink: 0; }
@@ -78,22 +78,18 @@
       border-radius: 10px;
       display: flex; align-items: center; justify-content: center;
       cursor: pointer; color: var(--text);
-      font-size: 18px;
-      transition: background 0.15s;
+      font-size: 18px; transition: background 0.15s;
     }
     .icon-btn:active { background: var(--border); }
     .icon-btn.primary-tint { color: var(--primary); }
 
-    /* ===== SCREENS ===== */
+    /* SCREENS */
     .screen { flex: 1; min-height: 0; display: none; }
     .screen.show { display: flex; flex-direction: column; }
     #uploadScreen.show { display: block; overflow-y: auto; }
 
-    /* ===== UPLOAD ===== */
-    .upload-inner {
-      max-width: 480px; margin: 0 auto;
-      padding: 32px 20px calc(32px + env(safe-area-inset-bottom));
-    }
+    /* UPLOAD */
+    .upload-inner { max-width: 480px; margin: 0 auto; padding: 32px 20px calc(32px + env(safe-area-inset-bottom)); }
     .hero { text-align: center; margin-bottom: 28px; }
     .hero .icon-box {
       width: 72px; height: 72px;
@@ -122,8 +118,7 @@
       width: 100%; padding: 36px 20px;
       border: 2px dashed var(--border-strong);
       border-radius: 14px; background: var(--bg-card);
-      text-align: center; cursor: pointer;
-      transition: all 0.2s;
+      text-align: center; cursor: pointer; transition: all 0.2s;
     }
     .drop-zone:active, .drop-zone.dragover { border-color: var(--primary); background: var(--primary-light); }
     .drop-zone .file-icon { font-size: 32px; margin-bottom: 10px; }
@@ -135,43 +130,37 @@
       background: var(--bg-card);
       border: 1px solid var(--border); border-radius: 12px;
       color: var(--text);
-      font-family: ui-monospace, "SF Mono", Consolas, monospace;
-      resize: vertical;
+      font-family: ui-monospace, "SF Mono", Consolas, monospace; resize: vertical;
     }
     .text-area:focus { outline: none; border-color: var(--primary); }
     .btn-primary {
       width: 100%; padding: 13px;
       background: var(--primary); color: white; border: none;
       border-radius: 12px;
-      font-size: 15px; font-weight: 600; cursor: pointer;
-      margin-top: 10px;
+      font-size: 15px; font-weight: 600; cursor: pointer; margin-top: 10px;
     }
     .btn-primary:active { transform: scale(0.99); }
+    .btn-primary:disabled { opacity: 0.5; cursor: not-allowed; }
     .btn-danger {
       width: 100%; padding: 11px;
       background: transparent; color: var(--danger); border: 1px solid var(--danger);
       border-radius: 12px;
-      font-size: 14px; font-weight: 600; cursor: pointer;
-      margin-top: 8px;
+      font-size: 14px; font-weight: 600; cursor: pointer; margin-top: 8px;
     }
 
-    /* ===== SCHEDULE: INFO + TOOLBAR ===== */
+    /* INFO + TOOLBAR */
     .info-bar {
       flex-shrink: 0;
       padding: 10px 14px;
       background: var(--bg-card);
       border-bottom: 1px solid var(--border);
       display: flex; gap: 18px;
-      overflow-x: auto;
-      -webkit-overflow-scrolling: touch;
+      overflow-x: auto; -webkit-overflow-scrolling: touch;
       scrollbar-width: none;
     }
     .info-bar::-webkit-scrollbar { display: none; }
     .info-item { flex-shrink: 0; }
-    .info-label {
-      font-size: 10px; color: var(--text-muted);
-      text-transform: uppercase; letter-spacing: 0.5px; font-weight: 600;
-    }
+    .info-label { font-size: 10px; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.5px; font-weight: 600; }
     .info-value { font-size: 14px; font-weight: 600; margin-top: 2px; }
 
     .toolbar {
@@ -183,13 +172,11 @@
     }
     .search-wrap { flex: 1; position: relative; }
     .search-wrap input {
-      width: 100%;
-      padding: 10px 12px 10px 36px;
+      width: 100%; padding: 10px 12px 10px 36px;
       border: 1px solid var(--border);
       background: var(--bg-card);
       border-radius: 10px;
-      font-size: 16px;
-      color: var(--text);
+      font-size: 16px; color: var(--text);
       -webkit-appearance: none;
     }
     .search-wrap input:focus { outline: none; border-color: var(--primary); }
@@ -205,111 +192,76 @@
       border: 1px solid var(--border);
       border-radius: 10px;
       cursor: pointer;
-      font-size: 14px; font-weight: 500;
-      color: var(--text);
+      font-size: 14px; font-weight: 500; color: var(--text);
       display: flex; align-items: center; gap: 6px;
     }
-    .pill-btn.active {
-      border-color: var(--primary); color: var(--primary); background: var(--primary-light);
-    }
+    .pill-btn.active { border-color: var(--primary); color: var(--primary); background: var(--primary-light); }
     .pill-btn .badge {
       background: var(--primary); color: white;
       font-size: 10px; padding: 1px 6px; border-radius: 6px;
       min-width: 18px; text-align: center;
     }
 
-    /* ===== THE GRID — sticky setup ===== */
+    /* GRID */
     .grid-wrap {
       flex: 1; min-height: 0;
-      overflow: auto;
-      -webkit-overflow-scrolling: touch;
+      overflow: auto; -webkit-overflow-scrolling: touch;
       background: var(--bg-card);
       position: relative;
-      isolation: isolate;          /* fresh stacking context — prevents iOS layer bleed */
+      isolation: isolate;
     }
-    .grid-table {
-      border-collapse: separate;    /* REQUIRED for sticky to work */
-      border-spacing: 0;
-      font-size: 12px;
-    }
-    .grid-table th,
-    .grid-table td {
+    .grid-table { border-collapse: separate; border-spacing: 0; font-size: 12px; }
+    .grid-table th, .grid-table td {
       padding: 0; margin: 0;
-      vertical-align: middle;
-      text-align: center;
+      vertical-align: middle; text-align: center;
       background-color: var(--bg-card);
       white-space: nowrap;
-      box-shadow: inset -1px -1px 0 var(--border);  /* internal grid lines, no gaps */
+      box-shadow: inset -1px -1px 0 var(--border);
     }
-
-    /* date headers: sticky to top */
     .grid-table thead th.date-cell {
-      position: -webkit-sticky;
-      position: sticky;
-      top: 0;
-      z-index: 30;
+      position: -webkit-sticky; position: sticky;
+      top: 0; z-index: 30;
       background-color: var(--bg-card);
       min-width: 42px; width: 42px;
-      padding: 6px 0;
-      font-size: 11px; line-height: 1.2;
-      font-weight: 600;
+      padding: 6px 0; font-size: 11px; line-height: 1.2; font-weight: 600;
     }
     .grid-table thead th.date-cell .dow { font-weight: 700; }
     .grid-table thead th.date-cell .md  { font-size: 10px; color: var(--text-muted); margin-top: 1px; }
     .grid-table thead th.date-cell.weekend { background-color: var(--weekend-bg); }
     .grid-table thead th.date-cell.today {
-      background-color: var(--primary-light);
-      color: var(--primary);
+      background-color: var(--primary-light); color: var(--primary);
       box-shadow: inset -1px -1px 0 var(--border), inset 0 -3px 0 var(--today-ring);
     }
     .grid-table thead th.date-cell.today .md { color: var(--primary); font-weight: 700; }
-
-    /* employee name column: sticky to left */
     .grid-table tbody th.name-cell {
-      position: -webkit-sticky;
-      position: sticky;
-      left: 0;
-      z-index: 20;
+      position: -webkit-sticky; position: sticky;
+      left: 0; z-index: 20;
       background-color: var(--bg-card);
       min-width: 134px; max-width: 134px;
-      text-align: left;
-      padding: 8px 10px;
-      font-weight: 500;
-      cursor: pointer;
+      text-align: left; padding: 8px 10px;
+      font-weight: 500; cursor: pointer;
       box-shadow: inset -1px -1px 0 var(--border), 2px 0 4px -2px rgba(0,0,0,0.08);
     }
     .grid-table tbody th.name-cell:active { background-color: var(--bg); }
     .grid-table tbody th.name-cell .nm {
       font-size: 12px; line-height: 1.25;
-      white-space: normal;
-      overflow: hidden; text-overflow: ellipsis;
+      white-space: normal; overflow: hidden; text-overflow: ellipsis;
       display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical;
     }
-    .grid-table tbody th.name-cell .rl {
-      font-size: 10px; color: var(--text-muted); margin-top: 2px; font-weight: 400;
-    }
-
-    /* corner: sticky in both directions, on top of all */
+    .grid-table tbody th.name-cell .rl { font-size: 10px; color: var(--text-muted); margin-top: 2px; font-weight: 400; }
     .grid-table thead th.corner-cell {
-      position: -webkit-sticky;
-      position: sticky;
-      top: 0; left: 0;
-      z-index: 40;
+      position: -webkit-sticky; position: sticky;
+      top: 0; left: 0; z-index: 40;
       background-color: var(--bg-card);
       min-width: 134px; max-width: 134px;
-      text-align: left;
-      padding: 8px 10px;
+      text-align: left; padding: 8px 10px;
       font-size: 10px; color: var(--text-muted);
       text-transform: uppercase; letter-spacing: 0.5px; font-weight: 700;
       box-shadow: inset -1px -1px 0 var(--border), 2px 2px 4px -2px rgba(0,0,0,0.08);
     }
-
-    /* data cells */
     .stat-cell { height: 40px; font-weight: 700; font-size: 12px; cursor: pointer; }
     .stat-cell.weekend { background-color: var(--weekend-bg); }
-    .stat-cell.today {
-      box-shadow: inset -1px -1px 0 var(--border), inset 0 -2px 0 var(--today-ring);
-    }
+    .stat-cell.today { box-shadow: inset -1px -1px 0 var(--border), inset 0 -2px 0 var(--today-ring); }
     .stat-cell.s-D  { background-color: var(--d-bg);  color: var(--d-fg); }
     .stat-cell.s-N  { background-color: var(--n-bg);  color: var(--n-fg); }
     .stat-cell.s-AL { background-color: var(--al-bg); color: var(--al-fg); }
@@ -317,7 +269,7 @@
     .stat-cell.s-X  { background-color: var(--x-bg);  color: var(--x-fg); }
     .stat-cell.empty { color: var(--text-muted); opacity: 0.35; }
 
-    /* compact mode */
+    /* compact */
     .grid-wrap.compact .grid-table thead th.date-cell { min-width: 30px; width: 30px; padding: 4px 0; font-size: 10px; }
     .grid-wrap.compact .grid-table thead th.date-cell .md { font-size: 9px; }
     .grid-wrap.compact .stat-cell { height: 32px; font-size: 11px; }
@@ -326,38 +278,32 @@
     .grid-wrap.compact .grid-table tbody th.name-cell .rl { font-size: 9px; }
     .grid-wrap.compact .grid-table thead th.corner-cell { min-width: 104px; max-width: 104px; padding: 6px 8px; font-size: 9px; }
 
-    /* legend */
+    /* LEGEND */
     .legend {
       flex-shrink: 0;
       padding: 8px 14px;
       padding-bottom: calc(8px + env(safe-area-inset-bottom));
       display: flex; gap: 12px;
-      overflow-x: auto;
-      -webkit-overflow-scrolling: touch;
+      overflow-x: auto; -webkit-overflow-scrolling: touch;
       background: var(--bg-card);
       border-top: 1px solid var(--border);
       scrollbar-width: none;
     }
     .legend::-webkit-scrollbar { display: none; }
     .leg-item { flex-shrink: 0; display: flex; align-items: center; gap: 6px; font-size: 12px; color: var(--text-muted); }
-    .leg-box {
-      width: 20px; height: 20px; border-radius: 5px;
-      font-size: 11px; font-weight: 700;
-      display: flex; align-items: center; justify-content: center;
-    }
+    .leg-box { width: 20px; height: 20px; border-radius: 5px; font-size: 11px; font-weight: 700; display: flex; align-items: center; justify-content: center; }
     .leg-D  { background: var(--d-bg);  color: var(--d-fg); }
     .leg-N  { background: var(--n-bg);  color: var(--n-fg); }
     .leg-AL { background: var(--al-bg); color: var(--al-fg); }
     .leg-RO { background: var(--ro-bg); color: var(--ro-fg); }
     .leg-X  { background: var(--x-bg);  color: var(--x-fg); }
 
-    /* ===== BOTTOM SHEETS ===== */
+    /* SHEETS */
     .sheet-backdrop {
       position: fixed; inset: 0;
       background: rgba(0,0,0,0.45);
       opacity: 0; pointer-events: none;
-      transition: opacity 0.22s;
-      z-index: 50;
+      transition: opacity 0.22s; z-index: 50;
     }
     .sheet-backdrop.show { opacity: 1; pointer-events: auto; }
     .sheet {
@@ -365,20 +311,14 @@
       background: var(--bg-card);
       border-radius: 18px 18px 0 0;
       padding: 8px 18px calc(20px + env(safe-area-inset-bottom));
-      max-height: 86vh; max-height: 86dvh;
+      max-height: 88vh; max-height: 88dvh;
       overflow-y: auto;
       transform: translateY(100%);
       transition: transform 0.26s cubic-bezier(0.32, 0.72, 0, 1);
-      z-index: 55;
-      box-shadow: var(--shadow-lg);
+      z-index: 55; box-shadow: var(--shadow-lg);
     }
     .sheet.show { transform: translateY(0); }
-    .sheet .handle {
-      width: 36px; height: 4px;
-      background: var(--border-strong);
-      border-radius: 2px;
-      margin: 6px auto 14px;
-    }
+    .sheet .handle { width: 36px; height: 4px; background: var(--border-strong); border-radius: 2px; margin: 6px auto 14px; }
     .sheet h3 { font-size: 17px; font-weight: 700; margin-bottom: 4px; }
     .sheet .sub { font-size: 13px; color: var(--text-muted); margin-bottom: 16px; }
     .sheet-section { margin-bottom: 18px; }
@@ -389,18 +329,14 @@
     .chip-row { display: flex; gap: 6px; flex-wrap: wrap; }
     .chip {
       padding: 7px 12px;
-      background: var(--bg);
-      border: 1px solid var(--border);
+      background: var(--bg); border: 1px solid var(--border);
       border-radius: 18px;
-      font-size: 13px; font-weight: 500; cursor: pointer;
-      color: var(--text);
+      font-size: 13px; font-weight: 500; cursor: pointer; color: var(--text);
     }
     .chip.active { background: var(--primary); border-color: var(--primary); color: white; }
     .toggle-row {
       display: flex; align-items: center; justify-content: space-between;
-      padding: 12px 0;
-      border-bottom: 1px solid var(--border);
-      gap: 12px;
+      padding: 12px 0; border-bottom: 1px solid var(--border); gap: 12px;
     }
     .toggle-row:last-child { border-bottom: none; }
     .toggle-row .lbl { font-size: 15px; font-weight: 500; }
@@ -408,24 +344,20 @@
     .switch {
       flex-shrink: 0; width: 48px; height: 28px;
       background: var(--border-strong); border-radius: 14px;
-      position: relative; cursor: pointer;
-      transition: background 0.2s;
+      position: relative; cursor: pointer; transition: background 0.2s;
     }
     .switch::after {
       content: ""; position: absolute;
       top: 2px; left: 2px;
       width: 24px; height: 24px;
       background: white; border-radius: 50%;
-      transition: transform 0.2s;
-      box-shadow: var(--shadow-sm);
+      transition: transform 0.2s; box-shadow: var(--shadow-sm);
     }
     .switch.on { background: var(--primary); }
     .switch.on::after { transform: translateX(20px); }
 
     /* employee detail */
-    .emp-stats {
-      display: grid; grid-template-columns: repeat(5, 1fr); gap: 5px; margin-bottom: 16px;
-    }
+    .emp-stats { display: grid; grid-template-columns: repeat(5, 1fr); gap: 5px; margin-bottom: 16px; }
     .emp-stat { padding: 8px 4px; border-radius: 9px; text-align: center; }
     .emp-stat .v { font-size: 18px; font-weight: 700; line-height: 1.1; }
     .emp-stat .l { font-size: 10px; opacity: 0.8; margin-top: 2px; }
@@ -435,19 +367,13 @@
     .emp-stat.s-RO { background: var(--ro-bg); color: var(--ro-fg); }
     .emp-stat.s-X  { background: var(--x-bg);  color: var(--x-fg); }
     .cal-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 4px; }
-    .cal-grid .dow-hd {
-      font-size: 10px; font-weight: 700; color: var(--text-muted);
-      text-align: center; padding: 4px 0; text-transform: uppercase;
-    }
+    .cal-grid .dow-hd { font-size: 10px; font-weight: 700; color: var(--text-muted); text-align: center; padding: 4px 0; text-transform: uppercase; }
     .cal-cell {
-      aspect-ratio: 1;
-      border-radius: 8px;
+      aspect-ratio: 1; border-radius: 8px;
       display: flex; flex-direction: column;
       align-items: center; justify-content: center;
       font-size: 11px;
-      background: var(--bg);
-      border: 1px solid var(--border);
-      gap: 1px;
+      background: var(--bg); border: 1px solid var(--border); gap: 1px;
     }
     .cal-cell.pad { background: transparent; border: none; }
     .cal-cell .dn { font-weight: 700; font-size: 12px; }
@@ -459,7 +385,29 @@
     .cal-cell.s-X  { background: var(--x-bg);  color: var(--x-fg);  border-color: transparent; }
     .cal-cell.today { box-shadow: 0 0 0 2px var(--today-ring); }
 
-    /* ===== SWAP FINDER ===== */
+    /* SWAP FINDER */
+    .mode-tabs {
+      display: flex;
+      background: var(--bg);
+      border-radius: 12px;
+      padding: 4px;
+      margin-bottom: 16px;
+      gap: 4px;
+    }
+    .mode-tab {
+      flex: 1; padding: 10px 8px;
+      background: transparent;
+      border: none; border-radius: 9px;
+      color: var(--text-muted);
+      font-size: 13px; font-weight: 600;
+      cursor: pointer; transition: all 0.15s;
+      display: flex; align-items: center; justify-content: center; gap: 5px;
+    }
+    .mode-tab.active {
+      background: var(--bg-card);
+      color: var(--primary);
+      box-shadow: var(--shadow-sm);
+    }
     .input-field {
       width: 100%; padding: 11px 14px;
       border: 1px solid var(--border);
@@ -473,9 +421,7 @@
     .emp-result {
       padding: 10px 12px;
       border: 1px solid var(--border);
-      border-radius: 10px;
-      margin-top: 6px;
-      cursor: pointer;
+      border-radius: 10px; margin-top: 6px; cursor: pointer;
       background: var(--bg);
       display: flex; justify-content: space-between; align-items: center; gap: 10px;
     }
@@ -486,23 +432,19 @@
       display: flex; align-items: center; justify-content: space-between;
       padding: 12px 14px;
       background: var(--primary-light);
-      border-radius: 10px;
-      gap: 10px;
+      border-radius: 10px; gap: 10px;
     }
     .me-selected .who { display: flex; flex-direction: column; min-width: 0; }
     .me-selected .who .nm { font-weight: 600; font-size: 14px; color: var(--primary); }
     .me-selected .who .rl { font-size: 11px; color: var(--text-muted); margin-top: 2px; }
     .link-btn {
-      background: none; border: none;
-      color: var(--primary);
-      font-size: 13px; font-weight: 600;
-      cursor: pointer; padding: 6px 10px; border-radius: 6px;
+      background: none; border: none; color: var(--primary);
+      font-size: 13px; font-weight: 600; cursor: pointer; padding: 6px 10px; border-radius: 6px;
     }
     .link-btn:active { background: var(--bg-card); }
-    .empty-hint {
-      color: var(--text-muted); font-size: 13px;
-      padding: 16px; text-align: center; display: block;
-    }
+    .empty-hint { color: var(--text-muted); font-size: 13px; padding: 16px; text-align: center; display: block; }
+
+    /* Score-based result cards */
     .swap-card {
       padding: 12px 14px;
       border-radius: 12px;
@@ -511,45 +453,84 @@
       border-left-width: 4px;
       margin-bottom: 10px;
     }
-    .swap-card.full-match    { border-left-color: var(--success); }
-    .swap-card.partial-match { border-left-color: var(--warning); }
+    .swap-card.excellent { border-left-color: var(--success); }
+    .swap-card.good      { border-left-color: var(--info); }
+    .swap-card.possible  { border-left-color: var(--warning); }
+    .swap-card.weak      { border-left-color: var(--danger); }
     .swap-card-head {
-      display: flex; justify-content: space-between; align-items: baseline;
-      gap: 10px; margin-bottom: 6px;
+      display: flex; justify-content: space-between; align-items: flex-start;
+      gap: 10px; margin-bottom: 10px;
     }
-    .swap-name { font-weight: 600; font-size: 14px; }
-    .swap-role {
-      font-size: 11px;
-      color: var(--text-muted);
-      background: var(--bg-card);
-      padding: 2px 8px;
-      border-radius: 6px;
+    .swap-card-head .who { min-width: 0; flex: 1; }
+    .swap-name { font-weight: 600; font-size: 14px; line-height: 1.25; }
+    .swap-role { font-size: 11px; color: var(--text-muted); margin-top: 2px; }
+    .score-badge {
       flex-shrink: 0;
+      display: inline-flex; align-items: center; gap: 4px;
+      padding: 5px 10px; border-radius: 14px;
+      font-size: 12px; font-weight: 700;
+      white-space: nowrap;
     }
-    .swap-summary {
-      font-size: 13px;
-      font-weight: 600;
-      margin-bottom: 8px;
-    }
-    .swap-card.full-match    .swap-summary { color: var(--success); }
-    .swap-card.partial-match .swap-summary { color: var(--warning); }
-    .swap-coverage { font-size: 12px; display: flex; flex-direction: column; gap: 3px; }
-    .cov-row { display: flex; gap: 6px; align-items: center; }
-    .cov-row.ok { color: var(--success); }
-    .cov-row.no { color: var(--danger); }
+    .score-badge.excellent { background: var(--excellent-bg); color: var(--excellent-fg); }
+    .score-badge.good      { background: var(--good-bg);      color: var(--good-fg); }
+    .score-badge.possible  { background: var(--possible-bg);  color: var(--possible-fg); }
+    .score-badge.weak      { background: var(--weak-bg);      color: var(--weak-fg); }
 
-    /* ===== TOAST ===== */
+    .swap-reasons { display: flex; flex-direction: column; gap: 4px; font-size: 12px; }
+    .swap-reasons + .swap-reasons { margin-top: 4px; }
+    .swap-reason { display: flex; gap: 6px; align-items: center; line-height: 1.35; }
+    .swap-reason.ok   { color: var(--success); }
+    .swap-reason.no   { color: var(--danger); }
+    .swap-reason.warn { color: var(--warning); }
+    .swap-reason.muted { color: var(--text-muted); }
+
+    .swap-warnings {
+      margin-top: 8px;
+      padding: 8px 10px;
+      background: var(--possible-bg);
+      color: var(--possible-fg);
+      border-radius: 8px;
+      font-size: 11px;
+      display: flex; flex-direction: column; gap: 3px;
+    }
+    .swap-warnings .wrow { display: flex; gap: 6px; align-items: flex-start; line-height: 1.4; }
+
+    .swap-proposal {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 10px 12px;
+      margin-top: 10px;
+      font-size: 13px;
+    }
+    .proposal-title {
+      font-size: 10px; text-transform: uppercase; letter-spacing: 0.5px;
+      color: var(--text-muted); font-weight: 700; margin-bottom: 8px;
+    }
+    .proposal-line {
+      display: flex; gap: 8px; align-items: flex-start;
+      padding: 4px 0; line-height: 1.45;
+    }
+    .proposal-line .arrow {
+      flex-shrink: 0; width: 18px;
+      font-weight: 700; font-size: 13px;
+      text-align: center;
+    }
+    .proposal-line.cov .arrow { color: var(--success); }
+    .proposal-line.ret .arrow { color: var(--primary); }
+    .proposal-line strong { font-weight: 600; }
+    .proposal-alt { margin-top: 8px; font-size: 11px; color: var(--text-muted); }
+
+    /* TOAST */
     .toast {
       position: fixed;
       bottom: calc(20px + env(safe-area-inset-bottom));
       left: 50%; transform: translate(-50%, 20px);
-      padding: 11px 18px;
-      border-radius: 12px;
+      padding: 11px 18px; border-radius: 12px;
       background: var(--text); color: var(--bg);
       font-size: 14px; font-weight: 500;
       box-shadow: var(--shadow-lg);
-      z-index: 70;
-      opacity: 0; pointer-events: none;
+      z-index: 70; opacity: 0; pointer-events: none;
       transition: opacity 0.22s, transform 0.22s;
       max-width: 92vw; text-align: center;
     }
@@ -572,7 +553,7 @@
     </div>
   </header>
 
-  <!-- ====== UPLOAD ====== -->
+  <!-- UPLOAD -->
   <div id="uploadScreen" class="screen show">
     <div class="upload-inner">
       <div class="hero">
@@ -599,7 +580,7 @@
     </div>
   </div>
 
-  <!-- ====== SCHEDULE ====== -->
+  <!-- SCHEDULE -->
   <div id="scheduleScreen" class="screen">
     <div class="info-bar">
       <div class="info-item"><div class="info-label">Unit</div><div class="info-value" id="infoUnit">—</div></div>
@@ -607,7 +588,6 @@
       <div class="info-item"><div class="info-label">Staff</div><div class="info-value" id="infoCount">0</div></div>
       <div class="info-item"><div class="info-label">Days</div><div class="info-value" id="infoDays">0</div></div>
     </div>
-
     <div class="toolbar">
       <div class="search-wrap">
         <input type="search" id="searchInput" placeholder="Search staff…" autocomplete="off">
@@ -617,11 +597,9 @@
         <span class="badge" id="filterBadge" style="display:none">0</span>
       </button>
     </div>
-
     <div class="grid-wrap" id="gridWrap">
       <table class="grid-table" id="gridTable"></table>
     </div>
-
     <div class="legend">
       <div class="leg-item"><span class="leg-box leg-D">D</span> Day</div>
       <div class="leg-item"><span class="leg-box leg-N">N</span> Night</div>
@@ -631,7 +609,7 @@
     </div>
   </div>
 
-  <!-- ====== SHEETS ====== -->
+  <!-- SHEETS -->
   <div class="sheet-backdrop" id="sheetBackdrop"></div>
 
   <div class="sheet" id="settingsSheet">
@@ -640,18 +618,12 @@
     <div class="sub">Personalize how the grid looks.</div>
     <div class="sheet-section">
       <div class="toggle-row">
-        <div>
-          <div class="lbl">Compact mode</div>
-          <div class="desc">Smaller cells — fit more dates at once</div>
-        </div>
-        <div class="switch" id="compactToggle" role="switch"></div>
+        <div><div class="lbl">Compact mode</div><div class="desc">Smaller cells — fit more dates at once</div></div>
+        <div class="switch" id="compactToggle"></div>
       </div>
       <div class="toggle-row">
-        <div>
-          <div class="lbl">Highlight today</div>
-          <div class="desc">Mark current date in the grid</div>
-        </div>
-        <div class="switch on" id="todayToggle" role="switch"></div>
+        <div><div class="lbl">Highlight today</div><div class="desc">Mark current date in the grid</div></div>
+        <div class="switch on" id="todayToggle"></div>
       </div>
     </div>
     <div class="sheet-section">
@@ -691,14 +663,19 @@
     </div>
   </div>
 
-  <!-- ====== SWAP FINDER ====== -->
+  <!-- SWAP FINDER -->
   <div class="sheet" id="swapSheet">
     <div class="handle"></div>
-    <h3>Find a Swap</h3>
-    <div class="sub">See who could realistically cover your shift.</div>
+    <h3>Swap Finder</h3>
+    <div class="sub" id="swapSubtitle">Find someone to cover your shift.</div>
+
+    <div class="mode-tabs">
+      <button class="mode-tab active" data-mode="cover">🙋 Find Cover</button>
+      <button class="mode-tab" data-mode="mutual">🔁 Mutual Swap</button>
+    </div>
 
     <div class="sheet-section">
-      <div class="sheet-section-label">Step 1 · Your name</div>
+      <div class="sheet-section-label">Your name</div>
       <div id="swapMePickerWrap">
         <input type="search" id="swapMeSearch" class="input-field" placeholder="Start typing your name…" autocomplete="off">
         <div class="name-results" id="swapMeResults"></div>
@@ -707,25 +684,49 @@
     </div>
 
     <div class="sheet-section" id="swapDatesSection" style="display:none">
-      <div class="sheet-section-label">Step 2 · Working days to swap</div>
+      <div class="sheet-section-label" id="swapDatesLabel">Working days to swap</div>
       <div class="chip-row" id="swapDateChips"></div>
     </div>
 
-    <div class="sheet-section" id="swapOptionsSection" style="display:none">
-      <div class="sheet-section-label">Step 3 · Preferences</div>
+    <!-- Cover-mode options -->
+    <div class="sheet-section" id="swapOptsCover" style="display:none">
+      <div class="sheet-section-label">Preferences</div>
       <div class="toggle-row">
-        <div>
-          <div class="lbl">Same role only</div>
-          <div class="desc">Only suggest people with your job role</div>
-        </div>
-        <div class="switch on" id="swapSameRoleToggle" role="switch"></div>
+        <div><div class="lbl">Same role only</div><div class="desc">Only suggest people with your job role</div></div>
+        <div class="switch on" id="coverSameRoleToggle"></div>
       </div>
       <div class="toggle-row">
-        <div>
-          <div class="lbl">Exclude annual leave</div>
-          <div class="desc">Skip people who are on annual leave</div>
-        </div>
-        <div class="switch on" id="swapExcludeAlToggle" role="switch"></div>
+        <div><div class="lbl">Exclude annual leave</div><div class="desc">Skip people on annual leave on your date</div></div>
+        <div class="switch on" id="coverExcludeAlToggle"></div>
+      </div>
+      <div class="toggle-row">
+        <div><div class="lbl">Show weak matches</div><div class="desc">Include matches below 60% score</div></div>
+        <div class="switch" id="coverShowWeakToggle"></div>
+      </div>
+    </div>
+
+    <!-- Mutual-mode options -->
+    <div class="sheet-section" id="swapOptsMutual" style="display:none">
+      <div class="sheet-section-label">Preferences</div>
+      <div class="toggle-row">
+        <div><div class="lbl">Same role only</div><div class="desc">Only people with your job role</div></div>
+        <div class="switch on" id="mutualSameRoleToggle"></div>
+      </div>
+      <div class="toggle-row">
+        <div><div class="lbl">Same shift only</div><div class="desc">Day swaps with Day, Night with Night</div></div>
+        <div class="switch on" id="mutualSameShiftToggle"></div>
+      </div>
+      <div class="toggle-row">
+        <div><div class="lbl">Exclude annual leave</div><div class="desc">Skip people on AL on your date</div></div>
+        <div class="switch on" id="mutualExcludeAlToggle"></div>
+      </div>
+      <div class="toggle-row">
+        <div><div class="lbl">Require multiple return options</div><div class="desc">Only show candidates with ≥ 2 possible return dates</div></div>
+        <div class="switch" id="mutualMultiReturnsToggle"></div>
+      </div>
+      <div class="toggle-row">
+        <div><div class="lbl">Show weak matches</div><div class="desc">Include matches below 60% score</div></div>
+        <div class="switch" id="mutualShowWeakToggle"></div>
       </div>
     </div>
 
@@ -753,9 +754,10 @@
     };
     const swap = {
       me: null,
+      mode: 'cover',
       dates: new Set(),
-      sameRole: true,
-      excludeAL: true,
+      cover:  { sameRole: true, excludeAL: true, showWeak: false },
+      mutual: { sameRole: true, sameShift: true, excludeAL: true, multiReturns: false, showWeak: false },
     };
 
     // ===== UTILS =====
@@ -765,6 +767,7 @@
     const DOW_FULL  = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
     const STATUS_NAMES = { D: 'Day shift', N: 'Night shift', AL: 'Annual leave', RO: 'Request off', X: 'Rest / Off' };
     const STATUS_LETTER = { D: 'D', N: 'N', AL: 'A', RO: 'R', X: 'X' };
+    const SHIFT_WORD = { D: 'Day', N: 'Night' };
 
     function toast(msg, kind = '') {
       const t = $('#toast');
@@ -776,23 +779,35 @@
     function escapeHtml(s) {
       return String(s).replace(/[&<>"']/g, c => ({ '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;' }[c]));
     }
-    function getDow(iso) { return new Date(iso + 'T00:00:00').getDay(); }
-    function isWeekend(iso) { const d = getDow(iso); return d === 5 || d === 6; }
-    function fmtMd(iso) { return iso.slice(5).replace('-', '/'); }
+    function getDow(iso)     { return new Date(iso + 'T00:00:00').getDay(); }
+    function isWeekend(iso)  { const d = getDow(iso); return d === 5 || d === 6; }
+    function fmtMd(iso)      { return iso.slice(5).replace('-', '/'); }
     function fmtDateLabel(iso) { return `${DOW_NAMES[getDow(iso)]} ${fmtMd(iso)}`; }
+    function daysBetween(a, b) {
+      const ms = new Date(a + 'T00:00:00') - new Date(b + 'T00:00:00');
+      return Math.round(Math.abs(ms) / 86400000);
+    }
+    function addDaysISO(iso, n) {
+      const d = new Date(iso + 'T00:00:00');
+      d.setDate(d.getDate() + n);
+      return d.toISOString().slice(0, 10);
+    }
     function expandDates(start, end) {
       const out = [];
       const cur = new Date(start + 'T00:00:00');
       const stop = new Date(end + 'T00:00:00');
-      while (cur <= stop) {
-        out.push(cur.toISOString().slice(0, 10));
-        cur.setDate(cur.getDate() + 1);
-      }
+      while (cur <= stop) { out.push(cur.toISOString().slice(0, 10)); cur.setDate(cur.getDate() + 1); }
       return out;
     }
     function statusOf(emp, date) {
       for (const k of ['D', 'N', 'AL', 'RO', 'X']) if (emp[k].includes(date)) return k;
       return null;
+    }
+    function scoreBracket(score) {
+      if (score >= 90) return { cls: 'excellent', label: 'Excellent' };
+      if (score >= 75) return { cls: 'good',      label: 'Good' };
+      if (score >= 60) return { cls: 'possible',  label: 'Possible' };
+      return                  { cls: 'weak',      label: 'Weak' };
     }
 
     // ===== SHEETS =====
@@ -847,11 +862,8 @@
           const content = await page.getTextContent();
           const viewport = page.getViewport({ scale: 1 });
           const items = content.items.map(it => ({
-            text: it.str,
-            x: it.transform[4],
-            y: viewport.height - it.transform[5],
-            width: it.width,
-            height: it.height,
+            text: it.str, x: it.transform[4], y: viewport.height - it.transform[5],
+            width: it.width, height: it.height,
           }));
           pages.push({ items, width: viewport.width, height: viewport.height, page: i });
         }
@@ -859,9 +871,7 @@
           p.items.sort((a, b) => (a.y - b.y) * 1000 + (a.x - b.x)).map(i => i.text).join(' ')
         ).join('\n');
         submitParse({ sourceType: 'pdf', pages, plainText });
-      } catch (e) {
-        toast('PDF read failed: ' + e.message, 'error');
-      }
+      } catch (e) { toast('PDF read failed: ' + e.message, 'error'); }
     }
 
     async function submitParse(payload) {
@@ -873,17 +883,11 @@
           body: JSON.stringify(payload),
         });
         const j = await res.json();
-        if (!res.ok) {
-          toast(j.error || 'Parse failed', 'error');
-          console.error('Parse error:', j);
-          return;
-        }
+        if (!res.ok) { toast(j.error || 'Parse failed', 'error'); console.error('Parse error:', j); return; }
         if (!j.start || !j.end) { toast('No period information found', 'error'); return; }
         loadData(j);
         toast(`Loaded ${j.employees.length} staff`, 'success');
-      } catch (e) {
-        toast('Network error: ' + e.message, 'error');
-      }
+      } catch (e) { toast('Network error: ' + e.message, 'error'); }
     }
 
     // ===== LOAD =====
@@ -891,18 +895,18 @@
       state.data = data;
       state.dates = expandDates(data.start, data.end);
       state.filter = { search: '', roles: new Set(), statuses: new Set() };
-
       try { localStorage.setItem('schedule_data_v1', JSON.stringify(data)); } catch {}
 
-      // restore "me" if name still exists in new data
       try {
         const meName = localStorage.getItem('me_name_v1');
-        if (meName) {
-          const me = data.employees.find(e => e.name === meName);
-          swap.me = me || null;
-        } else { swap.me = null; }
+        swap.me = meName ? (data.employees.find(e => e.name === meName) || null) : null;
       } catch { swap.me = null; }
       swap.dates.clear();
+
+      try {
+        const m = localStorage.getItem('swap_mode_v1');
+        if (m === 'cover' || m === 'mutual') swap.mode = m;
+      } catch {}
 
       $('#infoUnit').textContent   = data.unit || '—';
       $('#infoPeriod').textContent = `${data.start} → ${data.end}`;
@@ -917,8 +921,7 @@
         c.addEventListener('click', () => {
           c.classList.toggle('active');
           const r = c.dataset.role;
-          if (state.filter.roles.has(r)) state.filter.roles.delete(r);
-          else state.filter.roles.add(r);
+          if (state.filter.roles.has(r)) state.filter.roles.delete(r); else state.filter.roles.add(r);
           render(); updateFilterBadge();
         });
       });
@@ -931,7 +934,6 @@
       $('#todayBtn').style.display = state.dates.includes(state.todayISO) ? '' : 'none';
       $('#swapBtn').style.display = '';
       $('#appTitleText').textContent = data.unit || 'Schedule';
-
       render();
       setTimeout(scrollToToday, 60);
     }
@@ -944,8 +946,7 @@
       if (!target) return;
       const wrap = $('#gridWrap');
       const nameW = $('.name-cell')?.offsetWidth || 134;
-      const left = target.offsetLeft - nameW - 8;
-      wrap.scrollTo({ left: Math.max(0, left), behavior: 'smooth' });
+      wrap.scrollTo({ left: Math.max(0, target.offsetLeft - nameW - 8), behavior: 'smooth' });
     }
     $('#todayBtn').addEventListener('click', scrollToToday);
 
@@ -971,11 +972,8 @@
       for (const d of dates) {
         const wknd = isWeekend(d);
         const today = state.ui.showToday && d === state.todayISO;
-        const md = fmtMd(d);
-        const cls = ['date-cell'];
-        if (wknd) cls.push('weekend');
-        if (today) cls.push('today');
-        html += `<th class="${cls.join(' ')}" data-date="${d}"><div class="dow">${DOW_NAMES[getDow(d)]}</div><div class="md">${md}</div></th>`;
+        const cls = ['date-cell']; if (wknd) cls.push('weekend'); if (today) cls.push('today');
+        html += `<th class="${cls.join(' ')}" data-date="${d}"><div class="dow">${DOW_NAMES[getDow(d)]}</div><div class="md">${fmtMd(d)}</div></th>`;
       }
       html += '</tr></thead><tbody>';
       for (const emp of employees) {
@@ -986,9 +984,7 @@
           const code  = statusOf(emp, d);
           const wknd  = isWeekend(d);
           const today = state.ui.showToday && d === state.todayISO;
-          const cls = ['stat-cell'];
-          if (wknd) cls.push('weekend');
-          if (today) cls.push('today');
+          const cls = ['stat-cell']; if (wknd) cls.push('weekend'); if (today) cls.push('today');
           if (code) cls.push('s-' + code); else cls.push('empty');
           const letter = code ? STATUS_LETTER[code] : '·';
           html += `<td class="${cls.join(' ')}" data-emp="${safeName}" data-date="${d}" data-code="${code || ''}">${letter}</td>`;
@@ -1006,8 +1002,7 @@
           const date = c.dataset.date;
           const dow  = DOW_FULL[getDow(date)];
           const md   = fmtMd(date);
-          const label = code ? STATUS_NAMES[code] : 'No entry';
-          toast(`${name} · ${dow} ${md} · ${label}`);
+          toast(`${name} · ${dow} ${md} · ${code ? STATUS_NAMES[code] : 'No entry'}`);
         });
       });
       $$('#gridTable .name-cell').forEach(c => {
@@ -1025,19 +1020,15 @@
         <div class="emp-stat s-${k}"><div class="v">${emp[k].length}</div><div class="l">${STATUS_LETTER[k]}</div></div>
       `).join('');
       const dates = state.dates;
-      const first = new Date(dates[0] + 'T00:00:00');
-      const padStart = first.getDay();
+      const padStart = new Date(dates[0] + 'T00:00:00').getDay();
       let html = '';
       for (const n of DOW_NAMES) html += `<div class="dow-hd">${n}</div>`;
       for (let i = 0; i < padStart; i++) html += `<div class="cal-cell pad"></div>`;
       for (const d of dates) {
         const code = statusOf(emp, d);
         const today = d === state.todayISO;
-        const dn = d.slice(8);
-        const cls = ['cal-cell'];
-        if (code) cls.push('s-' + code);
-        if (today) cls.push('today');
-        html += `<div class="${cls.join(' ')}"><div class="dn">${dn}</div><div class="dc">${code ? STATUS_LETTER[code] : ''}</div></div>`;
+        const cls = ['cal-cell']; if (code) cls.push('s-' + code); if (today) cls.push('today');
+        html += `<div class="${cls.join(' ')}"><div class="dn">${d.slice(8)}</div><div class="dc">${code ? STATUS_LETTER[code] : ''}</div></div>`;
       }
       $('#calGrid').innerHTML = html;
       openSheet('#empSheet');
@@ -1055,8 +1046,7 @@
       c.addEventListener('click', () => {
         c.classList.toggle('active');
         const s = c.dataset.status;
-        if (state.filter.statuses.has(s)) state.filter.statuses.delete(s);
-        else state.filter.statuses.add(s);
+        if (state.filter.statuses.has(s)) state.filter.statuses.delete(s); else state.filter.statuses.add(s);
         render(); updateFilterBadge();
       });
     });
@@ -1108,18 +1098,50 @@
       $('#todayBtn').style.display = 'none';
       $('#swapBtn').style.display = 'none';
       $('#appTitleText').textContent = 'Schedule';
-      pdfInput.value = '';
-      $('#textInput').value = '';
+      pdfInput.value = ''; $('#textInput').value = '';
       closeAllSheets();
     });
 
-    // ===== SWAP FINDER =====
+    // ===== SWAP FINDER — open =====
     $('#swapBtn').addEventListener('click', () => {
       if (!state.data) return;
+      applySwapMode();
       renderSwapForm();
       openSheet('#swapSheet');
     });
 
+    // mode tabs
+    $$('.mode-tab').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const m = btn.dataset.mode;
+        if (m === swap.mode) return;
+        swap.mode = m;
+        if (m === 'mutual' && swap.dates.size > 1) {
+          const first = [...swap.dates][0];
+          swap.dates.clear(); swap.dates.add(first);
+        }
+        try { localStorage.setItem('swap_mode_v1', m); } catch {}
+        applySwapMode();
+        renderSwapForm();
+      });
+    });
+
+    function applySwapMode() {
+      $$('.mode-tab').forEach(t => t.classList.toggle('active', t.dataset.mode === swap.mode));
+      const cover = swap.mode === 'cover';
+      $('#swapSubtitle').textContent = cover
+        ? 'Find someone to cover one or more of your shifts.'
+        : 'Find a person who can cover you AND whose shift you can return.';
+      $('#swapOptsCover').style.display  = cover ? '' : 'none';
+      $('#swapOptsMutual').style.display = cover ? 'none' : '';
+      $('#swapDatesLabel').textContent   = cover
+        ? 'Working days to swap (pick one or more)'
+        : 'Pick one working day to swap';
+      $('#swapResults').innerHTML = '';
+      $('#swapResultsSection').style.display = 'none';
+    }
+
+    // me selection
     function renderSwapForm() {
       if (swap.me) {
         $('#swapMePickerWrap').style.display = 'none';
@@ -1134,7 +1156,6 @@
         $('#swapChangeBtn').addEventListener('click', changeSwapMe);
         renderSwapDateChips();
         $('#swapDatesSection').style.display = '';
-        $('#swapOptionsSection').style.display = '';
         $('#swapFindBtn').style.display = '';
       } else {
         $('#swapMePickerWrap').style.display = '';
@@ -1142,7 +1163,6 @@
         $('#swapMeResults').innerHTML = '';
         $('#swapMeSelected').style.display = 'none';
         $('#swapDatesSection').style.display = 'none';
-        $('#swapOptionsSection').style.display = 'none';
         $('#swapFindBtn').style.display = 'none';
         $('#swapResultsSection').style.display = 'none';
       }
@@ -1155,7 +1175,7 @@
         return s === 'D' || s === 'N';
       });
       if (!workingDates.length) {
-        $('#swapDateChips').innerHTML = '<span class="empty-hint">No working days found for this person in the schedule.</span>';
+        $('#swapDateChips').innerHTML = '<span class="empty-hint">No working days for this person in the schedule.</span>';
         return;
       }
       $('#swapDateChips').innerHTML = workingDates.map(d => {
@@ -1165,9 +1185,17 @@
       }).join('');
       $$('#swapDateChips .chip').forEach(c => {
         c.addEventListener('click', () => {
-          c.classList.toggle('active');
           const d = c.dataset.date;
-          if (swap.dates.has(d)) swap.dates.delete(d); else swap.dates.add(d);
+          if (swap.mode === 'mutual') {
+            // single select
+            $$('#swapDateChips .chip').forEach(o => o.classList.remove('active'));
+            c.classList.add('active');
+            swap.dates.clear();
+            swap.dates.add(d);
+          } else {
+            c.classList.toggle('active');
+            if (swap.dates.has(d)) swap.dates.delete(d); else swap.dates.add(d);
+          }
         });
       });
     }
@@ -1184,13 +1212,8 @@
     $('#swapMeSearch').addEventListener('input', e => {
       const q = e.target.value.toLowerCase().trim();
       if (!q) { $('#swapMeResults').innerHTML = ''; return; }
-      const matches = state.data.employees
-        .filter(emp => emp.name.toLowerCase().includes(q))
-        .slice(0, 10);
-      if (!matches.length) {
-        $('#swapMeResults').innerHTML = '<span class="empty-hint">No staff match that name.</span>';
-        return;
-      }
+      const matches = state.data.employees.filter(emp => emp.name.toLowerCase().includes(q)).slice(0, 10);
+      if (!matches.length) { $('#swapMeResults').innerHTML = '<span class="empty-hint">No staff match that name.</span>'; return; }
       $('#swapMeResults').innerHTML = matches.map(emp => `
         <div class="emp-result" data-name="${escapeHtml(emp.name)}">
           <div><div class="nm">${escapeHtml(emp.name)}</div><div class="rl">${escapeHtml(emp.role || '—')}</div></div>
@@ -1199,99 +1222,298 @@
       `).join('');
       $$('#swapMeResults .emp-result').forEach(el => {
         el.addEventListener('click', () => {
-          const name = el.dataset.name;
-          const emp = state.data.employees.find(x => x.name === name);
+          const emp = state.data.employees.find(x => x.name === el.dataset.name);
           if (!emp) return;
-          swap.me = emp;
-          swap.dates.clear();
-          try { localStorage.setItem('me_name_v1', name); } catch {}
+          swap.me = emp; swap.dates.clear();
+          try { localStorage.setItem('me_name_v1', emp.name); } catch {}
           renderSwapForm();
         });
       });
     });
 
-    $('#swapSameRoleToggle').addEventListener('click', e => {
-      e.currentTarget.classList.toggle('on');
-      swap.sameRole = e.currentTarget.classList.contains('on');
-    });
-    $('#swapExcludeAlToggle').addEventListener('click', e => {
-      e.currentTarget.classList.toggle('on');
-      swap.excludeAL = e.currentTarget.classList.contains('on');
-    });
+    // bind toggles
+    function bindToggle(id, getRef, setRef) {
+      const el = $('#' + id);
+      el.classList.toggle('on', getRef());
+      el.addEventListener('click', () => {
+        el.classList.toggle('on');
+        setRef(el.classList.contains('on'));
+      });
+    }
+    bindToggle('coverSameRoleToggle',   () => swap.cover.sameRole,    v => swap.cover.sameRole = v);
+    bindToggle('coverExcludeAlToggle',  () => swap.cover.excludeAL,   v => swap.cover.excludeAL = v);
+    bindToggle('coverShowWeakToggle',   () => swap.cover.showWeak,    v => swap.cover.showWeak = v);
+    bindToggle('mutualSameRoleToggle',  () => swap.mutual.sameRole,   v => swap.mutual.sameRole = v);
+    bindToggle('mutualSameShiftToggle', () => swap.mutual.sameShift,  v => swap.mutual.sameShift = v);
+    bindToggle('mutualExcludeAlToggle', () => swap.mutual.excludeAL,  v => swap.mutual.excludeAL = v);
+    bindToggle('mutualMultiReturnsToggle', () => swap.mutual.multiReturns, v => swap.mutual.multiReturns = v);
+    bindToggle('mutualShowWeakToggle',  () => swap.mutual.showWeak,   v => swap.mutual.showWeak = v);
 
     $('#swapFindBtn').addEventListener('click', () => {
       if (!swap.me) { toast('Pick yourself first', 'error'); return; }
       if (swap.dates.size === 0) { toast('Pick at least one date', 'error'); return; }
-      const results = findSwapCandidates();
+      const results = swap.mode === 'cover' ? findCoverCandidates() : findMutualCandidates();
       renderSwapResults(results);
-      // scroll the sheet to results
-      setTimeout(() => {
-        $('#swapResultsSection').scrollIntoView({ behavior: 'smooth', block: 'start' });
-      }, 50);
+      setTimeout(() => $('#swapResultsSection').scrollIntoView({ behavior: 'smooth', block: 'start' }), 50);
     });
 
-    function findSwapCandidates() {
+    // ===== COVER ALGORITHM =====
+    function findCoverCandidates() {
       const dates = [...swap.dates];
+      const opts = swap.cover;
+      const me = swap.me;
       return state.data.employees
-        .filter(emp => emp.name !== swap.me.name)
-        .filter(emp => !swap.sameRole || (emp.role || '') === (swap.me.role || ''))
-        .map(person => {
-          const coverage = dates.map(d => {
-            const status = statusOf(person, d);
-            const dateLabel = fmtDateLabel(d);
-            if (status === 'D' || status === 'N') return { date: d, dateLabel, ok: false, reason: `Working ${status}` };
-            if (status === 'AL') {
-              if (swap.excludeAL) return { date: d, dateLabel, ok: false, reason: 'On annual leave' };
-              return { date: d, dateLabel, ok: true, reason: 'Annual leave' };
-            }
-            if (status === 'RO') return { date: d, dateLabel, ok: true, reason: 'Requested off' };
-            if (status === 'X')  return { date: d, dateLabel, ok: true, reason: 'Rest day' };
-            return { date: d, dateLabel, ok: true, reason: 'Free' };
-          });
-          const okCount = coverage.filter(c => c.ok).length;
-          return { person, coverage, okCount };
-        })
-        .filter(r => r.okCount > 0)
-        .sort((a, b) => {
-          if (b.okCount !== a.okCount) return b.okCount - a.okCount;
-          // tiebreak: same role first
-          const aRole = (a.person.role || '') === (swap.me.role || '') ? 0 : 1;
-          const bRole = (b.person.role || '') === (swap.me.role || '') ? 0 : 1;
-          if (aRole !== bRole) return aRole - bRole;
-          return a.person.name.localeCompare(b.person.name);
-        });
+        .filter(emp => emp.name !== me.name)
+        .filter(emp => !opts.sameRole || (emp.role || '') === (me.role || ''))
+        .map(person => analyzeCover(person, me, dates, opts))
+        .filter(r => r && r.score > 0)
+        .filter(r => opts.showWeak || r.score >= 60)
+        .sort((a, b) => b.score - a.score);
     }
 
+    function analyzeCover(person, me, dates, opts) {
+      const STATUS_WEIGHT = { null: 1.0, X: 0.95, RO: 0.78, AL: 0.55 };
+      const coverage = dates.map(d => {
+        const s = statusOf(person, d);
+        if (s === 'D' || s === 'N') return { date: d, ok: false, status: s, reason: `Working ${s}` };
+        if (s === 'AL') {
+          if (opts.excludeAL) return { date: d, ok: false, status: 'AL', reason: 'On annual leave' };
+          return { date: d, ok: true, status: 'AL', reason: 'Annual leave (low priority)', weight: STATUS_WEIGHT.AL };
+        }
+        if (s === 'RO') return { date: d, ok: true, status: 'RO', reason: 'Requested off', weight: STATUS_WEIGHT.RO };
+        if (s === 'X')  return { date: d, ok: true, status: 'X',  reason: 'Rest day',      weight: STATUS_WEIGHT.X };
+        return                  { date: d, ok: true, status: null, reason: 'Off',         weight: STATUS_WEIGHT.null };
+      });
+      const okItems = coverage.filter(c => c.ok);
+      if (!okItems.length) return null;
+
+      const avgWeight  = okItems.reduce((s, c) => s + c.weight, 0) / okItems.length;
+      const coverRatio = okItems.length / dates.length;
+      let score = avgWeight * 100;
+      if (coverRatio < 1) score *= (0.5 + 0.5 * coverRatio);   // gentle partial penalty
+
+      // role
+      const sameRole = (person.role || '') === (me.role || '');
+      if (sameRole) score += 5; else score -= 8;
+
+      return {
+        person, coverage,
+        okCount: okItems.length, total: dates.length, sameRole,
+        score: Math.max(0, Math.min(100, Math.round(score))),
+        mode: 'cover',
+      };
+    }
+
+    // ===== MUTUAL ALGORITHM =====
+    function findMutualCandidates() {
+      const myDate = [...swap.dates][0];
+      const me = swap.me;
+      const myShift = statusOf(me, myDate);
+      if (myShift !== 'D' && myShift !== 'N') { toast('Pick a working day', 'error'); return []; }
+      const opts = swap.mutual;
+      return state.data.employees
+        .filter(emp => emp.name !== me.name)
+        .filter(emp => !opts.sameRole || (emp.role || '') === (me.role || ''))
+        .map(p => analyzeMutual(p, me, myDate, myShift, opts))
+        .filter(r => r !== null)
+        .filter(r => opts.showWeak || r.score >= 60)
+        .filter(r => !opts.multiReturns || r.returnDates.length >= 2)
+        .sort((a, b) => b.score - a.score);
+    }
+
+    function isMyselfAvailable(me, date) {
+      const s = statusOf(me, date);
+      return s === null || s === 'X' || s === 'RO';   // AL means I'm physically away
+    }
+    function isPersonWorking(p, date) {
+      const s = statusOf(p, date);
+      return s === 'D' || s === 'N';
+    }
+    function countConsecutiveWork(person, date) {
+      let c = 0;
+      if (isPersonWorking(person, addDaysISO(date, -1))) c++;
+      if (isPersonWorking(person, addDaysISO(date, +1))) c++;
+      return c;
+    }
+
+    function analyzeMutual(person, me, myDate, myShift, opts) {
+      const personStatus = statusOf(person, myDate);
+      if (personStatus === 'D' || personStatus === 'N') return null;     // they're working that day
+      if (personStatus === 'AL' && opts.excludeAL)     return null;
+
+      // find return dates (person works, I'm available)
+      const returnAll = state.dates
+        .filter(d => d !== myDate)
+        .map(d => {
+          const ps = statusOf(person, d);
+          if (ps !== 'D' && ps !== 'N') return null;
+          if (!isMyselfAvailable(me, d)) return null;
+          const sameShift = ps === myShift;
+          if (opts.sameShift && !sameShift) return null;
+          return { date: d, shift: ps, sameShift, daysAway: daysBetween(d, myDate) };
+        })
+        .filter(Boolean)
+        .sort((a, b) => {
+          if (a.sameShift !== b.sameShift) return a.sameShift ? -1 : 1;
+          return a.daysAway - b.daysAway;
+        });
+
+      // base score
+      let score = 0;
+      const availBonus = { null: 35, X: 30, RO: 20, AL: 5 };
+      score += availBonus[personStatus] ?? 35;
+
+      const bestReturn = returnAll[0] || null;
+      if (bestReturn) {
+        score += 40;
+        if (bestReturn.sameShift) score += 18;
+        if (bestReturn.daysAway <= 7) score += 5;
+        else if (bestReturn.daysAway > 21) score -= 5;
+        if (returnAll.length >= 3) score += 3;
+      }
+
+      const sameRole = (person.role || '') === (me.role || '');
+      if (sameRole) score += 5;
+
+      // fatigue penalties
+      const personConsec = countConsecutiveWork(person, myDate);
+      let myReturnConsec = 0;
+      if (bestReturn) myReturnConsec = countConsecutiveWork(me, bestReturn.date);
+      score -= personConsec * 4;
+      score -= myReturnConsec * 4;
+
+      // build reasons
+      const reasons = [];
+      const statusReason = {
+        null: { ok: true,  text: `Off on ${fmtDateLabel(myDate)}` },
+        X:    { ok: true,  text: `Rest day on ${fmtDateLabel(myDate)}` },
+        RO:   { ok: true,  text: `Requested off on ${fmtDateLabel(myDate)}` },
+        AL:   { ok: false, text: `On annual leave on ${fmtDateLabel(myDate)}` },
+      }[personStatus] || { ok: true, text: `Available on ${fmtDateLabel(myDate)}` };
+      reasons.push(statusReason);
+
+      if (sameRole) reasons.push({ ok: true, text: 'Same role' });
+      else reasons.push({ ok: false, text: `Different role (${person.role || '—'} vs ${me.role || '—'})` });
+
+      if (bestReturn) {
+        if (bestReturn.sameShift) reasons.push({ ok: true, text: `Same-shift return available (${SHIFT_WORD[bestReturn.shift]})` });
+        else reasons.push({ ok: false, text: `Return requires switching shift type (${SHIFT_WORD[myShift]} → ${SHIFT_WORD[bestReturn.shift]})` });
+        if (returnAll.length >= 3) reasons.push({ ok: true, text: `${returnAll.length} possible return dates` });
+      } else {
+        reasons.push({ ok: false, text: 'No matching return date found' });
+      }
+
+      // warnings
+      const warnings = [];
+      if (personConsec > 0)
+        warnings.push(`Adds to ${escapeHtml(person.name.split(',')[0])}'s consecutive workdays around ${fmtDateLabel(myDate)}`);
+      if (myReturnConsec > 0 && bestReturn)
+        warnings.push(`You'd have consecutive workdays around the return on ${fmtDateLabel(bestReturn.date)}`);
+
+      return {
+        person, personStatus, myShift, myDate,
+        returnDates: returnAll, bestReturn,
+        score: Math.max(0, Math.min(100, Math.round(score))),
+        reasons, warnings, sameRole,
+        mode: 'mutual',
+      };
+    }
+
+    // ===== RENDER RESULTS =====
     function renderSwapResults(results) {
       $('#swapResultCount').textContent = results.length;
       $('#swapResultsSection').style.display = '';
       if (!results.length) {
-        $('#swapResults').innerHTML = '<div class="empty-hint">No candidates found. Try turning off "Same role only" or "Exclude annual leave".</div>';
+        const hint = swap.mode === 'cover'
+          ? 'No candidates found. Try turning off "Same role only" or "Exclude annual leave".'
+          : 'No mutual swap found. Try turning off "Same shift only" or "Require multiple return options".';
+        $('#swapResults').innerHTML = `<div class="empty-hint">${hint}</div>`;
         return;
       }
-      const total = swap.dates.size;
-      $('#swapResults').innerHTML = results.slice(0, 30).map(r => {
-        const full = r.okCount === total;
-        const matchClass = full ? 'full-match' : 'partial-match';
-        const summary = full
-          ? (total > 1 ? `✓ Can cover all ${total} days` : '✓ Can cover this day')
-          : `⚠ Covers ${r.okCount} of ${total} days`;
-        const items = r.coverage.map(c => `
-          <div class="cov-row ${c.ok ? 'ok' : 'no'}">
-            ${c.ok ? '✓' : '✗'} ${c.dateLabel} — ${c.reason}
-          </div>
-        `).join('');
-        return `
-          <div class="swap-card ${matchClass}">
-            <div class="swap-card-head">
+      $('#swapResults').innerHTML = results.slice(0, 30).map(r =>
+        r.mode === 'cover' ? renderCoverCard(r) : renderMutualCard(r)
+      ).join('');
+    }
+
+    function renderCoverCard(r) {
+      const br = scoreBracket(r.score);
+      const items = r.coverage.map(c => `
+        <div class="swap-reason ${c.ok ? 'ok' : 'no'}">
+          ${c.ok ? '✓' : '✗'} ${fmtDateLabel(c.date)} — ${c.reason}
+        </div>
+      `).join('');
+      const summary = r.okCount === r.total
+        ? (r.total > 1 ? `Can cover all ${r.total} days` : 'Can cover this day')
+        : `Covers ${r.okCount} of ${r.total} days`;
+      return `
+        <div class="swap-card ${br.cls}">
+          <div class="swap-card-head">
+            <div class="who">
               <div class="swap-name">${escapeHtml(r.person.name)}</div>
               <div class="swap-role">${escapeHtml(r.person.role || '—')}</div>
             </div>
-            <div class="swap-summary">${summary}</div>
-            <div class="swap-coverage">${items}</div>
+            <div class="score-badge ${br.cls}">${r.score} · ${br.label}</div>
+          </div>
+          <div class="swap-reasons">
+            <div class="swap-reason muted">${summary}${r.sameRole ? ' · Same role' : ''}</div>
+            ${items}
+          </div>
+        </div>
+      `;
+    }
+
+    function renderMutualCard(r) {
+      const br = scoreBracket(r.score);
+      const reasons = r.reasons.map(rs =>
+        `<div class="swap-reason ${rs.ok ? 'ok' : 'no'}">${rs.ok ? '✓' : '✗'} ${escapeHtml(rs.text)}</div>`
+      ).join('');
+      let proposal = '';
+      if (r.bestReturn) {
+        const others = r.returnDates.slice(1, 4).map(rd =>
+          `${fmtDateLabel(rd.date)} (${rd.shift})${rd.sameShift ? '' : ' ⚠'}`
+        ).join(' · ');
+        proposal = `
+          <div class="swap-proposal">
+            <div class="proposal-title">Proposed swap</div>
+            <div class="proposal-line cov">
+              <div class="arrow">→</div>
+              <div><strong>${escapeHtml(r.person.name)}</strong> covers your <strong>${SHIFT_WORD[r.myShift]}</strong> shift on <strong>${fmtDateLabel(r.myDate)}</strong></div>
+            </div>
+            <div class="proposal-line ret">
+              <div class="arrow">←</div>
+              <div>You cover ${escapeHtml(r.person.name.split(',')[0])}'s <strong>${SHIFT_WORD[r.bestReturn.shift]}</strong> shift on <strong>${fmtDateLabel(r.bestReturn.date)}</strong></div>
+            </div>
+            ${others ? `<div class="proposal-alt">Other return options: ${others}</div>` : ''}
           </div>
         `;
-      }).join('');
+      } else {
+        proposal = `
+          <div class="swap-proposal">
+            <div class="proposal-title">Cover only — no return found</div>
+            <div class="proposal-line cov">
+              <div class="arrow">→</div>
+              <div><strong>${escapeHtml(r.person.name)}</strong> could cover your shift on <strong>${fmtDateLabel(r.myDate)}</strong>, but no return date available.</div>
+            </div>
+          </div>
+        `;
+      }
+      const warnings = r.warnings.length
+        ? `<div class="swap-warnings">${r.warnings.map(w => `<div class="wrow">⚠ ${w}</div>`).join('')}</div>`
+        : '';
+      return `
+        <div class="swap-card ${br.cls}">
+          <div class="swap-card-head">
+            <div class="who">
+              <div class="swap-name">${escapeHtml(r.person.name)}</div>
+              <div class="swap-role">${escapeHtml(r.person.role || '—')}</div>
+            </div>
+            <div class="score-badge ${br.cls}">${r.score} · ${br.label}</div>
+          </div>
+          <div class="swap-reasons">${reasons}</div>
+          ${warnings}
+          ${proposal}
+        </div>
+      `;
     }
 
     // ===== BOOT =====
