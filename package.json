@@ -1,13 +1,6 @@
 {
-  "name": "schedule-grid",
+  "name": "schedule-grid-parser",
   "version": "1.0.0",
   "private": true,
-  "type": "module",
-  "engines": {
-    "node": "20.x"
-  },
-  "scripts": {
-    "dev": "vercel dev"
-  },
-  "dependencies": {}
+  "type": "module"
 }
