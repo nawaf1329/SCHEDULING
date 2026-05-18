@@ -339,8 +339,8 @@ function parsePdfLayoutSchedule(pages, period, collector, debugMode) {
 // ─────────────────────────────────────────────────────────────────────────────
 
 // Role keywords recognised everywhere (classifyRow + name assembly + metaRow scan)
-const ROLE_PATTERN = /^(AHN|SN\s+I{1,2}|SN\s+II|CA|CLN|CLNSPC|WC|CI|Default|RN|LPN)$/i;
-const ROLE_INLINE  = /\b(AHN|SN\s+I{1,2}|SN\s+II|CA|CLN|CLNSPC|WC|CI|Default|RN|LPN)\b/i;
+const ROLE_PATTERN = /^(HN|AHN|SN\s+I{1,2}|SN\s+II|CA|CLN|CLNSPC|WC|CI|Default|RN|LPN)$/i;
+const ROLE_INLINE  = /\b(HN|AHN|SN\s+I{1,2}|SN\s+II|CA|CLN|CLNSPC|WC|CI|Default|RN|LPN)\b/i;
 
 function buildEmployeeEntries(nameZoneItems, pageHeight, headerY, debugMode) {
   const footerY   = pageHeight * 0.93;
@@ -425,6 +425,8 @@ function buildEmployeeEntries(nameZoneItems, pageHeight, headerY, debugMode) {
     }
 
     // ── name cleanup ──────────────────────────────────────────────────────
+    // Strip section labels that can bleed into the first name in secondary tables.
+    name = name.replace(/^Float\s+Out\s+/i, '').trim();
     // Strip FTE value bleeding into name row (rotated PDFs)
     name = name.replace(/\b[01]\.\d{2}\b/g, '').replace(/\s+/g, ' ').trim();
     // Detect trailing mixed-case partial role word (e.g. "Defa" from split "Default")
@@ -570,11 +572,18 @@ function isKnownAnnotation(text) {
   if (/^[-–—\.]+$/.test(u))          return true;
   if (u === 'N/A' || u === 'NA')     return true;
   // Date-header labels bleeding into cells (e.g. "05/01 Fr")
-  if (/^\d{1,2}\/\d{1,2}(\s+\w{2,3})?$/.test(raw)) return true;
+  if (/^\d{1,2}\/\d{1,2}(?:\s+\w{2,3})?(?:\s+\d+(?:\.\d+)?)?$/.test(raw)) return true;
   // Day-of-week abbreviations
   if (/^(Su|Mo|Tu|We|Th|Fr|Sa)$/i.test(raw))        return true;
-  // Footer/report strings
-  if (/^(report\s+date|printed|generated)/i.test(raw)) return true;
+  // Footer/report strings and secondary summary/header rows
+  if (/^(report\s+date|printed|generated|skill|employee|totals?\b|shift\s+partition)/i.test(raw)) return true;
+  if (/totals?\s+by\s+employee\s+skill/i.test(raw)) return true;
+  // Rows that are mostly date labels / FTE numbers, not shift statuses
+  if (/(?:\d{1,2}\/\d{1,2}.*){2,}/.test(raw)) return true;
+  // harmless cell-fragment bleed from adjacent role/skill text
+  if (/^[A-Z]$/i.test(raw)) return true;
+  if (/^[()]+$/.test(raw)) return true;
+  if (/^RAM\b/i.test(raw)) return true;
   return false;
 }
 
@@ -609,6 +618,23 @@ function hasNamePollution(name) {
 // ─────────────────────────────────────────────────────────────────────────────
 function reassembleStatusFragments(text) {
   let t = text.trim();
+
+  // Strip leading date-label artifacts that can bleed from secondary PDF header rows.
+  // Example: "03/15 Su ANNUAL K- INFU SN C" -> "ANNUAL K- INFU SN C"
+  t = t
+    .replace(/^\s*\d{1,2}\/\d{1,2}(?:\/\d{2,4})?\s+(?:Su|Mo|Tu|We|Th|Fr|Sa|Sun|Mon|Tue|Wed|Thu|Fri|Sat)\b\s*/i, '')
+    .trim();
+
+  // When PDF cell text bleeds into neighboring cells, the first visible status fragment
+  // is still the intended status for this cell. Normalize it before generic matching.
+  if (/^EDU\s*OFF\b/i.test(t)) return 'EDU OFF';
+  if (/^EDU\s*ON\b/i.test(t) || /^EDU\b/i.test(t)) return 'EDU ON';
+  if (/^(?:ANN|A\s*N\s*N)/i.test(t)) return 'ANNUAL';
+  if (/^RES\b/i.test(t)) return 'REST DAY';
+  if (/^(?:REQU?|REQ)/i.test(t)) return 'REQUEST OFF';
+  // Secondary Float Out rows can prepend header text before the actual ANNUAL status.
+  if (/ANNUAL|ANN\s*UAL|ANN.*UAL/i.test(t) && !/^Totals?\b/i.test(t)) return 'ANNUAL';
+
   const fixes = [
     [/\bA\s*N\s*N\s*U\s*A\s*L(?:\s*LEAVE)?\b/i, 'ANNUAL'],
     [/\bANUA\b/i,                                'ANNUAL'],
@@ -715,9 +741,11 @@ function reconstructLinesFromPages(pages) {
 }
 
 function extractPdfUnit(lines) {
-  for (const line of lines.slice(0, 50)) {
+  for (const line of lines) {
     const t = line.trim();
     if (!t || t.length < 2) continue;
+    const embeddedUnit = t.match(/([A-Z]\s*[-–]\s*[A-Z]{2}\s*[-–]\s*[A-Z]\s*[-–]?\s*\d+\s+[A-Z0-9\s-]*?UNIT)/i);
+    if (embeddedUnit) return embeddedUnit[1].replace(/\s+/g, ' ').trim();
     const m = t.match(/[Uu]nit\s*[:\-]?\s*([A-Z][A-Za-z0-9\s\-]{1,30})/);
     if (m && !/^(employee|skill|page|report|schedule|total|printed)/i.test(m[1].trim())) return m[1].trim();
     if (/^[A-Z]{1,4}\s*[-–]\s*[A-Z]{1,5}\s*[-–]\s*[A-Z][A-Z0-9]*$/i.test(t)) return t;
