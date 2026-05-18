@@ -22,6 +22,8 @@
       --al-bg: #fef3c7; --al-fg: #92400e;
       --ro-bg: #fee2e2; --ro-fg: #991b1b;
       --x-bg:  #e2e8f0; --x-fg:  #475569;
+      --eon-bg: #ede9fe; --eon-fg: #5b21b6;
+      --eoff-bg:#fce7f3; --eoff-fg:#9d174d;
       --weekend-bg: #f1f5f9;
       --today-ring: #4f46e5;
       --excellent-bg: #d1fae5; --excellent-fg: #065f46;
@@ -41,6 +43,8 @@
         --al-bg: #78350f; --al-fg: #fcd34d;
         --ro-bg: #7f1d1d; --ro-fg: #fca5a5;
         --x-bg:  #1e293b; --x-fg:  #94a3b8;
+        --eon-bg: #3b0764; --eon-fg: #d8b4fe;
+        --eoff-bg:#831843; --eoff-fg:#f9a8d4;
         --weekend-bg: #0f1729; --today-ring: #a5b4fc;
         --excellent-bg: #064e3b; --excellent-fg: #6ee7b7;
         --good-bg: #1e3a8a;     --good-fg: #93c5fd;
@@ -82,6 +86,17 @@
     }
     .icon-btn:active { background: var(--border); }
     .icon-btn.primary-tint { color: var(--primary); }
+    .icon-btn.text-chip {
+      width: auto; min-width: 62px; height: 36px;
+      padding: 0 10px; font-size: 13px; font-weight: 700;
+      border: 1px solid var(--border);
+      background: var(--bg);
+    }
+    .icon-btn.text-chip.primary-tint {
+      background: var(--primary-light);
+      border-color: transparent;
+    }
+
 
     /* SCREENS */
     .screen { flex: 1; min-height: 0; display: none; }
@@ -267,6 +282,10 @@
     .stat-cell.s-AL { background-color: var(--al-bg); color: var(--al-fg); }
     .stat-cell.s-RO { background-color: var(--ro-bg); color: var(--ro-fg); }
     .stat-cell.s-X  { background-color: var(--x-bg);  color: var(--x-fg); }
+    .stat-cell.s-EON  { background-color: var(--eon-bg);  color: var(--eon-fg); }
+    .stat-cell.s-EOFF { background-color: var(--eoff-bg); color: var(--eoff-fg); }
+    .grid-table tbody tr.me-row th.name-cell { background: var(--primary-light); border-left: 4px solid var(--primary); }
+    .grid-table tbody tr.me-row td { box-shadow: inset -1px -1px 0 var(--border), inset 0 0 0 1px rgba(79,70,229,.15); }
     .stat-cell.empty { color: var(--text-muted); opacity: 0.35; }
 
     /* compact */
@@ -297,6 +316,8 @@
     .leg-AL { background: var(--al-bg); color: var(--al-fg); }
     .leg-RO { background: var(--ro-bg); color: var(--ro-fg); }
     .leg-X  { background: var(--x-bg);  color: var(--x-fg); }
+    .leg-EON  { background: var(--eon-bg);  color: var(--eon-fg); }
+    .leg-EOFF { background: var(--eoff-bg); color: var(--eoff-fg); }
 
     /* SHEETS */
     .sheet-backdrop {
@@ -357,7 +378,7 @@
     .switch.on::after { transform: translateX(20px); }
 
     /* employee detail */
-    .emp-stats { display: grid; grid-template-columns: repeat(5, 1fr); gap: 5px; margin-bottom: 16px; }
+    .emp-stats { display: grid; grid-template-columns: repeat(7, 1fr); gap: 5px; margin-bottom: 16px; }
     .emp-stat { padding: 8px 4px; border-radius: 9px; text-align: center; }
     .emp-stat .v { font-size: 18px; font-weight: 700; line-height: 1.1; }
     .emp-stat .l { font-size: 10px; opacity: 0.8; margin-top: 2px; }
@@ -366,6 +387,8 @@
     .emp-stat.s-AL { background: var(--al-bg); color: var(--al-fg); }
     .emp-stat.s-RO { background: var(--ro-bg); color: var(--ro-fg); }
     .emp-stat.s-X  { background: var(--x-bg);  color: var(--x-fg); }
+    .emp-stat.s-EON  { background: var(--eon-bg);  color: var(--eon-fg); }
+    .emp-stat.s-EOFF { background: var(--eoff-bg); color: var(--eoff-fg); }
     .cal-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 4px; }
     .cal-grid .dow-hd { font-size: 10px; font-weight: 700; color: var(--text-muted); text-align: center; padding: 4px 0; text-transform: uppercase; }
     .cal-cell {
@@ -383,6 +406,8 @@
     .cal-cell.s-AL { background: var(--al-bg); color: var(--al-fg); border-color: transparent; }
     .cal-cell.s-RO { background: var(--ro-bg); color: var(--ro-fg); border-color: transparent; }
     .cal-cell.s-X  { background: var(--x-bg);  color: var(--x-fg);  border-color: transparent; }
+    .cal-cell.s-EON  { background: var(--eon-bg);  color: var(--eon-fg);  border-color: transparent; }
+    .cal-cell.s-EOFF { background: var(--eoff-bg); color: var(--eoff-fg); border-color: transparent; }
     .cal-cell.today { box-shadow: 0 0 0 2px var(--today-ring); }
 
     /* SWAP FINDER */
@@ -521,6 +546,74 @@
     .proposal-line strong { font-weight: 600; }
     .proposal-alt { margin-top: 8px; font-size: 11px; color: var(--text-muted); }
 
+
+    /* STAFF SUMMARY / WORKLOAD */
+    .summary-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 8px;
+      margin-bottom: 14px;
+    }
+    .summary-card {
+      background: var(--bg);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 10px 12px;
+    }
+    .summary-card .num { font-size: 22px; font-weight: 800; line-height: 1; }
+    .summary-card .lbl { font-size: 11px; color: var(--text-muted); margin-top: 4px; }
+    .workload-list { display: flex; flex-direction: column; gap: 10px; }
+    .workload-card {
+      background: var(--bg);
+      border: 1px solid var(--border);
+      border-left: 4px solid var(--border-strong);
+      border-radius: 12px;
+      padding: 11px 12px;
+    }
+    .workload-card.easy { border-left-color: var(--success); }
+    .workload-card.normal { border-left-color: var(--info); }
+    .workload-card.heavy { border-left-color: var(--warning); }
+    .workload-card.risky { border-left-color: var(--danger); }
+    .workload-head { display: flex; justify-content: space-between; align-items: flex-start; gap: 10px; }
+    .workload-name { font-size: 14px; font-weight: 700; line-height: 1.25; }
+    .workload-role { font-size: 11px; color: var(--text-muted); margin-top: 2px; }
+    .workload-score {
+      flex-shrink: 0;
+      font-size: 12px; font-weight: 800;
+      padding: 5px 9px; border-radius: 14px;
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+    }
+    .workload-meta {
+      display: flex; flex-wrap: wrap; gap: 6px;
+      margin-top: 9px;
+    }
+    .mini-chip {
+      font-size: 11px; font-weight: 700;
+      padding: 3px 7px; border-radius: 999px;
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      color: var(--text-muted);
+    }
+    .flag-list { margin-top: 8px; display: flex; flex-direction: column; gap: 3px; }
+    .flag-line { font-size: 12px; color: var(--warning); line-height: 1.35; }
+    .flag-line.danger { color: var(--danger); }
+    .summary-controls { display: flex; gap: 8px; margin-bottom: 12px; }
+    .summary-controls .chip { border-radius: 10px; }
+    .view-schedule-btn {
+      margin-top: 9px;
+      width: 100%;
+      padding: 8px 10px;
+      border-radius: 10px;
+      border: 1px solid var(--border);
+      background: var(--bg-card);
+      color: var(--primary);
+      font-size: 13px;
+      font-weight: 700;
+      cursor: pointer;
+    }
+    .view-schedule-btn:active { background: var(--primary-light); }
+
     /* TOAST */
     .toast {
       position: fixed;
@@ -547,8 +640,9 @@
       <span class="txt" id="appTitleText">Schedule</span>
     </div>
     <div class="header-actions">
-      <button class="icon-btn primary-tint" id="todayBtn" style="display:none" aria-label="Jump to today">📍</button>
-      <button class="icon-btn" id="swapBtn" style="display:none" aria-label="Find a swap">🔁</button>
+      <button class="icon-btn text-chip primary-tint" id="todayBtn" style="display:none" aria-label="Jump to today">Today</button>
+      <button class="icon-btn text-chip" id="summaryBtn" style="display:none" aria-label="Open staff summary">Summary</button>
+      <button class="icon-btn text-chip" id="swapBtn" style="display:none" aria-label="Find swap">Find Swap</button>
       <button class="icon-btn" id="settingsBtn" aria-label="Settings">⚙️</button>
     </div>
   </header>
@@ -606,6 +700,8 @@
       <div class="leg-item"><span class="leg-box leg-AL">A</span> Annual</div>
       <div class="leg-item"><span class="leg-box leg-RO">R</span> Req&nbsp;Off</div>
       <div class="leg-item"><span class="leg-box leg-X">X</span> Rest</div>
+      <div class="leg-item"><span class="leg-box leg-EON">EO</span> Edu On</div>
+      <div class="leg-item"><span class="leg-box leg-EOFF">EF</span> Edu Off</div>
     </div>
   </div>
 
@@ -647,6 +743,8 @@
         <button class="chip" data-status="N">Night shifts</button>
         <button class="chip" data-status="AL">Annual leave</button>
         <button class="chip" data-status="RO">Req. off</button>
+        <button class="chip" data-status="EON">Edu on</button>
+        <button class="chip" data-status="EOFF">Edu off</button>
       </div>
     </div>
     <button class="btn-primary" id="clearFiltersBtn">Clear filters</button>
@@ -660,6 +758,24 @@
     <div class="sheet-section">
       <div class="sheet-section-label">Schedule overview</div>
       <div class="cal-grid" id="calGrid"></div>
+    </div>
+  </div>
+
+
+  <div class="sheet" id="summarySheet">
+    <div class="handle"></div>
+    <h3>Staff Summary</h3>
+    <div class="sub">Workload overview. Short shifts are shown separately and do not inflate the risk score.</div>
+
+    <div class="summary-grid" id="summaryGrid"></div>
+
+    <div class="sheet-section">
+      <div class="sheet-section-label">Workload analysis</div>
+      <div class="summary-controls">
+        <button class="chip active" id="summaryAllBtn">All</button>
+        <button class="chip" id="summaryRiskBtn">Risky / Heavy</button>
+      </div>
+      <div class="workload-list" id="workloadList"></div>
     </div>
   </div>
 
@@ -765,9 +881,10 @@
     const $$ = sel => [...document.querySelectorAll(sel)];
     const DOW_NAMES = ['Su', 'Mo', 'Tu', 'We', 'Th', 'Fr', 'Sa'];
     const DOW_FULL  = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
-    const STATUS_NAMES = { D: 'Day shift', N: 'Night shift', AL: 'Annual leave', RO: 'Request off', X: 'Rest / Off' };
-    const STATUS_LETTER = { D: 'D', N: 'N', AL: 'A', RO: 'R', X: 'X' };
-    const SHIFT_WORD = { D: 'Day', N: 'Night' };
+    const STATUS_CODES = ['D', 'N', 'AL', 'RO', 'X', 'EON', 'EOFF'];
+    const STATUS_NAMES = { D: 'Day shift', N: 'Night shift', AL: 'Annual leave', RO: 'Request off', X: 'Rest / Off', EON: 'Education on', EOFF: 'Education off' };
+    const STATUS_LETTER = { D: 'D', N: 'N', AL: 'A', RO: 'R', X: 'X', EON: 'EO', EOFF: 'EF' };
+    const SHIFT_WORD = { D: 'Day', N: 'Night', EON: 'Education' };
 
     function toast(msg, kind = '') {
       const t = $('#toast');
@@ -800,8 +917,20 @@
       return out;
     }
     function statusOf(emp, date) {
-      for (const k of ['D', 'N', 'AL', 'RO', 'X']) if (emp[k].includes(date)) return k;
+      for (const k of STATUS_CODES) if ((emp[k] || []).includes(date)) return k;
       return null;
+    }
+    function isRegularWork(code) { return code === 'D' || code === 'N'; }
+    function isUnavailableWork(code) { return code === 'D' || code === 'N' || code === 'EON'; }
+    function isAvailableOff(code) { return code === null || code === 'X' || code === 'RO' || code === 'EOFF'; }
+    function getShiftHours(emp, date) {
+      const v = emp.shiftHours && emp.shiftHours[date];
+      const n = typeof v === 'number' ? v : parseFloat(v);
+      return Number.isFinite(n) ? n : null;
+    }
+    function isShortShift(emp, date) {
+      const h = getShiftHours(emp, date);
+      return h !== null && h < 11;
     }
     function scoreBracket(score) {
       if (score >= 90) return { cls: 'excellent', label: 'Excellent' };
@@ -891,7 +1020,20 @@
     }
 
     // ===== LOAD =====
+
+    function normalizeScheduleData(data) {
+      if (!data || !Array.isArray(data.employees)) return data;
+      data.employees = data.employees.map(emp => {
+        const next = { ...emp };
+        for (const k of STATUS_CODES) if (!Array.isArray(next[k])) next[k] = [];
+        if (!next.shiftHours || typeof next.shiftHours !== 'object') next.shiftHours = {};
+        return next;
+      });
+      return data;
+    }
+
     function loadData(data) {
+      data = normalizeScheduleData(data);
       state.data = data;
       state.dates = expandDates(data.start, data.end);
       state.filter = { search: '', roles: new Set(), statuses: new Set() };
@@ -932,6 +1074,7 @@
       $('#uploadScreen').classList.remove('show');
       $('#scheduleScreen').classList.add('show');
       $('#todayBtn').style.display = state.dates.includes(state.todayISO) ? '' : 'none';
+      $('#summaryBtn').style.display = '';
       $('#swapBtn').style.display = '';
       $('#appTitleText').textContent = data.unit || 'Schedule';
       render();
@@ -978,8 +1121,9 @@
       html += '</tr></thead><tbody>';
       for (const emp of employees) {
         const safeName = escapeHtml(emp.name);
-        html += '<tr>';
-        html += `<th class="name-cell" data-emp="${safeName}"><div class="nm">${safeName}</div>${emp.role ? `<div class="rl">${escapeHtml(emp.role)}</div>` : ''}</th>`;
+        const isMe = swap.me && swap.me.name === emp.name;
+        html += `<tr class="${isMe ? 'me-row' : ''}">`;
+        html += `<th class="name-cell ${isMe ? 'me' : ''}" data-emp="${safeName}"><div class="nm">${safeName}</div>${emp.role ? `<div class="rl">${escapeHtml(emp.role)}</div>` : ''}</th>`;
         for (const d of dates) {
           const code  = statusOf(emp, d);
           const wknd  = isWeekend(d);
@@ -1016,7 +1160,7 @@
       if (!emp) return;
       $('#empSheetName').textContent = emp.name;
       $('#empSheetRole').textContent = emp.role || '—';
-      $('#empStats').innerHTML = ['D','N','AL','RO','X'].map(k => `
+      $('#empStats').innerHTML = STATUS_CODES.map(k => `
         <div class="emp-stat s-${k}"><div class="v">${emp[k].length}</div><div class="l">${STATUS_LETTER[k]}</div></div>
       `).join('');
       const dates = state.dates;
@@ -1063,6 +1207,137 @@
       else { btn.classList.remove('active'); b.style.display = 'none'; }
     }
 
+
+    // ===== STAFF SUMMARY / WORKLOAD =====
+    $('#summaryBtn').addEventListener('click', () => {
+      if (!state.data) return;
+      renderSummary(false);
+      openSheet('#summarySheet');
+    });
+    $('#summaryAllBtn').addEventListener('click', () => {
+      $('#summaryAllBtn').classList.add('active');
+      $('#summaryRiskBtn').classList.remove('active');
+      renderSummary(false);
+    });
+    $('#summaryRiskBtn').addEventListener('click', () => {
+      $('#summaryRiskBtn').classList.add('active');
+      $('#summaryAllBtn').classList.remove('active');
+      renderSummary(true);
+    });
+
+    function analyzeWorkload(emp) {
+      const dates = state.dates;
+      let regularWork = 0, night = 0, day = 0, eduOn = 0, eduOff = 0, off = 0, leave = 0, ro = 0;
+      let maxConsec = 0, curConsec = 0, switches = 0, oneOffBetweenWork = 0, alReturn = 0, shortShifts = 0;
+      let lastWorkShift = null;
+
+      for (let i = 0; i < dates.length; i++) {
+        const d = dates[i];
+        const code = statusOf(emp, d);
+        const short = isShortShift(emp, d);
+
+        if (code === 'D') day++;
+        if (code === 'N') night++;
+        if (code === 'EON') eduOn++;
+        if (code === 'EOFF') eduOff++;
+        if (code === 'AL') leave++;
+        if (code === 'RO') ro++;
+        if (code === 'X' || code === null || code === 'EOFF') off++;
+
+        if ((code === 'D' || code === 'N') && short) shortShifts++;
+
+        const regular = (code === 'D' || code === 'N') && !short; // 7 / 8.5h are shown but not counted as heavy
+        if (regular) {
+          regularWork++;
+          curConsec++;
+          maxConsec = Math.max(maxConsec, curConsec);
+          if (lastWorkShift && lastWorkShift !== code) switches++;
+          lastWorkShift = code;
+        } else if (code === 'EON') {
+          // education on is visible but not treated like a full bedside shift
+          curConsec = 0;
+          lastWorkShift = null;
+        } else {
+          curConsec = 0;
+          lastWorkShift = null;
+        }
+
+        const prev = i > 0 ? statusOf(emp, dates[i - 1]) : null;
+        const next = i < dates.length - 1 ? statusOf(emp, dates[i + 1]) : null;
+        if (isAvailableOff(code) && isRegularWork(prev) && isRegularWork(next)) oneOffBetweenWork++;
+        if ((code === 'D' || code === 'N') && prev === 'AL') alReturn++;
+      }
+
+      let risk = 0;
+      risk += Math.max(0, maxConsec - 3) * 12;
+      risk += switches * 5;
+      risk += oneOffBetweenWork * 8;
+      risk += alReturn * 6;
+      risk += Math.max(0, regularWork - Math.ceil(dates.length * 0.55)) * 2;
+
+      let level = 'easy', label = 'Easy';
+      if (risk >= 55 || maxConsec >= 5) { level = 'risky'; label = 'Risky'; }
+      else if (risk >= 32 || maxConsec >= 4) { level = 'heavy'; label = 'Heavy'; }
+      else if (risk >= 14) { level = 'normal'; label = 'Normal'; }
+
+      const score = Math.max(0, Math.min(100, Math.round(100 - risk)));
+      const flags = [];
+      if (maxConsec >= 4) flags.push({ danger: maxConsec >= 5, text: `${maxConsec} consecutive regular shifts` });
+      if (switches >= 3) flags.push({ danger: switches >= 5, text: `${switches} D/N switches` });
+      if (oneOffBetweenWork >= 2) flags.push({ danger: oneOffBetweenWork >= 4, text: `${oneOffBetweenWork} isolated off days between work blocks` });
+      if (alReturn > 0) flags.push({ danger: false, text: `${alReturn} return after annual leave` });
+      if (shortShifts > 0) flags.push({ danger: false, text: `${shortShifts} short shifts shown separately, not counted as heavy` });
+
+      return { emp, score, level, label, regularWork, day, night, eduOn, eduOff, off, leave, ro, maxConsec, switches, oneOffBetweenWork, shortShifts, flags };
+    }
+
+    function renderSummary(onlyRisky) {
+      if (!state.data) return;
+      const analyses = state.data.employees.map(analyzeWorkload).sort((a, b) => a.score - b.score);
+      const totals = {
+        staff: state.data.employees.length,
+        day: analyses.reduce((s, a) => s + a.day, 0),
+        night: analyses.reduce((s, a) => s + a.night, 0),
+        leave: analyses.reduce((s, a) => s + a.leave, 0),
+        off: analyses.reduce((s, a) => s + a.off, 0),
+        eon: analyses.reduce((s, a) => s + a.eduOn, 0),
+        eoff: analyses.reduce((s, a) => s + a.eduOff, 0),
+        short: analyses.reduce((s, a) => s + a.shortShifts, 0),
+      };
+
+      $('#summaryGrid').innerHTML = `
+        <div class="summary-card"><div class="num">${totals.staff}</div><div class="lbl">Staff in rota</div></div>
+        <div class="summary-card"><div class="num">${totals.day}</div><div class="lbl">Day shifts</div></div>
+        <div class="summary-card"><div class="num">${totals.night}</div><div class="lbl">Night shifts</div></div>
+        <div class="summary-card"><div class="num">${totals.leave}</div><div class="lbl">Annual leave</div></div>
+        <div class="summary-card"><div class="num">${totals.off}</div><div class="lbl">Off / rest / blank</div></div>
+        <div class="summary-card"><div class="num">${totals.eon}</div><div class="lbl">Edu on</div></div>
+        <div class="summary-card"><div class="num">${totals.eoff}</div><div class="lbl">Edu off</div></div>
+        <div class="summary-card"><div class="num">${totals.short}</div><div class="lbl">Short shifts</div></div>
+      `;
+
+      const shown = onlyRisky ? analyses.filter(a => a.level === 'risky' || a.level === 'heavy') : analyses;
+      $('#workloadList').innerHTML = shown.length ? shown.map(a => `
+        <div class="workload-card ${a.level}">
+          <div class="workload-head">
+            <div>
+              <div class="workload-name">${escapeHtml(a.emp.name)}</div>
+              <div class="workload-role">${escapeHtml(a.emp.role || '—')} · ${a.label}</div>
+            </div>
+            <div class="workload-score">${a.score}/100</div>
+          </div>
+          <div class="workload-meta">
+            <span class="mini-chip">D ${a.day}</span>
+            <span class="mini-chip">N ${a.night}</span>
+            <span class="mini-chip">Max ${a.maxConsec} in row</span>
+            <span class="mini-chip">Switch ${a.switches}</span>
+            <span class="mini-chip">Short ${a.shortShifts}</span>
+          </div>
+          ${a.flags.length ? `<div class="flag-list">${a.flags.map(f => `<div class="flag-line ${f.danger ? 'danger' : ''}">⚠ ${escapeHtml(f.text)}</div>`).join('')}</div>` : ''}
+        </div>
+      `).join('') : '<span class="empty-hint">No heavy or risky schedules found.</span>';
+    }
+
     // ===== SETTINGS =====
     $('#settingsBtn').addEventListener('click', () => openSheet('#settingsSheet'));
     $('#compactToggle').addEventListener('click', e => {
@@ -1096,6 +1371,7 @@
       $('#scheduleScreen').classList.remove('show');
       $('#uploadScreen').classList.add('show');
       $('#todayBtn').style.display = 'none';
+      $('#summaryBtn').style.display = 'none';
       $('#swapBtn').style.display = 'none';
       $('#appTitleText').textContent = 'Schedule';
       pdfInput.value = ''; $('#textInput').value = '';
@@ -1172,7 +1448,7 @@
       const me = swap.me;
       const workingDates = state.dates.filter(d => {
         const s = statusOf(me, d);
-        return s === 'D' || s === 'N';
+        return isUnavailableWork(s);
       });
       if (!workingDates.length) {
         $('#swapDateChips').innerHTML = '<span class="empty-hint">No working days for this person in the schedule.</span>';
@@ -1204,6 +1480,7 @@
       swap.me = null;
       swap.dates.clear();
       try { localStorage.removeItem('me_name_v1'); } catch {}
+      render();
       $('#swapResults').innerHTML = '';
       $('#swapResultsSection').style.display = 'none';
       renderSwapForm();
@@ -1226,6 +1503,7 @@
           if (!emp) return;
           swap.me = emp; swap.dates.clear();
           try { localStorage.setItem('me_name_v1', emp.name); } catch {}
+          render();
           renderSwapForm();
         });
       });
@@ -1272,16 +1550,17 @@
     }
 
     function analyzeCover(person, me, dates, opts) {
-      const STATUS_WEIGHT = { null: 1.0, X: 0.95, RO: 0.78, AL: 0.55 };
+      const STATUS_WEIGHT = { null: 1.0, X: 0.95, EOFF: 0.90, RO: 0.78, AL: 0.55 };
       const coverage = dates.map(d => {
         const s = statusOf(person, d);
-        if (s === 'D' || s === 'N') return { date: d, ok: false, status: s, reason: `Working ${s}` };
+        if (isUnavailableWork(s)) return { date: d, ok: false, status: s, reason: `Working / unavailable (${STATUS_NAMES[s] || s})` };
         if (s === 'AL') {
           if (opts.excludeAL) return { date: d, ok: false, status: 'AL', reason: 'On annual leave' };
           return { date: d, ok: true, status: 'AL', reason: 'Annual leave (low priority)', weight: STATUS_WEIGHT.AL };
         }
         if (s === 'RO') return { date: d, ok: true, status: 'RO', reason: 'Requested off', weight: STATUS_WEIGHT.RO };
         if (s === 'X')  return { date: d, ok: true, status: 'X',  reason: 'Rest day',      weight: STATUS_WEIGHT.X };
+        if (s === 'EOFF') return { date: d, ok: true, status: 'EOFF', reason: 'Education off', weight: STATUS_WEIGHT.EOFF };
         return                  { date: d, ok: true, status: null, reason: 'Off',         weight: STATUS_WEIGHT.null };
       });
       const okItems = coverage.filter(c => c.ok);
@@ -1323,11 +1602,11 @@
 
     function isMyselfAvailable(me, date) {
       const s = statusOf(me, date);
-      return s === null || s === 'X' || s === 'RO';   // AL means I'm physically away
+      return isAvailableOff(s);   // AL means physically away; EOFF is available
     }
     function isPersonWorking(p, date) {
       const s = statusOf(p, date);
-      return s === 'D' || s === 'N';
+      return isUnavailableWork(s);
     }
     function countConsecutiveWork(person, date) {
       let c = 0;
@@ -1338,7 +1617,7 @@
 
     function analyzeMutual(person, me, myDate, myShift, opts) {
       const personStatus = statusOf(person, myDate);
-      if (personStatus === 'D' || personStatus === 'N') return null;     // they're working that day
+      if (isUnavailableWork(personStatus)) return null;     // they're working / unavailable that day
       if (personStatus === 'AL' && opts.excludeAL)     return null;
 
       // find return dates (person works, I'm available)
@@ -1360,7 +1639,7 @@
 
       // base score
       let score = 0;
-      const availBonus = { null: 35, X: 30, RO: 20, AL: 5 };
+      const availBonus = { null: 35, X: 30, EOFF: 28, RO: 20, AL: 5 };
       score += availBonus[personStatus] ?? 35;
 
       const bestReturn = returnAll[0] || null;
@@ -1388,6 +1667,7 @@
         null: { ok: true,  text: `Off on ${fmtDateLabel(myDate)}` },
         X:    { ok: true,  text: `Rest day on ${fmtDateLabel(myDate)}` },
         RO:   { ok: true,  text: `Requested off on ${fmtDateLabel(myDate)}` },
+        EOFF: { ok: true,  text: `Education off on ${fmtDateLabel(myDate)}` },
         AL:   { ok: false, text: `On annual leave on ${fmtDateLabel(myDate)}` },
       }[personStatus] || { ok: true, text: `Available on ${fmtDateLabel(myDate)}` };
       reasons.push(statusReason);
@@ -1433,6 +1713,17 @@
       $('#swapResults').innerHTML = results.slice(0, 30).map(r =>
         r.mode === 'cover' ? renderCoverCard(r) : renderMutualCard(r)
       ).join('');
+      bindSwapResultActions();
+    }
+
+    function bindSwapResultActions() {
+      $$('#swapResults .view-schedule-btn').forEach(btn => {
+        btn.addEventListener('click', () => {
+          const name = btn.dataset.name;
+          closeAllSheets();
+          setTimeout(() => openEmployee(name), 120);
+        });
+      });
     }
 
     function renderCoverCard(r) {
@@ -1458,6 +1749,7 @@
             <div class="swap-reason muted">${summary}${r.sameRole ? ' · Same role' : ''}</div>
             ${items}
           </div>
+          <button class="view-schedule-btn" data-name="${escapeHtml(r.person.name)}">View schedule →</button>
         </div>
       `;
     }
@@ -1512,6 +1804,7 @@
           <div class="swap-reasons">${reasons}</div>
           ${warnings}
           ${proposal}
+          <button class="view-schedule-btn" data-name="${escapeHtml(r.person.name)}">View schedule →</button>
         </div>
       `;
     }
