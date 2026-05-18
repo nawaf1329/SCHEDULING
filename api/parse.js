@@ -2,6 +2,9 @@ export const config = {
   api: { bodyParser: { sizeLimit: '4mb' } },
 };
 
+// All status codes the parser can emit. EON/EOFF stay distinct from D/X.
+const STATUS_CODES = ['D', 'N', 'AL', 'RO', 'X', 'EON', 'EOFF'];
+
 export default async function handler(req, res) {
   if (req.method !== 'POST') return res.status(405).json({ error: 'Method not allowed' });
   try {
@@ -79,7 +82,7 @@ async function parseSchedule(body) {
 
   let parsedEmployees = Array.from(employeeMap.values());
   if (!start || !end) {
-    const all = parsedEmployees.flatMap(e => ['D','N','AL','RO','X'].flatMap(k => e[k])).sort();
+    const all = parsedEmployees.flatMap(e => STATUS_CODES.flatMap(k => e[k] || [])).sort();
     if (all.length) { start = all[0]; end = all[all.length - 1]; period = { start, end }; }
   }
 
@@ -122,7 +125,7 @@ async function parseSchedule(body) {
       if (!cl) { unresolved.push({ status: row.status, employee: row.employee, date: row.date, confidence: null, reason: 'Not returned by classifier' }); continue; }
       if ((cl.confidence || 0) < THRESHOLD) { unresolved.push({ status: row.status, employee: row.employee, date: row.date, confidence: cl.confidence ?? null, reason: cl.reason || 'Low confidence' }); continue; }
       if (cl.mappedCode === 'skip') continue;
-      if (!['D','N','AL','RO','X'].includes(cl.mappedCode)) { unresolved.push({ status: row.status, employee: row.employee, date: row.date, confidence: cl.confidence ?? null, reason: 'Invalid mappedCode returned' }); continue; }
+      if (!STATUS_CODES.includes(cl.mappedCode)) { unresolved.push({ status: row.status, employee: row.employee, date: row.date, confidence: cl.confidence ?? null, reason: 'Invalid mappedCode returned' }); continue; }
       const finalEmp = employeeMap.get(row.normalizedKey);
       if (finalEmp && row.date) finalEmp[cl.mappedCode].push(row.date);
       else unresolved.push({ status: row.status, employee: row.employee, date: row.date, confidence: cl.confidence ?? null, reason: 'Employee or date not found' });
@@ -145,11 +148,64 @@ async function parseSchedule(body) {
 
   const employees = parsedEmployees.map(emp => ({
     name: emp.name, role: emp.role,
-    D:  [...new Set(emp.D)].sort(),  N:  [...new Set(emp.N)].sort(),
-    AL: [...new Set(emp.AL)].sort(), RO: [...new Set(emp.RO)].sort(),
-    X:  [...new Set(emp.X)].sort()
+    D:    [...new Set(emp.D)].sort(),    N:    [...new Set(emp.N)].sort(),
+    AL:   [...new Set(emp.AL)].sort(),   RO:   [...new Set(emp.RO)].sort(),
+    X:    [...new Set(emp.X)].sort(),
+    EON:  [...new Set(emp.EON || [])].sort(),
+    EOFF: [...new Set(emp.EOFF || [])].sort(),
+    shiftHours: emp.shiftHours || {},
   }));
-  return { status: 200, body: { unit, start, end, employees } };
+  const responseDiagnostics = buildResponseDiagnostics({
+    employees,
+    pageCount: pages ? pages.length : 0,
+    perPage: pdfResult ? (pdfResult.debugPages || []).map(p => ({
+      page: p.page, dateColumnsFound: p.dateColumnsFound,
+      employeeBlocksDetected: p.employeeBlocksDetected,
+      employeeBlocksAccepted: p.employeeBlocksAccepted,
+      warnings: p.warnings || [],
+    })) : [],
+    warnings: pdfResult ? pdfResult.warnings || [] : [],
+    unknownStatusRows: collector.unknownStatusRows,
+    expectedCount: pdfResult ? pdfResult.pdfExpectedCount : (expectedCount || parsedEmployees.length),
+  });
+  return { status: 200, body: { unit, start, end, employees, diagnostics: responseDiagnostics } };
+}
+
+// Extract shift hours from raw cell text like "D 8.5(7:00)AHN" or "D 12SN I".
+function extractShiftHours(rawText) {
+  if (!rawText) return null;
+  const m = rawText.match(/(?:^|\s)([DN])\s+(\d+(?:\.\d+)?)/i);
+  return m ? parseFloat(m[2]) : null;
+}
+
+// Always-available diagnostics summary for the response.
+function buildResponseDiagnostics({ employees, pageCount, perPage, warnings, unknownStatusRows, expectedCount }) {
+  const counts = { D: 0, N: 0, AL: 0, RO: 0, X: 0, EON: 0, EOFF: 0 };
+  const hourBreakdown = {};
+  let shortShiftCount = 0, normalShiftCount = 0;
+  for (const emp of employees) {
+    for (const c of STATUS_CODES) counts[c] += (emp[c] || []).length;
+    for (const date in (emp.shiftHours || {})) {
+      const h = emp.shiftHours[date];
+      const key = String(h);
+      hourBreakdown[key] = (hourBreakdown[key] || 0) + 1;
+      if (h < 11) shortShiftCount++;
+      else normalShiftCount++;
+    }
+  }
+  const unknownStatuses = [...new Set((unknownStatusRows || []).map(r => r.status))];
+  return {
+    parsedCount: employees.length,
+    expectedCount,
+    pageCount,
+    warnings: warnings || [],
+    unknownStatuses,
+    statusCounts: counts,
+    shiftHourBreakdown: hourBreakdown,
+    shortShiftCount,
+    normalShiftCount,
+    perPage,
+  };
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -246,7 +302,7 @@ function parsePdfLayoutSchedule(pages, period, collector, debugMode) {
       const bandItems = normItems.filter(i => i.y >= yStart && i.y < yEnd && i.x >= nameZoneXEnd);
       const key = normalizeName(name);
       let emp = employeeMap.get(key);
-      if (!emp) { emp = { name: name.trim(), role: role || '', _rowCount: 0, D:[], N:[], AL:[], RO:[], X:[] }; employeeMap.set(key, emp); }
+      if (!emp) { emp = { name: name.trim(), role: role || '', _rowCount: 0, D:[], N:[], AL:[], RO:[], X:[], EON:[], EOFF:[], shiftHours:{} }; employeeMap.set(key, emp); }
       else if (role && !emp.role) emp.role = role;
 
       let cellsMatched = 0;
@@ -260,6 +316,8 @@ function parsePdfLayoutSchedule(pages, period, collector, debugMode) {
         const code      = mapStatus(assembled);
         if (code) {
           emp[code].push(col.date);
+          const hrs = extractShiftHours(rawText);
+          if (hrs !== null) emp.shiftHours[col.date] = hrs;
         } else if (assembled && assembled !== '-' && !isKnownAnnotation(assembled)) {
           collector.unknownStatusRows.push({ line: rawText, status: assembled, employee: name, normalizedKey: key, date: col.date });
         }
@@ -560,8 +618,8 @@ function reassembleStatusFragments(text) {
     [/\bREQ\s*OFF\b/i,                           'REQUEST OFF'],
     [/\bRees\s*Of\b/i,                           'REQUEST OFF'],
     [/\bREQU?\s*es\w*\s*Of\w*/i,                 'REQUEST OFF'],
-    [/\bEDU\s+ON\b/i,                            'EDU ON'],
-    [/\bEDU\s+OFF\b/i,                           'EDU OFF'],
+    [/\bEDU\s*ON\b/i,                             'EDU ON'],
+    [/\bEDU\s*OFF\b/i,                            'EDU OFF'],
     [/\bPUBLIC\s*HOL\w*/i,                       'REST'],
     [/\bVACA\s*TION\b/i,                         'ANNUAL'],
     [/\bHOL\s*I\s*DAY\b/i,                       'REST'],
@@ -576,14 +634,17 @@ function mapStatus(raw) {
   if (!s || s === '-') return null;
   const u = s.toUpperCase();
 
+  // EDU statuses — keep DISTINCT from D / X (was a bug: EDU ON → D, EDU OFF → X)
+  if (/^EDU\s*OFF\b/.test(u)) return 'EOFF';
+  if (/^EDU\s*ON\b/.test(u))  return 'EON';
+  if (/^EDU\b/.test(u))        return 'EON';   // bare "EDU" → treat as on-duty edu
+  if (/^STUDY\b/.test(u) || /^TRAINING\b/.test(u) || /^SEMINAR\b/.test(u)) return 'EON';
+
   if (/^D(\s|$|\d)/.test(u)  || u === 'DAY'   || /^DAY\s/.test(u))   return 'D';
   if (/^N(\s|$|\d)/.test(u)  || u === 'NIGHT' || /^NIGHT\s/.test(u)) return 'N';
   if (/^A\s*N\s*N\s*U\s*A\s*L/.test(u) || u === 'AL' || u === 'A/L' || /^LEAVE/.test(u) || /^VACATION/.test(u)) return 'AL';
   if (/^REQUEST/.test(u) || /^REQ\s/.test(u) || u === 'RO') return 'RO';
   if (/^REST/.test(u) || u === 'OFF' || /^OFF\s/.test(u)) return 'X';
-  if (/^EDU\s*OFF/.test(u)) return 'X';
-  if (/^EDU\s*ON/.test(u))  return 'D';
-  if (/^EDU/.test(u) || /^STUDY/.test(u) || /^TRAINING/.test(u) || /^SEMINAR/.test(u)) return 'D';
   if (u === 'PH' || u === 'HD')                return 'X';
   if (u === 'SL' || u === 'EL' || u === 'ML') return 'AL';
   return null;
@@ -596,7 +657,8 @@ function mergeIntoMap(emp, employeeMap, collector) {
   const key = normalizeName(emp.name);
   if (employeeMap.has(key)) {
     const ex = employeeMap.get(key);
-    for (const code of ['D','N','AL','RO','X']) for (const d of emp[code]) if (!ex[code].includes(d)) ex[code].push(d);
+    for (const code of STATUS_CODES) for (const d of emp[code]) if (!ex[code].includes(d)) ex[code].push(d);
+    Object.assign(ex.shiftHours, emp.shiftHours || {});
     ex._rowCount += emp._rowCount || 0;
     if (emp._blockType === 'NUMBERED' && ex._blockType !== 'NUMBERED') { ex.name = emp.name; ex._blockType = 'NUMBERED'; }
     if (emp.role && !ex.role) ex.role = emp.role;
@@ -606,7 +668,7 @@ function mergeIntoMap(emp, employeeMap, collector) {
   }
 }
 
-function totalDates(emp) { return ['D','N','AL','RO','X'].reduce((s, k) => s + emp[k].length, 0); }
+function totalDates(emp) { return STATUS_CODES.reduce((s, k) => s + emp[k].length, 0); }
 
 function normalizeName(name) {
   return name.toUpperCase().replace(/\[[^\]]*\]/g,'').replace(/^\d+\.\s*/,'').replace(/[,.\-']/g,' ').replace(/\s+/g,' ').trim().split(' ').filter(t => t.length > 0).sort().join('|');
@@ -710,7 +772,7 @@ function parseBlock(blockText, period, collector) {
     if (m) { empRole = extractBracketRole(m[1])||''; empName = cleanName(m[1]); blockType = 'NUMBERED'; dataStart = i+1; const sr = findSkillLine(lines,i+1,8); if(sr){empRole=sr.role;dataStart=sr.next;} break; }
   }
   if (!empName) return null;
-  const emp = { name: empName, role: empRole, _blockType: blockType, _rowCount: 0, D:[], N:[], AL:[], RO:[], X:[] };
+  const emp = { name: empName, role: empRole, _blockType: blockType, _rowCount: 0, D:[], N:[], AL:[], RO:[], X:[], EON:[], EOFF:[], shiftHours:{} };
   for (let i = dataStart; i < lines.length; i++) parseDailyRow(lines[i].trim(), emp, period, collector);
   if (totalDates(emp) === 0 && emp._rowCount === 0) parseSectionMode(lines, dataStart, emp, period);
   return (emp._rowCount > 0 || totalDates(emp) > 0) ? emp : null;
@@ -764,7 +826,7 @@ function parseHorizontalTable(text, period, collector) {
     const cells = usePipe ? line.split('|').map(c => c.trim()) : line.split(/\s{2,}|\t/).map(c => c.trim());
     if (cells.length < 2) continue;
     const nameCell = cleanName(cells[0]); if (!looksLikeName(nameCell)) continue;
-    const emp = { name: nameCell, role: '', _rowCount: 0, D:[], N:[], AL:[], RO:[], X:[] };
+    const emp = { name: nameCell, role: '', _rowCount: 0, D:[], N:[], AL:[], RO:[], X:[], EON:[], EOFF:[], shiftHours:{} };
     for (const { idx, d } of colDateMap) { const raw=(cells[idx]||'').trim(); emp._rowCount++; const c=mapStatus(raw); if(c) emp[c].push(d); else if(raw&&raw!=='-'&&!isKnownAnnotation(raw)) collector.unknownStatusRows.push({line,status:raw,employee:nameCell,normalizedKey:normalizeName(nameCell),date:d}); }
     if (emp._rowCount > 0) employees.push(emp);
   }
@@ -843,7 +905,7 @@ function detectExpectedCountFallback(text) {
 // ─────────────────────────────────────────────────────────────────────────────
 const STATUS_CLASSIFIER_SCHEMA = {
   type:'object',
-  properties:{classifications:{type:'array',items:{type:'object',properties:{rawStatus:{type:'string'},mappedCode:{type:'string',enum:['D','N','AL','RO','X','skip']},confidence:{type:'number'},reason:{type:'string'}},required:['rawStatus','mappedCode','confidence','reason'],additionalProperties:false}}},
+  properties:{classifications:{type:'array',items:{type:'object',properties:{rawStatus:{type:'string'},mappedCode:{type:'string',enum:['D','N','AL','RO','X','EON','EOFF','skip']},confidence:{type:'number'},reason:{type:'string'}},required:['rawStatus','mappedCode','confidence','reason'],additionalProperties:false}}},
   required:['classifications'],additionalProperties:false
 };
 
@@ -861,7 +923,14 @@ async function callOpenAIStatusClassifier(unknownRows) {
     body:JSON.stringify({
       model:'gpt-4o-2024-08-06',
       messages:[
-        {role:'system',content:'You are a hospital staff schedule status classifier. Classify each rawStatus into D(day), N(night), AL(annual leave), RO(request off), X(rest/off), or skip(not a shift status). Return ONLY valid JSON.'},
+        {role:'system',content:
+          'You are a hospital staff schedule status classifier. '
+          + 'Classify each rawStatus into one of: '
+          + 'D(day shift), N(night shift), AL(annual leave/vacation), RO(request off), X(rest/off), '
+          + 'EON(education/training/seminar/study while on duty), '
+          + 'EOFF(education off/training off/education while not working), '
+          + 'or skip(not a shift status). '
+          + 'Classify status codes only. Do not produce employee names, dates, or schedules. Return ONLY valid JSON.'},
         {role:'user',content:JSON.stringify([...byStatus.values()],null,2)}
       ],
       response_format:{type:'json_schema',json_schema:{name:'status_classifications',strict:true,schema:STATUS_CLASSIFIER_SCHEMA}},
@@ -896,7 +965,7 @@ async function callOpenAIFormatDetector(sampleText, diagnostics) {
 // ─────────────────────────────────────────────────────────────────────────────
 const AUDIT_SCHEMA = {
   type:'object',
-  properties:{pass:{type:'boolean'},severity:{type:'string',enum:['none','low','medium','high']},issues:{type:'array',items:{type:'object',properties:{type:{type:'string',enum:['missing_employee','unknown_status','wrong_period','unsupported_format','low_confidence','other']},message:{type:'string'},evidence:{type:'string'}},required:['type','message','evidence'],additionalProperties:false}},recommendedAction:{type:'string',enum:['accept','block_output','needs_format_fallback']},detectedFormat:{type:'string',enum:['daily_rows_under_employee','horizontal_table','section_mode','unknown']},confidence:{type:'number'},suggestedMappings:{type:'array',items:{type:'object',properties:{rawStatus:{type:'string'},mappedCode:{type:'string',enum:['D','N','AL','RO','X','skip']},confidence:{type:'number'},reason:{type:'string'}},required:['rawStatus','mappedCode','confidence','reason'],additionalProperties:false}}},
+  properties:{pass:{type:'boolean'},severity:{type:'string',enum:['none','low','medium','high']},issues:{type:'array',items:{type:'object',properties:{type:{type:'string',enum:['missing_employee','unknown_status','wrong_period','unsupported_format','low_confidence','other']},message:{type:'string'},evidence:{type:'string'}},required:['type','message','evidence'],additionalProperties:false}},recommendedAction:{type:'string',enum:['accept','block_output','needs_format_fallback']},detectedFormat:{type:'string',enum:['daily_rows_under_employee','horizontal_table','section_mode','unknown']},confidence:{type:'number'},suggestedMappings:{type:'array',items:{type:'object',properties:{rawStatus:{type:'string'},mappedCode:{type:'string',enum:['D','N','AL','RO','X','EON','EOFF','skip']},confidence:{type:'number'},reason:{type:'string'}},required:['rawStatus','mappedCode','confidence','reason'],additionalProperties:false}}},
   required:['pass','severity','issues','recommendedAction','detectedFormat','confidence','suggestedMappings'],additionalProperties:false
 };
 
