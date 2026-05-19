@@ -14,7 +14,7 @@
     *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
     body{font-family:-apple-system,BlinkMacSystemFont,"SF Pro Text","Segoe UI",Roboto,sans-serif;background:var(--bg);color:var(--text);line-height:1.5;height:100vh;height:100dvh;overflow:hidden;display:flex;flex-direction:column;overscroll-behavior:none}
     .app-header{flex-shrink:0;background:var(--bg-card);border-bottom:1px solid var(--border);padding:10px 12px;padding-top:calc(10px + env(safe-area-inset-top));display:flex;align-items:center;justify-content:space-between;gap:6px}
-    .app-title{font-size:16px;font-weight:700;display:flex;align-items:center;gap:7px;min-width:0;flex:1}.app-title .emoji{font-size:18px;flex-shrink:0}.app-title .txt{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+    .app-title{min-width:0;flex:1;display:flex;align-items:center;gap:7px}.app-title .emoji{font-size:18px;flex-shrink:0}.app-title-main{min-width:0;display:flex;flex-direction:column;line-height:1.1}.app-title .txt{font-size:16px;font-weight:700;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.app-credit{font-size:10px;color:var(--text-muted);font-weight:600;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
     .header-actions{display:flex;gap:4px;flex-shrink:0;align-items:center}
     .icon-btn{width:38px;height:38px;border:none;background:transparent;border-radius:9px;display:flex;align-items:center;justify-content:center;cursor:pointer;color:var(--text);font-size:17px;transition:background .15s}.icon-btn:active{background:var(--border)}
     .hdr-chip{height:32px;padding:0 11px;border:none;border-radius:16px;font-size:12px;font-weight:700;cursor:pointer;display:flex;align-items:center;gap:5px;transition:all .15s;white-space:nowrap}
@@ -80,7 +80,7 @@
 </head>
 <body>
 <header class="app-header">
-  <div class="app-title"><span class="emoji">📅</span><span class="txt" id="appTitleText">Schedule</span></div>
+  <div class="app-title"><span class="emoji">📅</span><div class="app-title-main"><span class="txt" id="appTitleText">Schedule</span><span class="app-credit">Nawaf Alshammari · ID 1520110</span></div></div>
   <div class="header-actions">
     <button class="hdr-chip today-chip" id="todayBtn" style="display:none">Today</button>
     <button class="hdr-chip summary-chip" id="summaryBtn" style="display:none">📊</button>
