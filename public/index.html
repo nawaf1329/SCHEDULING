@@ -25,7 +25,6 @@
     #uploadScreen.show{display:block;overflow-y:auto}
     .upload-inner{max-width:480px;margin:0 auto;padding:28px 18px calc(28px + env(safe-area-inset-bottom))}
     .hero{text-align:center;margin-bottom:24px}.hero .icon-box{width:68px;height:68px;background:var(--primary-light);border-radius:18px;display:flex;align-items:center;justify-content:center;margin:0 auto 14px;font-size:34px}.hero h1{font-size:20px;font-weight:700;margin-bottom:5px}.hero p{color:var(--text-muted);font-size:14px}
-    .credit-line{margin-top:10px;font-size:12px;color:var(--text-muted);text-align:center}.credit-line strong{color:var(--text);font-weight:700}
     .upload-tabs{display:flex;gap:4px;background:var(--bg-card);border-radius:12px;padding:4px;margin-bottom:14px;border:1px solid var(--border)}.upload-tab{flex:1;padding:9px;background:transparent;border:none;border-radius:9px;color:var(--text-muted);font-size:14px;font-weight:600;cursor:pointer}.upload-tab.active{background:var(--primary);color:#fff}
     .tab-pane{display:none}.tab-pane.active{display:block}
     .drop-zone{width:100%;padding:32px 18px;border:2px dashed var(--border-strong);border-radius:14px;background:var(--bg-card);text-align:center;cursor:pointer;transition:all .2s}.drop-zone:active,.drop-zone.dragover{border-color:var(--primary);background:var(--primary-light)}.drop-zone .file-icon{font-size:30px;margin-bottom:9px}.drop-zone .label{font-weight:600;font-size:15px;margin-bottom:4px}.drop-zone .hint{font-size:12px;color:var(--text-muted)}
@@ -88,39 +87,14 @@
     <button class="icon-btn" id="settingsBtn">⚙️</button>
   </div>
 </header>
-
 <div id="uploadScreen" class="screen show">
   <div class="upload-inner">
-    <div class="hero">
-      <div class="icon-box">📋</div>
-      <h1>Schedule Viewer</h1>
-      <p>Upload your hospital schedule PDF to view an interactive grid.</p>
-      <div class="credit-line">
-        Created by <strong>Nawaf Alshammari</strong> · ID: <strong>1520110</strong>
-      </div>
-    </div>
-
-    <div class="upload-tabs">
-      <button class="upload-tab active" data-tab="pdf">📄 PDF</button>
-      <button class="upload-tab" data-tab="text">📝 Text</button>
-    </div>
-
-    <div class="tab-pane active" data-pane="pdf">
-      <div class="drop-zone" id="dropZone">
-        <div class="file-icon">📤</div>
-        <div class="label">Tap to choose PDF</div>
-        <div class="hint">or drag &amp; drop · max 4 MB</div>
-        <input type="file" id="pdfInput" accept=".pdf" hidden>
-      </div>
-    </div>
-
-    <div class="tab-pane" data-pane="text">
-      <textarea class="text-area" id="textInput" placeholder="Paste schedule text…"></textarea>
-      <button class="btn-primary" id="textSubmitBtn">Parse Text</button>
-    </div>
+    <div class="hero"><div class="icon-box">📋</div><h1>Schedule Viewer</h1><p>Upload your hospital schedule PDF to view an interactive grid.</p></div>
+    <div class="upload-tabs"><button class="upload-tab active" data-tab="pdf">📄 PDF</button><button class="upload-tab" data-tab="text">📝 Text</button></div>
+    <div class="tab-pane active" data-pane="pdf"><div class="drop-zone" id="dropZone"><div class="file-icon">📤</div><div class="label">Tap to choose PDF</div><div class="hint">or drag &amp; drop · max 4 MB</div><input type="file" id="pdfInput" accept=".pdf" hidden></div></div>
+    <div class="tab-pane" data-pane="text"><textarea class="text-area" id="textInput" placeholder="Paste schedule text…"></textarea><button class="btn-primary" id="textSubmitBtn">Parse Text</button></div>
   </div>
 </div>
-
 <div id="scheduleScreen" class="screen">
   <div class="info-bar">
     <div class="info-item"><div class="info-label">Unit</div><div class="info-value" id="infoUnit">—</div></div>
@@ -128,182 +102,22 @@
     <div class="info-item"><div class="info-label">Staff</div><div class="info-value" id="infoCount">0</div></div>
     <div class="info-item"><div class="info-label">Days</div><div class="info-value" id="infoDays">0</div></div>
   </div>
-
-  <div class="toolbar">
-    <div class="search-wrap">
-      <input type="search" id="searchInput" placeholder="Search staff…" autocomplete="off">
-    </div>
-    <button class="pill-btn" id="filterBtn">
-      <span>Filter</span>
-      <span class="badge" id="filterBadge" style="display:none">0</span>
-    </button>
-  </div>
-
-  <div class="grid-wrap" id="gridWrap">
-    <table class="grid-table" id="gridTable"></table>
-  </div>
-
+  <div class="toolbar"><div class="search-wrap"><input type="search" id="searchInput" placeholder="Search staff…" autocomplete="off"></div><button class="pill-btn" id="filterBtn"><span>Filter</span><span class="badge" id="filterBadge" style="display:none">0</span></button></div>
+  <div class="grid-wrap" id="gridWrap"><table class="grid-table" id="gridTable"></table></div>
   <div class="legend">
-    <div class="leg-item"><span class="leg-box leg-D">D</span>Day</div>
-    <div class="leg-item"><span class="leg-box leg-N">N</span>Night</div>
-    <div class="leg-item"><span class="leg-box leg-AL">A</span>Annual</div>
-    <div class="leg-item"><span class="leg-box leg-RO">R</span>Req&nbsp;Off</div>
-    <div class="leg-item"><span class="leg-box leg-X">X</span>Rest</div>
-    <div class="leg-item"><span class="leg-box leg-EON">EO</span>Edu&nbsp;ON</div>
+    <div class="leg-item"><span class="leg-box leg-D">D</span>Day</div><div class="leg-item"><span class="leg-box leg-N">N</span>Night</div>
+    <div class="leg-item"><span class="leg-box leg-AL">A</span>Annual</div><div class="leg-item"><span class="leg-box leg-RO">R</span>Req&nbsp;Off</div>
+    <div class="leg-item"><span class="leg-box leg-X">X</span>Rest</div><div class="leg-item"><span class="leg-box leg-EON">EO</span>Edu&nbsp;ON</div>
     <div class="leg-item"><span class="leg-box leg-EOFF">EF</span>Edu&nbsp;OFF</div>
   </div>
 </div>
-
 <div class="sheet-backdrop" id="sheetBackdrop"></div>
-
-<div class="sheet" id="settingsSheet">
-  <div class="handle"></div>
-  <h3>Settings</h3>
-  <div class="sub">Customize the grid.</div>
-  <div class="sheet-section">
-    <div class="toggle-row">
-      <div><div class="lbl">Compact mode</div><div class="desc">Smaller cells</div></div>
-      <div class="switch" id="compactToggle"></div>
-    </div>
-    <div class="toggle-row">
-      <div><div class="lbl">Highlight today</div><div class="desc">Mark current date</div></div>
-      <div class="switch on" id="todayToggle"></div>
-    </div>
-  </div>
-  <div class="sheet-section">
-    <div class="sheet-section-label">Schedule</div>
-    <button class="btn-danger" id="resetBtn">Upload a different schedule</button>
-  </div>
-</div>
-
-<div class="sheet" id="filterSheet">
-  <div class="handle"></div>
-  <h3>Filter staff</h3>
-  <div class="sub">Combine filters to narrow the grid.</div>
-  <div class="sheet-section">
-    <div class="sheet-section-label">Role</div>
-    <div class="chip-row" id="roleChips"></div>
-  </div>
-  <div class="sheet-section">
-    <div class="sheet-section-label">Has at least one…</div>
-    <div class="chip-row" id="statusChips">
-      <button class="chip" data-status="D">Day shifts</button>
-      <button class="chip" data-status="N">Night shifts</button>
-      <button class="chip" data-status="AL">Annual leave</button>
-      <button class="chip" data-status="RO">Req. off</button>
-      <button class="chip" data-status="EON">Edu ON</button>
-      <button class="chip" data-status="EOFF">Edu OFF</button>
-    </div>
-  </div>
-  <button class="btn-primary" id="clearFiltersBtn">Clear filters</button>
-</div>
-
-<div class="sheet" id="empSheet">
-  <div class="handle"></div>
-  <h3 id="empSheetName">—</h3>
-  <div class="sub" id="empSheetRole">—</div>
-  <div class="emp-stats" id="empStats"></div>
-  <div class="sheet-section">
-    <div class="sheet-section-label">Schedule overview</div>
-    <div class="cal-grid" id="calGrid"></div>
-  </div>
-</div>
-
-<div class="sheet" id="swapSheet">
-  <div class="handle"></div>
-  <h3>Swap Finder</h3>
-  <div class="sub" id="swapSubtitle">Find coverage for your shift.</div>
-
-  <div class="mode-tabs">
-    <button class="mode-tab active" data-mode="cover">🙋 Find Cover</button>
-    <button class="mode-tab" data-mode="mutual">🔁 Mutual Swap</button>
-  </div>
-
-  <div class="sheet-section">
-    <div class="sheet-section-label">Your name</div>
-    <div id="swapMePickerWrap">
-      <input type="search" id="swapMeSearch" class="input-field" placeholder="Start typing your name…" autocomplete="off">
-      <div class="name-results" id="swapMeResults"></div>
-    </div>
-    <div id="swapMeSelected" class="me-selected" style="display:none"></div>
-  </div>
-
-  <div class="sheet-section" id="swapDatesSection" style="display:none">
-    <div class="sheet-section-label" id="swapDatesLabel">Working days to swap</div>
-    <div class="chip-row" id="swapDateChips"></div>
-  </div>
-
-  <div class="sheet-section" id="swapOptsCover" style="display:none">
-    <div class="sheet-section-label">Preferences</div>
-    <div class="toggle-row">
-      <div><div class="lbl">Same role only</div><div class="desc">Only people with your job role</div></div>
-      <div class="switch on" id="coverSameRoleToggle"></div>
-    </div>
-    <div class="toggle-row">
-      <div><div class="lbl">Exclude annual leave</div><div class="desc">Skip people on AL on your date</div></div>
-      <div class="switch on" id="coverExcludeAlToggle"></div>
-    </div>
-    <div class="toggle-row">
-      <div><div class="lbl">Show weak matches</div><div class="desc">Include matches below 60%</div></div>
-      <div class="switch" id="coverShowWeakToggle"></div>
-    </div>
-  </div>
-
-  <div class="sheet-section" id="swapOptsMutual" style="display:none">
-    <div class="sheet-section-label">Preferences</div>
-    <div class="toggle-row">
-      <div><div class="lbl">Same role only</div><div class="desc">Only people with your job role</div></div>
-      <div class="switch on" id="mutualSameRoleToggle"></div>
-    </div>
-    <div class="toggle-row">
-      <div><div class="lbl">Same shift only</div><div class="desc">Day swaps Day, Night swaps Night</div></div>
-      <div class="switch on" id="mutualSameShiftToggle"></div>
-    </div>
-    <div class="toggle-row">
-      <div><div class="lbl">Exclude annual leave</div><div class="desc">Skip people on AL on your date</div></div>
-      <div class="switch on" id="mutualExcludeAlToggle"></div>
-    </div>
-    <div class="toggle-row">
-      <div><div class="lbl">Require multiple return options</div><div class="desc">Only show candidates with ≥ 2 return dates</div></div>
-      <div class="switch" id="mutualMultiReturnsToggle"></div>
-    </div>
-    <div class="toggle-row">
-      <div><div class="lbl">Show weak matches</div><div class="desc">Include matches below 60%</div></div>
-      <div class="switch" id="mutualShowWeakToggle"></div>
-    </div>
-  </div>
-
-  <button class="btn-primary" id="swapFindBtn" style="display:none">Find candidates</button>
-
-  <div class="sheet-section" id="swapResultsSection" style="display:none;margin-top:16px">
-    <div class="sheet-section-label">Suggestions · <span id="swapResultCount">0</span></div>
-    <div id="swapResults"></div>
-  </div>
-</div>
-
-<div class="sheet" id="summarySheet">
-  <div class="handle"></div>
-  <h3>📊 Schedule Summary</h3>
-  <div class="sub">Staffing overview and schedule health.</div>
-  <div class="sheet-section">
-    <div class="sheet-section-label">Status counts (shift-days)</div>
-    <div class="summary-grid" id="summaryGrid"></div>
-  </div>
-  <div class="sheet-section" id="shortShiftsSection" style="display:none">
-    <div class="sheet-section-label">Short shifts ( &lt; 11 h )</div>
-    <table class="short-table" id="shortShiftsTable"></table>
-  </div>
-  <div class="sheet-section">
-    <div class="sheet-section-label" style="display:flex;justify-content:space-between">
-      <span>Workload · <span id="wlSubtitle"></span></span>
-      <span style="font-size:10px;color:var(--text-muted)">tap to view schedule</span>
-    </div>
-    <div class="wl-list" id="wlList"></div>
-  </div>
-</div>
-
+<div class="sheet" id="settingsSheet"><div class="handle"></div><h3>Settings</h3><div class="sub">Customize the grid.</div><div class="sheet-section"><div class="toggle-row"><div><div class="lbl">Compact mode</div><div class="desc">Smaller cells</div></div><div class="switch" id="compactToggle"></div></div><div class="toggle-row"><div><div class="lbl">Highlight today</div><div class="desc">Mark current date</div></div><div class="switch on" id="todayToggle"></div></div></div><div class="sheet-section"><div class="sheet-section-label">Schedule</div><button class="btn-danger" id="resetBtn">Upload a different schedule</button></div></div>
+<div class="sheet" id="filterSheet"><div class="handle"></div><h3>Filter staff</h3><div class="sub">Combine filters to narrow the grid.</div><div class="sheet-section"><div class="sheet-section-label">Role</div><div class="chip-row" id="roleChips"></div></div><div class="sheet-section"><div class="sheet-section-label">Has at least one…</div><div class="chip-row" id="statusChips"><button class="chip" data-status="D">Day shifts</button><button class="chip" data-status="N">Night shifts</button><button class="chip" data-status="AL">Annual leave</button><button class="chip" data-status="RO">Req. off</button><button class="chip" data-status="EON">Edu ON</button><button class="chip" data-status="EOFF">Edu OFF</button></div></div><button class="btn-primary" id="clearFiltersBtn">Clear filters</button></div>
+<div class="sheet" id="empSheet"><div class="handle"></div><h3 id="empSheetName">—</h3><div class="sub" id="empSheetRole">—</div><div class="emp-stats" id="empStats"></div><div class="sheet-section"><div class="sheet-section-label">Schedule overview</div><div class="cal-grid" id="calGrid"></div></div></div>
+<div class="sheet" id="swapSheet"><div class="handle"></div><h3>Swap Finder</h3><div class="sub" id="swapSubtitle">Find coverage for your shift.</div><div class="mode-tabs"><button class="mode-tab active" data-mode="cover">🙋 Find Cover</button><button class="mode-tab" data-mode="mutual">🔁 Mutual Swap</button></div><div class="sheet-section"><div class="sheet-section-label">Your name</div><div id="swapMePickerWrap"><input type="search" id="swapMeSearch" class="input-field" placeholder="Start typing your name…" autocomplete="off"><div class="name-results" id="swapMeResults"></div></div><div id="swapMeSelected" class="me-selected" style="display:none"></div></div><div class="sheet-section" id="swapDatesSection" style="display:none"><div class="sheet-section-label" id="swapDatesLabel">Working days to swap</div><div class="chip-row" id="swapDateChips"></div></div><div class="sheet-section" id="swapOptsCover" style="display:none"><div class="sheet-section-label">Preferences</div><div class="toggle-row"><div><div class="lbl">Same role only</div><div class="desc">Only people with your job role</div></div><div class="switch on" id="coverSameRoleToggle"></div></div><div class="toggle-row"><div><div class="lbl">Exclude annual leave</div><div class="desc">Skip people on AL on your date</div></div><div class="switch on" id="coverExcludeAlToggle"></div></div><div class="toggle-row"><div><div class="lbl">Show weak matches</div><div class="desc">Include matches below 60%</div></div><div class="switch" id="coverShowWeakToggle"></div></div></div><div class="sheet-section" id="swapOptsMutual" style="display:none"><div class="sheet-section-label">Preferences</div><div class="toggle-row"><div><div class="lbl">Same role only</div><div class="desc">Only people with your job role</div></div><div class="switch on" id="mutualSameRoleToggle"></div></div><div class="toggle-row"><div><div class="lbl">Same shift only</div><div class="desc">Day swaps Day, Night swaps Night</div></div><div class="switch on" id="mutualSameShiftToggle"></div></div><div class="toggle-row"><div><div class="lbl">Exclude annual leave</div><div class="desc">Skip people on AL on your date</div></div><div class="switch on" id="mutualExcludeAlToggle"></div></div><div class="toggle-row"><div><div class="lbl">Require multiple return options</div><div class="desc">Only show candidates with ≥ 2 return dates</div></div><div class="switch" id="mutualMultiReturnsToggle"></div></div><div class="toggle-row"><div><div class="lbl">Show weak matches</div><div class="desc">Include matches below 60%</div></div><div class="switch" id="mutualShowWeakToggle"></div></div></div><button class="btn-primary" id="swapFindBtn" style="display:none">Find candidates</button><div class="sheet-section" id="swapResultsSection" style="display:none;margin-top:16px"><div class="sheet-section-label">Suggestions · <span id="swapResultCount">0</span></div><div id="swapResults"></div></div></div>
+<div class="sheet" id="summarySheet"><div class="handle"></div><h3>📊 Schedule Summary</h3><div class="sub">Staffing overview and schedule health.</div><div class="sheet-section"><div class="sheet-section-label">Status counts (shift-days)</div><div class="summary-grid" id="summaryGrid"></div></div><div class="sheet-section" id="shortShiftsSection" style="display:none"><div class="sheet-section-label">Short shifts ( &lt; 11 h )</div><table class="short-table" id="shortShiftsTable"></table></div><div class="sheet-section"><div class="sheet-section-label" style="display:flex;justify-content:space-between"><span>Workload · <span id="wlSubtitle"></span></span><span style="font-size:10px;color:var(--text-muted)">tap to view schedule</span></div><div class="wl-list" id="wlList"></div></div></div>
 <div class="toast" id="toast"></div>
-
 <script>
 pdfjsLib.GlobalWorkerOptions.workerSrc='https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
 const state={data:null,dates:[],todayISO:new Date().toISOString().slice(0,10),filter:{search:'',roles:new Set(),statuses:new Set()},ui:{compact:false,showToday:true}};
@@ -313,7 +127,6 @@ const DOW=['Su','Mo','Tu','We','Th','Fr','Sa'],DOW_FULL=['Sunday','Monday','Tues
 const STATUS_NAMES={D:'Day shift',N:'Night shift',AL:'Annual leave',RO:'Request off',X:'Rest/Off',EON:'Education (on duty)',EOFF:'Education (off duty)'};
 const STATUS_LETTER={D:'D',N:'N',AL:'A',RO:'R',X:'X',EON:'EO',EOFF:'EF'};
 const SHIFT_WORD={D:'Day',N:'Night'};
-
 function toast(msg,kind=''){const t=$('#toast');t.textContent=msg;t.className='toast show '+kind;clearTimeout(t._tid);t._tid=setTimeout(()=>t.classList.remove('show'),2800)}
 function esc(s){return String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]))}
 function getDow(iso){return new Date(iso+'T00:00:00').getDay()}
@@ -325,25 +138,22 @@ function daysBetween(a,b){return Math.round(Math.abs(new Date(a+'T00:00:00')-new
 function expandDates(s,e){const out=[],cur=new Date(s+'T00:00:00'),stop=new Date(e+'T00:00:00');while(cur<=stop){out.push(cur.toISOString().slice(0,10));cur.setDate(cur.getDate()+1)}return out}
 function statusOf(emp,date){for(const k of['D','N','AL','RO','X','EON','EOFF'])if(emp[k]&&emp[k].includes(date))return k;return null}
 function scoreBracket(s){if(s>=90)return{cls:'excellent',label:'Excellent'};if(s>=75)return{cls:'good',label:'Good'};if(s>=60)return{cls:'possible',label:'Possible'};return{cls:'weak',label:'Weak'}}
-
+// Sheets
 function openSheet(sel){$('#sheetBackdrop').classList.add('show');$(sel).classList.add('show')}
 function closeAllSheets(){$('#sheetBackdrop').classList.remove('show');$$('.sheet').forEach(s=>s.classList.remove('show'))}
 $('#sheetBackdrop').addEventListener('click',closeAllSheets);
-
+// Upload tabs
 $$('.upload-tab').forEach(btn=>btn.addEventListener('click',()=>{
   $$('.upload-tab').forEach(b=>b.classList.remove('active'));$$('.tab-pane').forEach(p=>p.classList.remove('active'));
   btn.classList.add('active');$(`.tab-pane[data-pane="${btn.dataset.tab}"]`).classList.add('active');
 }));
-
 const dropZone=$('#dropZone'),pdfInput=$('#pdfInput');
 dropZone.addEventListener('click',()=>pdfInput.click());
 dropZone.addEventListener('dragover',e=>{e.preventDefault();dropZone.classList.add('dragover')});
 dropZone.addEventListener('dragleave',()=>dropZone.classList.remove('dragover'));
 dropZone.addEventListener('drop',e=>{e.preventDefault();dropZone.classList.remove('dragover');if(e.dataTransfer.files[0]){pdfInput.files=e.dataTransfer.files;handlePdf()}});
 pdfInput.addEventListener('change',handlePdf);
-
 $('#textSubmitBtn').addEventListener('click',()=>{const txt=$('#textInput').value.trim();if(!txt){toast('Paste text first','error');return}submitParse({sourceType:'text',text:txt})});
-
 async function handlePdf(){
   const file=pdfInput.files[0];if(!file)return;
   try{
@@ -359,7 +169,6 @@ async function handlePdf(){
     submitParse({sourceType:'pdf',pages,plainText});
   }catch(e){toast('PDF error: '+e.message,'error')}
 }
-
 async function submitParse(payload){
   toast('Parsing…');
   try{
@@ -370,10 +179,10 @@ async function submitParse(payload){
     loadData(j);toast(`Loaded ${j.employees.length} staff`,'success');
   }catch(e){toast('Network error: '+e.message,'error')}
 }
-
 function loadData(data){
   state.data=data;state.dates=expandDates(data.start,data.end);
   state.filter={search:'',roles:new Set(),statuses:new Set()};
+  // migration check
   const emp0=data.employees[0]||{};
   if('EON'in emp0){try{localStorage.setItem('schedule_data_v1',JSON.stringify(data))}catch{}}
   else{try{localStorage.removeItem('schedule_data_v1')}catch{}}
@@ -397,7 +206,6 @@ function loadData(data){
   $('#appTitleText').textContent=data.unit||'Schedule';
   render();setTimeout(scrollToToday,80);
 }
-
 function scrollToToday(){
   const idx=state.dates.indexOf(state.todayISO);if(idx<0)return;
   const cells=$$('#gridTable thead .date-cell'),target=cells[idx];if(!target)return;
@@ -405,7 +213,6 @@ function scrollToToday(){
   wrap.scrollTo({left:Math.max(0,target.offsetLeft-nameW-8),behavior:'smooth'});
 }
 $('#todayBtn').addEventListener('click',scrollToToday);
-
 function getFiltered(){
   const q=state.filter.search.toLowerCase().trim();
   return state.data.employees.filter(emp=>{
@@ -415,7 +222,6 @@ function getFiltered(){
     return true;
   });
 }
-
 function render(){
   if(!state.data)return;
   const employees=getFiltered(),dates=state.dates;
@@ -448,7 +254,6 @@ function render(){
   }));
   $$('#gridTable .name-cell').forEach(c=>c.addEventListener('click',()=>openEmployee(c.dataset.emp)));
 }
-
 function openEmployee(name){
   const emp=state.data.employees.find(e=>e.name===name);if(!emp)return;
   $('#empSheetName').textContent=emp.name;$('#empSheetRole').textContent=emp.role||'—';
@@ -465,29 +270,24 @@ function openEmployee(name){
   }
   $('#calGrid').innerHTML=cal;openSheet('#empSheet');
 }
-
 let searchT;
 $('#searchInput').addEventListener('input',e=>{clearTimeout(searchT);searchT=setTimeout(()=>{state.filter.search=e.target.value;render()},100)});
 $('#filterBtn').addEventListener('click',()=>openSheet('#filterSheet'));
-
 $$('#statusChips .chip').forEach(c=>c.addEventListener('click',()=>{
   c.classList.toggle('active');const s=c.dataset.status;
   if(state.filter.statuses.has(s))state.filter.statuses.delete(s);else state.filter.statuses.add(s);
   render();updateFilterBadge();
 }));
-
 $('#clearFiltersBtn').addEventListener('click',()=>{
   state.filter={search:'',roles:new Set(),statuses:new Set()};
   $('#searchInput').value='';$$('#roleChips .chip.active,#statusChips .chip.active').forEach(c=>c.classList.remove('active'));
   render();updateFilterBadge();closeAllSheets();
 });
-
 function updateFilterBadge(){
   const t=state.filter.roles.size+state.filter.statuses.size;
   const btn=$('#filterBtn'),b=$('#filterBadge');
   if(t>0){btn.classList.add('active');b.style.display='';b.textContent=t}else{btn.classList.remove('active');b.style.display='none'}
 }
-
 $('#settingsBtn').addEventListener('click',()=>openSheet('#settingsSheet'));
 $('#compactToggle').addEventListener('click',e=>{
   e.currentTarget.classList.toggle('on');state.ui.compact=e.currentTarget.classList.contains('on');
@@ -496,10 +296,8 @@ $('#compactToggle').addEventListener('click',e=>{
 $('#todayToggle').addEventListener('click',e=>{
   e.currentTarget.classList.toggle('on');state.ui.showToday=e.currentTarget.classList.contains('on');render();saveUI();
 });
-
 function saveUI(){try{localStorage.setItem('schedule_ui_v1',JSON.stringify(state.ui))}catch{}}
 function loadUI(){try{const u=JSON.parse(localStorage.getItem('schedule_ui_v1')||'{}');state.ui={...state.ui,...u};$('#compactToggle').classList.toggle('on',state.ui.compact);$('#todayToggle').classList.toggle('on',state.ui.showToday)}catch{}}
-
 $('#resetBtn').addEventListener('click',()=>{
   if(!confirm('Clear schedule?'))return;
   try{localStorage.removeItem('schedule_data_v1')}catch{}
@@ -508,13 +306,13 @@ $('#resetBtn').addEventListener('click',()=>{
   $('#todayBtn').style.display='none';$('#swapBtn').style.display='none';$('#summaryBtn').style.display='none';
   $('#appTitleText').textContent='Schedule';pdfInput.value='';$('#textInput').value='';closeAllSheets();
 });
-
+// Summary
 $('#summaryBtn').addEventListener('click',()=>{if(!state.data)return;renderSummary();openSheet('#summarySheet')});
-
 function computeWorkload(emp,dates){
   const seq=dates.map(d=>statusOf(emp,d));
+  const isWork=s=>s==='D'||s==='N'||s==='EON';
   let score=100;const issues=[];
-  let maxC=0,curC=0;for(const s of seq){if(s==='D'||s==='N'){curC++;maxC=Math.max(maxC,curC)}else curC=0}
+  let maxC=0,curC=0;for(const s of seq){if(isWork(s)){curC++;maxC=Math.max(maxC,curC)}else curC=0}
   if(maxC>=6){score-=30;issues.push(`${maxC} consecutive shifts`)}else if(maxC>=4){score-=15;issues.push(`${maxC} consecutive shifts`)}
   let maxN=0,curN=0;for(const s of seq){if(s==='N'){curN++;maxN=Math.max(maxN,curN)}else curN=0}
   if(maxN>=5){score-=20;issues.push(`${maxN} consecutive nights`)}else if(maxN>=3){score-=8;issues.push(`${maxN} consecutive nights`)}
@@ -522,15 +320,14 @@ function computeWorkload(emp,dates){
   if(flips>=3){score-=20;issues.push(`${flips} D/N switches`)}else if(flips>=2){score-=10;issues.push(`${flips} D/N switches`)}
   let quick=0;for(let i=2;i<seq.length;i++){const b=seq[i-2],m=seq[i-1],a=seq[i];const offM=m==='X'||m===null;if(offM&&((b==='N'&&a==='D')||(b==='D'&&a==='N')))quick++}
   if(quick>=2){score-=15;issues.push(`${quick} quick shift-type changes`)}else if(quick>=1){score-=8;issues.push('Quick shift-type change')}
-  for(let i=1;i<seq.length;i++)if(seq[i-1]==='AL'&&(seq[i]==='D'||seq[i]==='N')){score-=5;issues.push('Returns from AL into work');break}
-  let iso=0;for(let i=1;i<seq.length-1;i++){const w=s=>s==='D'||s==='N';if((seq[i]==='X'||seq[i]===null)&&w(seq[i-1])&&w(seq[i+1]))iso++}
+  for(let i=1;i<seq.length;i++)if(seq[i-1]==='AL'&&isWork(seq[i])){score-=5;issues.push('Returns from AL into work');break}
+  let iso=0;for(let i=1;i<seq.length-1;i++){if((seq[i]==='X'||seq[i]===null)&&isWork(seq[i-1])&&isWork(seq[i+1]))iso++}
   if(iso>=5){score-=10;issues.push(`${iso} isolated rest days`)}else if(iso>=3){score-=5;issues.push(`${iso} isolated rest days`)}
   score=Math.max(0,Math.min(100,Math.round(score)));
   let label,cls;
   if(score>=85){label='Easy';cls='easy'}else if(score>=70){label='Normal';cls='normal'}else if(score>=50){label='Heavy';cls='heavy'}else{label='Risky';cls='risky'}
   return{score,label,cls,issues:issues.slice(0,3)};
 }
-
 function renderSummary(){
   const data=state.data,dates=state.dates,diag=data.diagnostics||{},counts=diag.statusCounts||{};
   const CELLS=[{key:'D',label:'Day',cls:'s-D'},{key:'N',label:'Night',cls:'s-N'},{key:'X',label:'Rest',cls:'s-X'},{key:'AL',label:'Annual',cls:'s-AL'},{key:'RO',label:'ReqOff',cls:'s-RO'},{key:'EON',label:'Edu ON',cls:'s-EON'},{key:'EOFF',label:'Edu OFF',cls:'s-EOFF'},{key:'_total',label:'Total Staff',cls:'s-total'}];
@@ -546,16 +343,14 @@ function renderSummary(){
   $('#wlList').innerHTML=ratings.map(r=>`<div class="wl-item" data-emp="${esc(r.emp.name)}"><div class="wl-info"><div class="wl-name">${esc(r.emp.name)}</div><div class="wl-issues">${r.issues.length>0?r.issues.join(' · '):'No flagged patterns'}</div></div><div class="wl-badge ${r.cls}">${r.score} · ${r.label}</div></div>`).join('');
   $$('#wlList .wl-item').forEach(el=>el.addEventListener('click',()=>openEmployee(el.dataset.emp)));
 }
-
+// Swap Finder
 $('#swapBtn').addEventListener('click',()=>{if(!state.data)return;applySwapMode();renderSwapForm();openSheet('#swapSheet')});
-
 $$('.mode-tab').forEach(btn=>btn.addEventListener('click',()=>{
   const m=btn.dataset.mode;if(m===swap.mode)return;swap.mode=m;
   if(m==='mutual'&&swap.dates.size>1){const first=[...swap.dates][0];swap.dates.clear();swap.dates.add(first)}
   try{localStorage.setItem('swap_mode_v1',m)}catch{}
   applySwapMode();renderSwapForm();
 }));
-
 function applySwapMode(){
   $$('.mode-tab').forEach(t=>t.classList.toggle('active',t.dataset.mode===swap.mode));
   const cover=swap.mode==='cover';
@@ -564,7 +359,6 @@ function applySwapMode(){
   $('#swapDatesLabel').textContent=cover?'Working days to swap (pick one or more)':'Pick one working day to swap';
   $('#swapResults').innerHTML='';$('#swapResultsSection').style.display='none';
 }
-
 function renderSwapForm(){
   if(swap.me){
     $('#swapMePickerWrap').style.display='none';$('#swapMeSelected').style.display='';
@@ -577,7 +371,6 @@ function renderSwapForm(){
     $('#swapFindBtn').style.display='none';$('#swapResultsSection').style.display='none';
   }
 }
-
 function renderSwapDateChips(){
   const me=swap.me,working=state.dates.filter(d=>{const s=statusOf(me,d);return s==='D'||s==='N'});
   if(!working.length){$('#swapDateChips').innerHTML='<span class="empty-hint">No working days found.</span>';return}
@@ -588,9 +381,7 @@ function renderSwapDateChips(){
     else{c.classList.toggle('active');if(swap.dates.has(d))swap.dates.delete(d);else swap.dates.add(d)}
   }));
 }
-
 function changeSwapMe(){swap.me=null;swap.dates.clear();try{localStorage.removeItem('me_name_v1')}catch{};$('#swapResults').innerHTML='';$('#swapResultsSection').style.display='none';renderSwapForm()}
-
 $('#swapMeSearch').addEventListener('input',e=>{
   const q=e.target.value.toLowerCase().trim();
   if(!q){$('#swapMeResults').innerHTML='';return}
@@ -602,7 +393,6 @@ $('#swapMeSearch').addEventListener('input',e=>{
     swap.me=emp;swap.dates.clear();try{localStorage.setItem('me_name_v1',emp.name)}catch{};renderSwapForm();
   }));
 });
-
 function bindToggle(id,getRef,setRef){const el=$('#'+id);el.classList.toggle('on',getRef());el.addEventListener('click',()=>{el.classList.toggle('on');setRef(el.classList.contains('on'))})}
 bindToggle('coverSameRoleToggle',()=>swap.cover.sameRole,v=>swap.cover.sameRole=v);
 bindToggle('coverExcludeAlToggle',()=>swap.cover.excludeAL,v=>swap.cover.excludeAL=v);
@@ -612,7 +402,6 @@ bindToggle('mutualSameShiftToggle',()=>swap.mutual.sameShift,v=>swap.mutual.same
 bindToggle('mutualExcludeAlToggle',()=>swap.mutual.excludeAL,v=>swap.mutual.excludeAL=v);
 bindToggle('mutualMultiReturnsToggle',()=>swap.mutual.multiReturns,v=>swap.mutual.multiReturns=v);
 bindToggle('mutualShowWeakToggle',()=>swap.mutual.showWeak,v=>swap.mutual.showWeak=v);
-
 $('#swapFindBtn').addEventListener('click',()=>{
   if(!swap.me){toast('Pick yourself first','error');return}
   if(swap.dates.size===0){toast('Pick at least one date','error');return}
@@ -620,96 +409,191 @@ $('#swapFindBtn').addEventListener('click',()=>{
   renderSwapResults(results);
   setTimeout(()=>$('#swapResultsSection').scrollIntoView({behavior:'smooth',block:'start'}),60);
 });
+// ═══ SWAP FINDER — scoring engine ════════════════════════════════════════
+// Analyses consecutive runs + shift-flip risk when adding one coverage shift.
+function assessCoverageImpact(person,coverDate,coverShift){
+  const all=state.dates,idx=all.indexOf(coverDate);
+  if(idx<0)return{totalConsec:1,bwd:0,fwd:1,flipRisk:null,prevShift:null,nextShift:null};
+  let fwd=1;
+  for(let i=idx+1;i<all.length;i++){const s=statusOf(person,all[i]);if(s==='D'||s==='N'||s==='EON')fwd++;else break}
+  let bwd=0;
+  for(let i=idx-1;i>=0;i--){const s=statusOf(person,all[i]);if(s==='D'||s==='N'||s==='EON')bwd++;else break}
+  const totalConsec=bwd+fwd;
+  const prevShift=idx>0?statusOf(person,all[idx-1]):null;
+  const nextShift=idx<all.length-1?statusOf(person,all[idx+1]):null;
+  let flipRisk=null;
+  if(prevShift==='N'&&coverShift==='D')flipRisk='Night before \u2192 Day coverage (unsafe turnaround)';
+  else if(coverShift==='N'&&nextShift==='D')flipRisk='Night coverage \u2192 Day after (unsafe turnaround)';
+  else if(prevShift==='D'&&coverShift==='N')flipRisk='Day before \u2192 Night coverage';
+  else if(coverShift==='D'&&nextShift==='N')flipRisk='Day coverage \u2192 Night after';
+  return{totalConsec,bwd,fwd,flipRisk,prevShift,nextShift};
+}
+
+// Scores feasibility of one person covering one date.
+// Returns {score:0-100, reasons:string[], blocked:bool, sameRole:bool, impact}
+// Score = availability(35) + role(10) + shiftCompat(15) + feasibility(40).
+function scoreSingleCoverage(person,me,coverDate,opts){
+  const myShift=statusOf(me,coverDate);
+  const coverShift=(myShift==='D'||myShift==='N')?myShift:'D';
+  const pStatus=statusOf(person,coverDate);
+  const reasons=[];
+  // Hard blocks
+  if(pStatus==='D'||pStatus==='N')return{score:0,reasons:[`\u2717 Already working ${pStatus} on ${fmtDL(coverDate)}`],blocked:true,sameRole:false};
+  if(pStatus==='EON'||pStatus==='EOFF')return{score:0,reasons:['\u2717 Education day \u2014 not eligible'],blocked:true,sameRole:false};
+  if(pStatus==='AL'&&opts.excludeAL)return{score:0,reasons:['\u2717 On annual leave'],blocked:true,sameRole:false};
+  // 1. Availability (max 35)
+  let avail;
+  if(pStatus===null){avail=35;reasons.push(`\u2713 Off on ${fmtDL(coverDate)}`);}
+  else if(pStatus==='X'){avail=30;reasons.push(`\u2713 Rest day on ${fmtDL(coverDate)}`);}
+  else if(pStatus==='RO'){avail=22;reasons.push(`\u2713 Requested off on ${fmtDL(coverDate)}`);}
+  else{avail=10;reasons.push(`\u26a0 Annual leave on ${fmtDL(coverDate)}`);}
+  // 2. Role (max 10)
+  const sameRole=(person.role||'')===(me.role||'');
+  const rolePoints=sameRole?10:0;
+  reasons.push(sameRole?'\u2713 Same role':'\u2717 Different role');
+  // 3. Shift compatibility (max 15) — penalise flips
+  const impact=assessCoverageImpact(person,coverDate,coverShift);
+  let shiftPoints=15,flipCap=100;
+  if(impact.flipRisk){
+    const unsafe=impact.flipRisk.includes('unsafe');
+    shiftPoints=0;flipCap=unsafe?40:55;
+    reasons.push(`\u26a0 ${impact.flipRisk}`);
+  }
+  // 4. Feasibility after coverage (max 40) + hard consecutive caps
+  let feasPoints=40,consCap=100;
+  if(impact.totalConsec>=5){feasPoints=0;consCap=0;reasons.push(`\u26a0 Would create ${impact.totalConsec} consecutive shifts \u2014 not feasible`);}
+  else if(impact.totalConsec===4){feasPoints=5;consCap=45;reasons.push('\u26a0 Creates 4 consecutive shifts');}
+  else if(impact.totalConsec===3){feasPoints=20;consCap=70;reasons.push('\u26a0 Creates 3 consecutive shifts');}
+  else if(impact.totalConsec===2){feasPoints=35;}
+  else{feasPoints=40;}
+  if(impact.bwd>=3&&impact.totalConsec<5)reasons.push(`\u26a0 Already ${impact.bwd} shifts before this date`);
+  // Hard cap
+  const hardCap=Math.min(consCap,flipCap,pStatus==='AL'?45:100,!sameRole?85:100);
+  const raw=avail+rolePoints+shiftPoints+feasPoints;
+  const score=Math.max(0,Math.min(hardCap,raw));
+  return{score,reasons,blocked:score===0,sameRole,impact,hardCap};
+}
+
+// Feasibility of ME covering a return date (0-100, pure schedule-impact score).
+function assessReturnFeasibility(person,coverDate,coverShift){
+  const impact=assessCoverageImpact(person,coverDate,coverShift);
+  let score=100,hardCap=100;const reasons=[];
+  if(impact.totalConsec>=5){score=0;hardCap=0;reasons.push('\u26a0 Return would create 5+ consecutive shifts for you');}
+  else if(impact.totalConsec===4){hardCap=Math.min(hardCap,45);score=Math.min(score,45);reasons.push('\u26a0 Return creates 4 consecutive shifts for you');}
+  else if(impact.totalConsec===3){hardCap=Math.min(hardCap,70);score=Math.min(score,70);reasons.push('\u26a0 Return creates 3 consecutive shifts for you');}
+  if(impact.flipRisk){const unsafe=impact.flipRisk.includes('unsafe');const cap=unsafe?40:55;hardCap=Math.min(hardCap,cap);score=Math.min(score,cap);reasons.push(`\u26a0 Return: ${impact.flipRisk}`);}
+  return{score,reasons,impact,hardCap};
+}
 
 function findCoverCandidates(){
   const dates=[...swap.dates],opts=swap.cover,me=swap.me;
-  return state.data.employees.filter(emp=>emp.name!==me.name).filter(emp=>!opts.sameRole||(emp.role||'')===(me.role||'')).map(p=>analyzeCover(p,me,dates,opts)).filter(r=>r&&r.score>0).filter(r=>opts.showWeak||r.score>=60).sort((a,b)=>b.score-a.score);
+  return state.data.employees
+    .filter(emp=>emp.name!==me.name)
+    .filter(emp=>!opts.sameRole||(emp.role||'')===(me.role||''))
+    .map(p=>analyzeCover(p,me,dates,opts))
+    .filter(r=>r&&r.score>0)
+    .filter(r=>opts.showWeak||r.score>=60)
+    .sort((a,b)=>b.score-a.score);
 }
-
 function analyzeCover(person,me,dates,opts){
-  const W={null:1.0,X:0.95,RO:0.78,AL:0.55};
-  const coverage=dates.map(d=>{
-    const s=statusOf(person,d);
-    if(s==='D'||s==='N')return{date:d,ok:false,status:s,reason:`Working ${s}`};
-    if(s==='EON'||s==='EOFF')return{date:d,ok:false,status:s,reason:'Education day'};
-    if(s==='AL'){if(opts.excludeAL)return{date:d,ok:false,status:'AL',reason:'On annual leave'};return{date:d,ok:true,status:'AL',reason:'Annual leave (low priority)',weight:W.AL}}
-    if(s==='RO')return{date:d,ok:true,status:'RO',reason:'Requested off',weight:W.RO};
-    if(s==='X')return{date:d,ok:true,status:'X',reason:'Rest day',weight:W.X};
-    return{date:d,ok:true,status:null,reason:'Off',weight:W.null};
-  });
-  const ok=coverage.filter(c=>c.ok);if(!ok.length)return null;
-  const avg=ok.reduce((s,c)=>s+c.weight,0)/ok.length,ratio=ok.length/dates.length;
-  let score=avg*100;if(ratio<1)score*=(0.5+0.5*ratio);
-  const sameRole=(person.role||'')===(me.role||'');if(sameRole)score+=5;else score-=8;
-  return{person,coverage,okCount:ok.length,total:dates.length,sameRole,score:Math.max(0,Math.min(100,Math.round(score))),mode:'cover'};
+  const perDate=dates.map(d=>({date:d,...scoreSingleCoverage(person,me,d,opts)}));
+  const eligible=perDate.filter(c=>!c.blocked);
+  if(!eligible.length)return null;
+  const okCount=eligible.length,total=dates.length;
+  const avgScore=eligible.reduce((s,c)=>s+c.score,0)/eligible.length;
+  let score=avgScore;
+  if(okCount<total)score*=(0.5+0.5*okCount/total);
+  const seenR=new Set(),reasons=[];
+  for(const c of perDate)for(const r of c.reasons)if(!seenR.has(r)){seenR.add(r);reasons.push(r);}
+  if(okCount<total&&total>1)reasons.push(`\u26a0 Can only cover ${okCount} of ${total} dates`);
+  const sameRole=(person.role||'')===(me.role||'');
+  return{person,reasons,okCount,total,sameRole,score:Math.max(0,Math.min(100,Math.round(score))),mode:'cover'};
 }
-
 function findMutualCandidates(){
   const myDate=[...swap.dates][0],me=swap.me,myShift=statusOf(me,myDate);
   if(myShift!=='D'&&myShift!=='N'){toast('Pick a working day','error');return[]}
   const opts=swap.mutual;
-  return state.data.employees.filter(emp=>emp.name!==me.name).filter(emp=>!opts.sameRole||(emp.role||'')===(me.role||'')).map(p=>analyzeMutual(p,me,myDate,myShift,opts)).filter(r=>r!==null).filter(r=>opts.showWeak||r.score>=60).filter(r=>!opts.multiReturns||r.returnDates.length>=2).sort((a,b)=>b.score-a.score);
+  return state.data.employees
+    .filter(emp=>emp.name!==me.name)
+    .filter(emp=>!opts.sameRole||(emp.role||'')===(me.role||''))
+    .map(p=>analyzeMutual(p,me,myDate,myShift,opts))
+    .filter(r=>r!==null)
+    .filter(r=>opts.showWeak||r.score>=60)
+    .filter(r=>!opts.multiReturns||r.returnDates.length>=2)
+    .sort((a,b)=>b.score-a.score);
 }
-
 function isMeAvail(me,date){const s=statusOf(me,date);return s===null||s==='X'||s==='RO'}
-function personAdjWork(person,date){let c=0;const b=addDays(date,-1),a=addDays(date,1);const sb=statusOf(person,b),sa=statusOf(person,a);if(sb==='D'||sb==='N')c++;if(sa==='D'||sa==='N')c++;return c}
-function meAdjWork(me,date){let c=0;const sb=statusOf(me,addDays(date,-1)),sa=statusOf(me,addDays(date,1));if(sb==='D'||sb==='N')c++;if(sa==='D'||sa==='N')c++;return c}
-
 function analyzeMutual(person,me,myDate,myShift,opts){
-  const pStatus=statusOf(person,myDate);
-  if(pStatus==='D'||pStatus==='N')return null;
-  if(pStatus==='EON'||pStatus==='EOFF')return null;
-  if(pStatus==='AL'&&opts.excludeAL)return null;
+  const candidateSide=scoreSingleCoverage(person,me,myDate,opts);
+  if(candidateSide.blocked||candidateSide.score===0)return null;
   const returnAll=state.dates.filter(d=>d!==myDate).map(d=>{
     const ps=statusOf(person,d);if(ps!=='D'&&ps!=='N')return null;
     if(!isMeAvail(me,d))return null;
     const sameShift=ps===myShift;if(opts.sameShift&&!sameShift)return null;
     return{date:d,shift:ps,sameShift,daysAway:daysBetween(d,myDate)};
   }).filter(Boolean).sort((a,b)=>{if(a.sameShift!==b.sameShift)return a.sameShift?-1:1;return a.daysAway-b.daysAway});
-  let score=0;const avail={null:35,X:30,RO:20,AL:5};score+=avail[pStatus]??35;
-  const best=returnAll[0]||null;
-  if(best){score+=40;if(best.sameShift)score+=18;if(best.daysAway<=7)score+=5;else if(best.daysAway>21)score-=5;if(returnAll.length>=3)score+=3}
-  const sameRole=(person.role||'')===(me.role||'');if(sameRole)score+=5;
-  const pConsec=personAdjWork(person,myDate),mConsec=best?meAdjWork(me,best.date):0;
-  score-=pConsec*4;score-=mConsec*4;
-  const reasons=[];
-  const stMap={null:{ok:true,text:`Off on ${fmtDL(myDate)}`},X:{ok:true,text:`Rest day on ${fmtDL(myDate)}`},RO:{ok:true,text:`Requested off on ${fmtDL(myDate)}`},AL:{ok:false,text:`On annual leave on ${fmtDL(myDate)}`}};
-  reasons.push(stMap[pStatus]||{ok:true,text:`Available on ${fmtDL(myDate)}`});
-  if(sameRole)reasons.push({ok:true,text:'Same role'});else reasons.push({ok:false,text:`Different role (${person.role||'—'} vs ${me.role||'—'})`});
-  if(best){if(best.sameShift)reasons.push({ok:true,text:`Same-shift return (${SHIFT_WORD[best.shift]})`});else reasons.push({ok:false,text:`Return needs shift change (${SHIFT_WORD[myShift]}→${SHIFT_WORD[best.shift]})`});if(returnAll.length>=3)reasons.push({ok:true,text:`${returnAll.length} possible return dates`})}
-  else reasons.push({ok:false,text:'No return date found'});
-  const warnings=[];
-  if(pConsec>0)warnings.push(`Adds to ${esc(person.name.split(',')[0])}'s consecutive shifts`);
-  if(mConsec>0&&best)warnings.push(`You'd have consecutive shifts around the return date`);
-  return{person,pStatus,myShift,myDate,returnDates:returnAll,bestReturn:best,score:Math.max(0,Math.min(100,Math.round(score))),reasons,warnings,sameRole,mode:'mutual'};
+  if(!returnAll.length){
+    const score=Math.min(candidateSide.score,40);
+    return{person,pStatus:statusOf(person,myDate),myShift,myDate,returnDates:[],bestReturn:null,
+      reasons:[...candidateSide.reasons,'\u2717 No return date found'],score,sameRole:candidateSide.sameRole,mode:'mutual'};
+  }
+  const best=returnAll[0];
+  // Evaluate MY feasibility on the return date
+  const mySide=assessReturnFeasibility(me,best.date,best.shift);
+  // Bonuses for return quality
+  const sameShiftBonus=best.sameShift?5:0;
+  const closeBonus=best.daysAway<=7?3:(best.daysAway>21?-3:0);
+  const multiBonus=returnAll.length>=3?3:0;
+  // Final = worst side + small bonuses, then apply the strictest cap again.
+  // This prevents bonuses from lifting risky schedules above their fatigue cap.
+  const rawFinal=Math.min(candidateSide.score,mySide.score)+sameShiftBonus+closeBonus+multiBonus;
+  const finalCap=Math.min(candidateSide.hardCap??100,mySide.hardCap??mySide.score??100);
+  const score=Math.max(0,Math.min(100,finalCap,rawFinal));
+  const reasons=[
+    ...candidateSide.reasons,
+    best.sameShift?`\u2713 Same-shift return (${SHIFT_WORD[best.shift]})`:`\u26a0 Return needs shift change (${SHIFT_WORD[myShift]}\u2192${SHIFT_WORD[best.shift]})`,
+    ...(returnAll.length>=3?[`\u2713 ${returnAll.length} possible return dates`]:[]),
+    ...mySide.reasons,
+  ];
+  return{person,pStatus:statusOf(person,myDate),myShift,myDate,returnDates:returnAll,bestReturn:best,
+    score,reasons,sameRole:candidateSide.sameRole,mode:'mutual'};
 }
-
 function renderSwapResults(results){
   $('#swapResultCount').textContent=results.length;$('#swapResultsSection').style.display='';
-  if(!results.length){const hint=swap.mode==='cover'?'No candidates. Try turning off "Same role only" or "Exclude annual leave".':'No mutual swap. Try turning off "Same shift only" or "Require multiple return options".';$('#swapResults').innerHTML=`<div class="empty-hint">${hint}</div>`;return}
+  if(!results.length){
+    const hint=swap.mode==='cover'?'No candidates. Try turning off "Same role only" or "Exclude annual leave".':'No mutual swap. Try turning off "Same shift only" or "Require multiple return options".';
+    $('#swapResults').innerHTML=`<div class="empty-hint">${hint}</div>`;return;
+  }
   $('#swapResults').innerHTML=results.slice(0,30).map(r=>r.mode==='cover'?renderCoverCard(r):renderMutualCard(r)).join('');
-  $$('#swapResults .view-sched-btn').forEach(btn=>btn.addEventListener('click',e=>{e.stopPropagation();openEmployee(btn.dataset.emp)}));
+  // Fix: decode URI + close swap sheet so employee sheet is not hidden behind it
+  $$('#swapResults .view-sched-btn').forEach(btn=>btn.addEventListener('click',e=>{
+    e.preventDefault();e.stopPropagation();
+    const empName=decodeURIComponent(btn.dataset.emp);
+    $('#swapSheet').classList.remove('show');
+    openEmployee(empName);
+  }));
 }
-
+function renderReasonLine(txt){
+  const cls=txt.startsWith('\u2713')?'ok':txt.startsWith('\u2717')?'no':txt.startsWith('\u26a0')?'warn':'muted';
+  return `<div class="swap-reason ${cls}">${txt}</div>`;
+}
 function renderCoverCard(r){
   const br=scoreBracket(r.score);
-  const items=r.coverage.map(c=>`<div class="swap-reason ${c.ok?'ok':'no'}">${c.ok?'✓':'✗'} ${fmtDL(c.date)} — ${c.reason}</div>`).join('');
   const summary=r.okCount===r.total?(r.total>1?`Can cover all ${r.total} days`:'Can cover this day'):`Covers ${r.okCount} of ${r.total} days`;
-  return `<div class="swap-card ${br.cls}"><div class="swap-card-head"><div class="who"><div class="swap-name">${esc(r.person.name)}</div><div class="swap-role">${esc(r.person.role||'—')}</div></div><div class="score-badge ${br.cls}">${r.score} · ${br.label}</div></div><div class="swap-reasons"><div class="swap-reason muted">${summary}${r.sameRole?' · Same role':''}</div>${items}</div><button class="view-sched-btn" data-emp="${esc(r.person.name)}">View schedule →</button></div>`;
+  const reasonLines=(r.reasons||[]).map(renderReasonLine).join('');
+  return `<div class="swap-card ${br.cls}"><div class="swap-card-head"><div class="who"><div class="swap-name">${esc(r.person.name)}</div><div class="swap-role">${esc(r.person.role||'\u2014')}</div></div><div class="score-badge ${br.cls}">${r.score} \u00b7 ${br.label}</div></div><div class="swap-reasons"><div class="swap-reason muted">${summary}</div>${reasonLines}</div><button class="view-sched-btn" data-emp="${encodeURIComponent(r.person.name)}">View schedule \u2192</button></div>`;
 }
-
 function renderMutualCard(r){
   const br=scoreBracket(r.score);
-  const reasons=r.reasons.map(rs=>`<div class="swap-reason ${rs.ok?'ok':'no'}">${rs.ok?'✓':'✗'} ${esc(rs.text)}</div>`).join('');
+  const reasonLines=(r.reasons||[]).map(renderReasonLine).join('');
   let proposal='';
   if(r.bestReturn){
-    const others=r.returnDates.slice(1,4).map(rd=>`${fmtDL(rd.date)}(${rd.shift})${rd.sameShift?'':'⚠'}`).join(' · ');
-    proposal=`<div class="swap-proposal"><div class="proposal-title">Proposed swap</div><div class="proposal-line cov"><div class="arrow">→</div><div><strong>${esc(r.person.name)}</strong> covers your <strong>${SHIFT_WORD[r.myShift]}</strong> shift on <strong>${fmtDL(r.myDate)}</strong></div></div><div class="proposal-line ret"><div class="arrow">←</div><div>You cover ${esc(r.person.name.split(',')[0])}'s <strong>${SHIFT_WORD[r.bestReturn.shift]}</strong> shift on <strong>${fmtDL(r.bestReturn.date)}</strong></div></div>${others?`<div class="proposal-alt">Other return options: ${others}</div>`:''}</div>`;
-  }else{proposal=`<div class="swap-proposal"><div class="proposal-title">Cover only — no return found</div><div class="proposal-line cov"><div class="arrow">→</div><div><strong>${esc(r.person.name)}</strong> could cover your shift on <strong>${fmtDL(r.myDate)}</strong></div></div></div>`}
-  const warnings=r.warnings.length?`<div class="swap-warnings">${r.warnings.map(w=>`<div>⚠ ${w}</div>`).join('')}</div>`:'';
-  return `<div class="swap-card ${br.cls}"><div class="swap-card-head"><div class="who"><div class="swap-name">${esc(r.person.name)}</div><div class="swap-role">${esc(r.person.role||'—')}</div></div><div class="score-badge ${br.cls}">${r.score} · ${br.label}</div></div><div class="swap-reasons">${reasons}</div>${warnings}${proposal}<button class="view-sched-btn" data-emp="${esc(r.person.name)}">View schedule →</button></div>`;
+    const others=r.returnDates.slice(1,4).map(rd=>`${fmtDL(rd.date)}(${rd.shift})${rd.sameShift?'':'\u26a0'}`).join(' \u00b7 ');
+    proposal=`<div class="swap-proposal"><div class="proposal-title">Proposed swap</div><div class="proposal-line cov"><div class="arrow">\u2192</div><div><strong>${esc(r.person.name)}</strong> covers your <strong>${SHIFT_WORD[r.myShift]}</strong> shift on <strong>${fmtDL(r.myDate)}</strong></div></div><div class="proposal-line ret"><div class="arrow">\u2190</div><div>You cover ${esc(r.person.name.split(',')[0])}'s <strong>${SHIFT_WORD[r.bestReturn.shift]}</strong> shift on <strong>${fmtDL(r.bestReturn.date)}</strong></div></div>${others?`<div class="proposal-alt">Other return options: ${others}</div>`:''}</div>`;
+  }else{proposal=`<div class="swap-proposal"><div class="proposal-title">Cover only \u2014 no return found</div><div class="proposal-line cov"><div class="arrow">\u2192</div><div><strong>${esc(r.person.name)}</strong> could cover your shift on <strong>${fmtDL(r.myDate)}</strong></div></div></div>`}
+  return `<div class="swap-card ${br.cls}"><div class="swap-card-head"><div class="who"><div class="swap-name">${esc(r.person.name)}</div><div class="swap-role">${esc(r.person.role||'\u2014')}</div></div><div class="score-badge ${br.cls}">${r.score} \u00b7 ${br.label}</div></div><div class="swap-reasons">${reasonLines}</div>${proposal}<button class="view-sched-btn" data-emp="${encodeURIComponent(r.person.name)}">View schedule \u2192</button></div>`;
 }
-
+// Boot
 loadUI();
 try{
   const saved=JSON.parse(localStorage.getItem('schedule_data_v1')||'null');
