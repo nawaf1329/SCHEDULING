@@ -24,7 +24,7 @@
     .screen{flex:1;min-height:0;display:none}.screen.show{display:flex;flex-direction:column}
     #uploadScreen.show{display:block;overflow-y:auto}
     .upload-inner{max-width:480px;margin:0 auto;padding:28px 18px calc(28px + env(safe-area-inset-bottom))}
-    .hero{text-align:center;margin-bottom:24px}.hero .icon-box{width:68px;height:68px;background:var(--primary-light);border-radius:18px;display:flex;align-items:center;justify-content:center;margin:0 auto 14px;font-size:34px}.hero h1{font-size:20px;font-weight:700;margin-bottom:5px}.hero p{color:var(--text-muted);font-size:14px}
+    .hero{text-align:center;margin-bottom:24px}.hero .icon-box{width:68px;height:68px;background:var(--primary-light);border-radius:18px;display:flex;align-items:center;justify-content:center;margin:0 auto 14px;font-size:34px}.hero h1{font-size:20px;font-weight:700;margin-bottom:5px}.hero p{color:var(--text-muted);font-size:14px}.creator-tag{margin-top:10px;font-size:12px;color:var(--text-muted);font-weight:600}.creator-tag strong{color:var(--primary)}
     .upload-tabs{display:flex;gap:4px;background:var(--bg-card);border-radius:12px;padding:4px;margin-bottom:14px;border:1px solid var(--border)}.upload-tab{flex:1;padding:9px;background:transparent;border:none;border-radius:9px;color:var(--text-muted);font-size:14px;font-weight:600;cursor:pointer}.upload-tab.active{background:var(--primary);color:#fff}
     .tab-pane{display:none}.tab-pane.active{display:block}
     .drop-zone{width:100%;padding:32px 18px;border:2px dashed var(--border-strong);border-radius:14px;background:var(--bg-card);text-align:center;cursor:pointer;transition:all .2s}.drop-zone:active,.drop-zone.dragover{border-color:var(--primary);background:var(--primary-light)}.drop-zone .file-icon{font-size:30px;margin-bottom:9px}.drop-zone .label{font-weight:600;font-size:15px;margin-bottom:4px}.drop-zone .hint{font-size:12px;color:var(--text-muted)}
@@ -35,6 +35,575 @@
     .toolbar{flex-shrink:0;padding:9px 12px;display:flex;gap:7px;background:var(--bg);border-bottom:1px solid var(--border)}.search-wrap{flex:1;position:relative}.search-wrap input{width:100%;padding:9px 12px 9px 34px;border:1px solid var(--border);background:var(--bg-card);border-radius:10px;font-size:16px;color:var(--text);-webkit-appearance:none}.search-wrap input:focus{outline:none;border-color:var(--primary)}.search-wrap::before{content:"🔍";position:absolute;left:10px;top:50%;transform:translateY(-50%);font-size:13px;opacity:.45}
     .pill-btn{flex-shrink:0;padding:8px 13px;background:var(--bg-card);border:1px solid var(--border);border-radius:10px;cursor:pointer;font-size:13px;font-weight:500;color:var(--text);display:flex;align-items:center;gap:5px}.pill-btn.active{border-color:var(--primary);color:var(--primary);background:var(--primary-light)}.pill-btn .badge{background:var(--primary);color:#fff;font-size:10px;padding:1px 6px;border-radius:6px;min-width:18px;text-align:center}
     .grid-wrap{flex:1;min-height:0;overflow:auto;-webkit-overflow-scrolling:touch;background:var(--bg-card);position:relative;isolation:isolate}
+    .grid-table{border-collapse:separate;border-spacing:0;font-size:12px}.grid-table th,.grid-table td{padding:0;margin:0;vertical-align:middle;text-align:center;background-color:var(--bg-card);white-space:nowrap;box-shadow:inset -1px -1px 0 var(--border)}
+    .grid-table thead th.date-cell{position:-webkit-sticky;position:sticky;top:0;z-index:30;background-color:var(--bg-card);min-width:40px;width:40px;padding:5px 0;font-size:11px;line-height:1.2;font-weight:600}.grid-table thead th.date-cell .dow{font-weight:700}.grid-table thead th.date-cell .md{font-size:10px;color:var(--text-muted);margin-top:1px}.grid-table thead th.date-cell.weekend{background-color:var(--weekend-bg)}.grid-table thead th.date-cell.today{background-color:var(--primary-light);color:var(--primary);box-shadow:inset -1px -1px 0 var(--border),inset 0 -3px 0 var(--today-ring)}.grid-table thead th.date-cell.today .md{color:var(--primary);font-weight:700}
+    .grid-table tbody th.name-cell{position:-webkit-sticky;position:sticky;left:0;z-index:20;background-color:var(--bg-card);min-width:130px;max-width:130px;text-align:left;padding:7px 9px;font-weight:500;cursor:pointer;box-shadow:inset -1px -1px 0 var(--border),2px 0 4px -2px rgba(0,0,0,.08)}.grid-table tbody th.name-cell:active{background-color:var(--bg)}.grid-table tbody th.name-cell .nm{font-size:12px;line-height:1.25;white-space:normal;overflow:hidden;text-overflow:ellipsis;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical}.grid-table tbody th.name-cell .rl{font-size:10px;color:var(--text-muted);margin-top:2px;font-weight:400}
+    .grid-table thead th.corner-cell{position:-webkit-sticky;position:sticky;top:0;left:0;z-index:40;background-color:var(--bg-card);min-width:130px;max-width:130px;text-align:left;padding:7px 9px;font-size:9px;color:var(--text-muted);text-transform:uppercase;letter-spacing:.5px;font-weight:700;box-shadow:inset -1px -1px 0 var(--border),2px 2px 4px -2px rgba(0,0,0,.08)}
+    .stat-cell{height:38px;font-weight:700;font-size:12px;cursor:pointer}.stat-cell.weekend{background-color:var(--weekend-bg)}.stat-cell.today{box-shadow:inset -1px -1px 0 var(--border),inset 0 -2px 0 var(--today-ring)}
+    .stat-cell.s-D{background-color:var(--d-bg);color:var(--d-fg)}.stat-cell.s-N{background-color:var(--n-bg);color:var(--n-fg)}.stat-cell.s-AL{background-color:var(--al-bg);color:var(--al-fg)}.stat-cell.s-RO{background-color:var(--ro-bg);color:var(--ro-fg)}.stat-cell.s-X{background-color:var(--x-bg);color:var(--x-fg)}.stat-cell.s-EON{background-color:var(--eon-bg);color:var(--eon-fg)}.stat-cell.s-EOFF{background-color:var(--eoff-bg);color:var(--eoff-fg)}.stat-cell.empty{color:var(--text-muted);opacity:.3}
+    .my-row th.name-cell{border-left:3px solid var(--primary)!important;background-color:var(--primary-light)!important}.my-row th.name-cell .nm{color:var(--primary);font-weight:700}
+    .grid-wrap.compact .grid-table thead th.date-cell{min-width:28px;width:28px;padding:3px 0;font-size:10px}.grid-wrap.compact .grid-table thead th.date-cell .md{font-size:9px}.grid-wrap.compact .stat-cell{height:30px;font-size:11px}.grid-wrap.compact .grid-table tbody th.name-cell{min-width:100px;max-width:100px;padding:5px 7px}.grid-wrap.compact .grid-table tbody th.name-cell .nm{font-size:11px}.grid-wrap.compact .grid-table thead th.corner-cell{min-width:100px;max-width:100px;padding:5px 7px;font-size:8px}
+    .legend{flex-shrink:0;padding:7px 12px;padding-bottom:calc(7px + env(safe-area-inset-bottom));display:flex;gap:9px;overflow-x:auto;-webkit-overflow-scrolling:touch;background:var(--bg-card);border-top:1px solid var(--border);scrollbar-width:none}.legend::-webkit-scrollbar{display:none}.leg-item{flex-shrink:0;display:flex;align-items:center;gap:5px;font-size:11px;color:var(--text-muted)}.leg-box{width:18px;height:18px;border-radius:4px;font-size:10px;font-weight:700;display:flex;align-items:center;justify-content:center}
+    .leg-D{background:var(--d-bg);color:var(--d-fg)}.leg-N{background:var(--n-bg);color:var(--n-fg)}.leg-AL{background:var(--al-bg);color:var(--al-fg)}.leg-RO{background:var(--ro-bg);color:var(--ro-fg)}.leg-X{background:var(--x-bg);color:var(--x-fg)}.leg-EON{background:var(--eon-bg);color:var(--eon-fg)}.leg-EOFF{background:var(--eoff-bg);color:var(--eoff-fg)}
+    .sheet-backdrop{position:fixed;inset:0;background:rgba(0,0,0,.48);opacity:0;pointer-events:none;transition:opacity .22s;z-index:50}.sheet-backdrop.show{opacity:1;pointer-events:auto}
+    .sheet{position:fixed;left:0;right:0;bottom:0;background:var(--bg-card);border-radius:18px 18px 0 0;padding:8px 18px calc(20px + env(safe-area-inset-bottom));max-height:91dvh;overflow-y:auto;transform:translateY(100%);transition:transform .26s cubic-bezier(.32,.72,0,1);z-index:55;box-shadow:var(--shadow-lg)}.sheet.show{transform:translateY(0)}.sheet .handle{width:36px;height:4px;background:var(--border-strong);border-radius:2px;margin:6px auto 14px}.sheet h3{font-size:17px;font-weight:700;margin-bottom:4px}.sheet .sub{font-size:13px;color:var(--text-muted);margin-bottom:16px}
+    .sheet-section{margin-bottom:18px}.sheet-section-label{font-size:10px;text-transform:uppercase;letter-spacing:.5px;color:var(--text-muted);font-weight:700;margin-bottom:8px}
+    .chip-row{display:flex;gap:6px;flex-wrap:wrap}.chip{padding:7px 12px;background:var(--bg);border:1px solid var(--border);border-radius:18px;font-size:13px;font-weight:500;cursor:pointer;color:var(--text)}.chip.active{background:var(--primary);border-color:var(--primary);color:#fff}
+    .toggle-row{display:flex;align-items:center;justify-content:space-between;padding:11px 0;border-bottom:1px solid var(--border);gap:12px}.toggle-row:last-child{border-bottom:none}.toggle-row .lbl{font-size:15px;font-weight:500}.toggle-row .desc{font-size:12px;color:var(--text-muted);margin-top:2px}
+    .switch{flex-shrink:0;width:46px;height:27px;background:var(--border-strong);border-radius:14px;position:relative;cursor:pointer;transition:background .2s}.switch::after{content:"";position:absolute;top:2px;left:2px;width:23px;height:23px;background:#fff;border-radius:50%;transition:transform .2s;box-shadow:var(--shadow-sm)}.switch.on{background:var(--primary)}.switch.on::after{transform:translateX(19px)}
+    .emp-stats{display:grid;grid-template-columns:repeat(4,1fr);gap:4px;margin-bottom:14px}.emp-stat{padding:7px 4px;border-radius:8px;text-align:center}.emp-stat .v{font-size:17px;font-weight:700;line-height:1.1}.emp-stat .l{font-size:9px;opacity:.8;margin-top:2px}
+    .emp-stat.s-D{background:var(--d-bg);color:var(--d-fg)}.emp-stat.s-N{background:var(--n-bg);color:var(--n-fg)}.emp-stat.s-AL{background:var(--al-bg);color:var(--al-fg)}.emp-stat.s-RO{background:var(--ro-bg);color:var(--ro-fg)}.emp-stat.s-X{background:var(--x-bg);color:var(--x-fg)}.emp-stat.s-EON{background:var(--eon-bg);color:var(--eon-fg)}.emp-stat.s-EOFF{background:var(--eoff-bg);color:var(--eoff-fg)}
+    .cal-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:3px}.cal-grid .dow-hd{font-size:9px;font-weight:700;color:var(--text-muted);text-align:center;padding:3px 0;text-transform:uppercase}
+    .cal-cell{aspect-ratio:1;border-radius:7px;display:flex;flex-direction:column;align-items:center;justify-content:center;font-size:10px;background:var(--bg);border:1px solid var(--border);gap:1px}.cal-cell.pad{background:transparent;border:none}.cal-cell .dn{font-weight:700;font-size:11px}.cal-cell .dc{font-size:9px;opacity:.9;font-weight:700}
+    .cal-cell.s-D{background:var(--d-bg);color:var(--d-fg);border-color:transparent}.cal-cell.s-N{background:var(--n-bg);color:var(--n-fg);border-color:transparent}.cal-cell.s-AL{background:var(--al-bg);color:var(--al-fg);border-color:transparent}.cal-cell.s-RO{background:var(--ro-bg);color:var(--ro-fg);border-color:transparent}.cal-cell.s-X{background:var(--x-bg);color:var(--x-fg);border-color:transparent}.cal-cell.s-EON{background:var(--eon-bg);color:var(--eon-fg);border-color:transparent}.cal-cell.s-EOFF{background:var(--eoff-bg);color:var(--eoff-fg);border-color:transparent}.cal-cell.today{box-shadow:0 0 0 2px var(--today-ring)}
+    .mode-tabs{display:flex;background:var(--bg);border-radius:12px;padding:4px;margin-bottom:16px;gap:4px}.mode-tab{flex:1;padding:9px 6px;background:transparent;border:none;border-radius:9px;color:var(--text-muted);font-size:13px;font-weight:600;cursor:pointer;transition:all .15s;display:flex;align-items:center;justify-content:center;gap:5px}.mode-tab.active{background:var(--bg-card);color:var(--primary);box-shadow:var(--shadow-sm)}
+    .input-field{width:100%;padding:10px 13px;border:1px solid var(--border);background:var(--bg);border-radius:10px;font-size:16px;color:var(--text);-webkit-appearance:none}.input-field:focus{outline:none;border-color:var(--primary)}
+    .name-results{max-height:210px;overflow-y:auto;margin-top:7px}.emp-result{padding:10px 12px;border:1px solid var(--border);border-radius:10px;margin-top:6px;cursor:pointer;background:var(--bg);display:flex;justify-content:space-between;align-items:center;gap:10px}.emp-result:active{background:var(--primary-light);border-color:var(--primary)}.emp-result .nm{font-size:14px;font-weight:600}.emp-result .rl{font-size:11px;color:var(--text-muted);margin-top:2px}
+    .me-selected{display:flex;align-items:center;justify-content:space-between;padding:11px 13px;background:var(--primary-light);border-radius:10px;gap:10px}.me-selected .who{display:flex;flex-direction:column;min-width:0}.me-selected .who .nm{font-weight:600;font-size:14px;color:var(--primary)}.me-selected .who .rl{font-size:11px;color:var(--text-muted);margin-top:2px}
+    .link-btn{background:none;border:none;color:var(--primary);font-size:13px;font-weight:600;cursor:pointer;padding:6px 10px;border-radius:6px}.link-btn:active{background:var(--bg-card)}
+    .empty-hint{color:var(--text-muted);font-size:13px;padding:14px;text-align:center;display:block}
+    .swap-card{padding:12px 13px;border-radius:12px;background:var(--bg);border:1px solid var(--border);border-left-width:4px;margin-bottom:10px}.swap-card.excellent{border-left-color:var(--success)}.swap-card.good{border-left-color:var(--info)}.swap-card.possible{border-left-color:var(--warning)}.swap-card.weak{border-left-color:var(--danger)}
+    .swap-card-head{display:flex;justify-content:space-between;align-items:flex-start;gap:10px;margin-bottom:9px}.swap-card-head .who{min-width:0;flex:1}.swap-name{font-weight:600;font-size:14px;line-height:1.25}.swap-role{font-size:11px;color:var(--text-muted);margin-top:2px}
+    .score-badge{flex-shrink:0;display:inline-flex;align-items:center;padding:4px 9px;border-radius:14px;font-size:12px;font-weight:700;white-space:nowrap}.score-badge.excellent{background:var(--exc-bg);color:var(--exc-fg)}.score-badge.good{background:var(--gd-bg);color:var(--gd-fg)}.score-badge.possible{background:var(--pos-bg);color:var(--pos-fg)}.score-badge.weak{background:var(--wk-bg);color:var(--wk-fg)}
+    .swap-reasons{display:flex;flex-direction:column;gap:4px;font-size:12px}.swap-reason{display:flex;gap:6px;align-items:flex-start;line-height:1.35}.swap-reason.ok{color:var(--success)}.swap-reason.no{color:var(--danger)}.swap-reason.warn{color:var(--warning)}.swap-reason.muted{color:var(--text-muted)}
+    .swap-warnings{margin-top:8px;padding:7px 10px;background:var(--pos-bg);color:var(--pos-fg);border-radius:8px;font-size:11px;display:flex;flex-direction:column;gap:3px}
+    .swap-proposal{background:var(--bg-card);border:1px solid var(--border);border-radius:10px;padding:10px 12px;margin-top:9px;font-size:13px}.proposal-title{font-size:10px;text-transform:uppercase;letter-spacing:.5px;color:var(--text-muted);font-weight:700;margin-bottom:7px}.proposal-line{display:flex;gap:8px;align-items:flex-start;padding:3px 0;line-height:1.45}.proposal-line .arrow{flex-shrink:0;width:16px;font-weight:700;text-align:center}.proposal-line.cov .arrow{color:var(--success)}.proposal-line.ret .arrow{color:var(--primary)}.proposal-alt{margin-top:7px;font-size:11px;color:var(--text-muted)}
+    .view-sched-btn{width:100%;margin-top:9px;padding:8px;background:transparent;border:1px solid var(--border);border-radius:8px;color:var(--primary);font-size:12px;font-weight:600;cursor:pointer;text-align:center}.view-sched-btn:active{background:var(--primary-light)}
+    .summary-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:5px;margin-bottom:14px}.sum-cell{padding:8px 4px;border-radius:9px;text-align:center}.sum-cell .sv{font-size:20px;font-weight:700;line-height:1}.sum-cell .sl{font-size:10px;opacity:.85;margin-top:2px;font-weight:600}
+    .sum-cell.s-D{background:var(--d-bg);color:var(--d-fg)}.sum-cell.s-N{background:var(--n-bg);color:var(--n-fg)}.sum-cell.s-AL{background:var(--al-bg);color:var(--al-fg)}.sum-cell.s-RO{background:var(--ro-bg);color:var(--ro-fg)}.sum-cell.s-X{background:var(--x-bg);color:var(--x-fg)}.sum-cell.s-EON{background:var(--eon-bg);color:var(--eon-fg)}.sum-cell.s-EOFF{background:var(--eoff-bg);color:var(--eoff-fg)}.sum-cell.s-total{background:var(--bg);color:var(--text);border:1px solid var(--border)}
+    .wl-list{display:flex;flex-direction:column;gap:8px}.wl-item{display:flex;align-items:center;gap:10px;padding:9px 11px;background:var(--bg);border-radius:10px;cursor:pointer}.wl-item:active{background:var(--primary-light)}.wl-info{flex:1;min-width:0}.wl-name{font-size:13px;font-weight:600;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.wl-issues{font-size:11px;color:var(--text-muted);margin-top:2px}
+    .wl-badge{flex-shrink:0;padding:4px 9px;border-radius:12px;font-size:12px;font-weight:700}.wl-badge.easy{background:var(--easy-bg);color:var(--easy-fg)}.wl-badge.normal{background:var(--norm-bg);color:var(--norm-fg)}.wl-badge.heavy{background:var(--heav-bg);color:var(--heav-fg)}.wl-badge.risky{background:var(--risk-bg);color:var(--risk-fg)}
+    .short-table{width:100%;font-size:13px;border-collapse:collapse}.short-table td{padding:6px 0;border-bottom:1px solid var(--border)}.short-table td:last-child{text-align:right;font-weight:700;font-family:ui-monospace,monospace}
+    .toast{position:fixed;bottom:calc(18px + env(safe-area-inset-bottom));left:50%;transform:translate(-50%,20px);padding:10px 18px;border-radius:12px;background:var(--text);color:var(--bg);font-size:14px;font-weight:500;box-shadow:var(--shadow-lg);z-index:70;opacity:0;pointer-events:none;transition:opacity .22s,transform .22s;max-width:92vw;text-align:center}.toast.show{opacity:1;transform:translate(-50%,0)}.toast.error{background:var(--danger);color:#fff}.toast.success{background:var(--success);color:#fff}
+  </style>
+</head>
+<body>
+<header class="app-header">
+  <div class="app-title"><span class="emoji">📅</span><span class="txt" id="appTitleText">Schedule</span></div>
+  <div class="header-actions">
+    <button class="hdr-chip today-chip" id="todayBtn" style="display:none">Today</button>
+    <button class="hdr-chip summary-chip" id="summaryBtn" style="display:none">📊</button>
+    <button class="hdr-chip swap-chip" id="swapBtn" style="display:none">🔁 Find Swap</button>
+    <button class="icon-btn" id="settingsBtn">⚙️</button>
+  </div>
+</header>
+<div id="uploadScreen" class="screen show">
+  <div class="upload-inner">
+    <div class="hero"><div class="icon-box">📋</div><h1>Schedule Viewer</h1><p>Upload your hospital schedule PDF to view an interactive grid.</p><div class="creator-tag">Created by <strong>Nawaf Alshammari</strong> · ID 1520110</div></div>
+    <div class="upload-tabs"><button class="upload-tab active" data-tab="pdf">📄 PDF</button><button class="upload-tab" data-tab="text">📝 Text</button></div>
+    <div class="tab-pane active" data-pane="pdf"><div class="drop-zone" id="dropZone"><div class="file-icon">📤</div><div class="label">Tap to choose PDF</div><div class="hint">or drag &amp; drop · max 4 MB</div><input type="file" id="pdfInput" accept=".pdf" hidden></div></div>
+    <div class="tab-pane" data-pane="text"><textarea class="text-area" id="textInput" placeholder="Paste schedule text…"></textarea><button class="btn-primary" id="textSubmitBtn">Parse Text</button></div>
+  </div>
+</div>
+<div id="scheduleScreen" class="screen">
+  <div class="info-bar">
+    <div class="info-item"><div class="info-label">Unit</div><div class="info-value" id="infoUnit">—</div></div>
+    <div class="info-item"><div class="info-label">Period</div><div class="info-value" id="infoPeriod">—</div></div>
+    <div class="info-item"><div class="info-label">Staff</div><div class="info-value" id="infoCount">0</div></div>
+    <div class="info-item"><div class="info-label">Days</div><div class="info-value" id="infoDays">0</div></div>
+    <div class="info-item"><div class="info-label">Created by</div><div class="info-value">Nawaf · 1520110</div></div>
+  </div>
+  <div class="toolbar"><div class="search-wrap"><input type="search" id="searchInput" placeholder="Search staff…" autocomplete="off"></div><button class="pill-btn" id="filterBtn"><span>Filter</span><span class="badge" id="filterBadge" style="display:none">0</span></button></div>
+  <div class="grid-wrap" id="gridWrap"><table class="grid-table" id="gridTable"></table></div>
+  <div class="legend">
+    <div class="leg-item"><span class="leg-box leg-D">D</span>Day</div><div class="leg-item"><span class="leg-box leg-N">N</span>Night</div>
+    <div class="leg-item"><span class="leg-box leg-AL">A</span>Annual</div><div class="leg-item"><span class="leg-box leg-RO">R</span>Req&nbsp;Off</div>
+    <div class="leg-item"><span class="leg-box leg-X">X</span>Rest</div><div class="leg-item"><span class="leg-box leg-EON">EO</span>Edu&nbsp;ON</div>
+    <div class="leg-item"><span class="leg-box leg-EOFF">EF</span>Edu&nbsp;OFF</div>
+  </div>
+</div>
+<div class="sheet-backdrop" id="sheetBackdrop"></div>
+<div class="sheet" id="settingsSheet"><div class="handle"></div><h3>Settings</h3><div class="sub">Customize the grid.</div><div class="sheet-section"><div class="toggle-row"><div><div class="lbl">Compact mode</div><div class="desc">Smaller cells</div></div><div class="switch" id="compactToggle"></div></div><div class="toggle-row"><div><div class="lbl">Highlight today</div><div class="desc">Mark current date</div></div><div class="switch on" id="todayToggle"></div></div></div><div class="sheet-section"><div class="sheet-section-label">Schedule</div><button class="btn-danger" id="resetBtn">Upload a different schedule</button></div></div>
+<div class="sheet" id="filterSheet"><div class="handle"></div><h3>Filter staff</h3><div class="sub">Combine filters to narrow the grid.</div><div class="sheet-section"><div class="sheet-section-label">Role</div><div class="chip-row" id="roleChips"></div></div><div class="sheet-section"><div class="sheet-section-label">Has at least one…</div><div class="chip-row" id="statusChips"><button class="chip" data-status="D">Day shifts</button><button class="chip" data-status="N">Night shifts</button><button class="chip" data-status="AL">Annual leave</button><button class="chip" data-status="RO">Req. off</button><button class="chip" data-status="EON">Edu ON</button><button class="chip" data-status="EOFF">Edu OFF</button></div></div><button class="btn-primary" id="clearFiltersBtn">Clear filters</button></div>
+<div class="sheet" id="empSheet"><div class="handle"></div><h3 id="empSheetName">—</h3><div class="sub" id="empSheetRole">—</div><div class="emp-stats" id="empStats"></div><div class="sheet-section"><div class="sheet-section-label">Schedule overview</div><div class="cal-grid" id="calGrid"></div></div></div>
+<div class="sheet" id="swapSheet"><div class="handle"></div><h3>Swap Finder</h3><div class="sub" id="swapSubtitle">Find coverage for your shift.</div><div class="mode-tabs"><button class="mode-tab active" data-mode="cover">🙋 Find Cover</button><button class="mode-tab" data-mode="mutual">🔁 Mutual Swap</button></div><div class="sheet-section"><div class="sheet-section-label">Your name</div><div id="swapMePickerWrap"><input type="search" id="swapMeSearch" class="input-field" placeholder="Start typing your name…" autocomplete="off"><div class="name-results" id="swapMeResults"></div></div><div id="swapMeSelected" class="me-selected" style="display:none"></div></div><div class="sheet-section" id="swapDatesSection" style="display:none"><div class="sheet-section-label" id="swapDatesLabel">Working days to swap</div><div class="chip-row" id="swapDateChips"></div></div><div class="sheet-section" id="swapOptsCover" style="display:none"><div class="sheet-section-label">Preferences</div><div class="toggle-row"><div><div class="lbl">Same role only</div><div class="desc">Only people with your job role</div></div><div class="switch" id="coverSameRoleToggle"></div></div><div class="toggle-row"><div><div class="lbl">Exclude annual leave</div><div class="desc">Skip people on AL on your date</div></div><div class="switch on" id="coverExcludeAlToggle"></div></div><div class="toggle-row"><div><div class="lbl">Show weak matches</div><div class="desc">Include risky/low-score matches</div></div><div class="switch on" id="coverShowWeakToggle"></div></div></div><div class="sheet-section" id="swapOptsMutual" style="display:none"><div class="sheet-section-label">Preferences</div><div class="toggle-row"><div><div class="lbl">Same role only</div><div class="desc">Only people with your job role</div></div><div class="switch" id="mutualSameRoleToggle"></div></div><div class="toggle-row"><div><div class="lbl">Same shift only</div><div class="desc">Day swaps Day, Night swaps Night</div></div><div class="switch on" id="mutualSameShiftToggle"></div></div><div class="toggle-row"><div><div class="lbl">Exclude annual leave</div><div class="desc">Skip people on AL on your date</div></div><div class="switch on" id="mutualExcludeAlToggle"></div></div><div class="toggle-row"><div><div class="lbl">Require multiple return options</div><div class="desc">Only show candidates with ≥ 2 return dates</div></div><div class="switch" id="mutualMultiReturnsToggle"></div></div><div class="toggle-row"><div><div class="lbl">Show weak matches</div><div class="desc">Include risky/low-score matches</div></div><div class="switch on" id="mutualShowWeakToggle"></div></div></div><button class="btn-primary" id="swapFindBtn" style="display:none">Find candidates</button><div class="sheet-section" id="swapResultsSection" style="display:none;margin-top:16px"><div class="sheet-section-label">Suggestions · <span id="swapResultCount">0</span></div><div id="swapResults"></div></div></div>
+<div class="sheet" id="summarySheet"><div class="handle"></div><h3>📊 Schedule Summary</h3><div class="sub">Staffing overview and schedule health.</div><div class="sheet-section"><div class="sheet-section-label">Status counts (shift-days)</div><div class="summary-grid" id="summaryGrid"></div></div><div class="sheet-section" id="shortShiftsSection" style="display:none"><div class="sheet-section-label">Short shifts ( &lt; 11 h )</div><table class="short-table" id="shortShiftsTable"></table></div><div class="sheet-section"><div class="sheet-section-label" style="display:flex;justify-content:space-between"><span>Workload · <span id="wlSubtitle"></span></span><span style="font-size:10px;color:var(--text-muted)">tap to view schedule</span></div><div class="wl-list" id="wlList"></div></div></div>
+<div class="toast" id="toast"></div>
+<script>
+pdfjsLib.GlobalWorkerOptions.workerSrc='https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
+const state={data:null,dates:[],todayISO:new Date().toISOString().slice(0,10),filter:{search:'',roles:new Set(),statuses:new Set()},ui:{compact:false,showToday:true}};
+const swap={me:null,mode:'cover',dates:new Set(),cover:{sameRole:false,excludeAL:true,showWeak:true},mutual:{sameRole:false,sameShift:true,excludeAL:true,multiReturns:false,showWeak:true}};
+const $=s=>document.querySelector(s),$$=s=>[...document.querySelectorAll(s)];
+const DOW=['Su','Mo','Tu','We','Th','Fr','Sa'],DOW_FULL=['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'];
+const STATUS_NAMES={D:'Day shift',N:'Night shift',AL:'Annual leave',RO:'Request off',X:'Rest/Off',EON:'Education (on duty)',EOFF:'Education (off duty)'};
+const STATUS_LETTER={D:'D',N:'N',AL:'A',RO:'R',X:'X',EON:'EO',EOFF:'EF'};
+const SHIFT_WORD={D:'Day',N:'Night'};
+function toast(msg,kind=''){const t=$('#toast');t.textContent=msg;t.className='toast show '+kind;clearTimeout(t._tid);t._tid=setTimeout(()=>t.classList.remove('show'),2800)}
+function esc(s){return String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]))}
+function getDow(iso){return new Date(iso+'T00:00:00').getDay()}
+function isWeekend(iso){const d=getDow(iso);return d===5||d===6}
+function fmtMd(iso){return iso.slice(5).replace('-','/')}
+function fmtDL(iso){return `${DOW[getDow(iso)]} ${fmtMd(iso)}`}
+function addDays(iso,n){const d=new Date(iso+'T00:00:00');d.setDate(d.getDate()+n);return d.toISOString().slice(0,10)}
+function daysBetween(a,b){return Math.round(Math.abs(new Date(a+'T00:00:00')-new Date(b+'T00:00:00'))/86400000)}
+function expandDates(s,e){const out=[],cur=new Date(s+'T00:00:00'),stop=new Date(e+'T00:00:00');while(cur<=stop){out.push(cur.toISOString().slice(0,10));cur.setDate(cur.getDate()+1)}return out}
+function statusOf(emp,date){for(const k of['D','N','AL','RO','X','EON','EOFF'])if(emp[k]&&emp[k].includes(date))return k;return null}
+function scoreBracket(s){if(s>=90)return{cls:'excellent',label:'Excellent'};if(s>=75)return{cls:'good',label:'Good'};if(s>=60)return{cls:'possible',label:'Possible'};return{cls:'weak',label:'Weak'}}
+// Sheets
+function openSheet(sel){$('#sheetBackdrop').classList.add('show');$(sel).classList.add('show')}
+function closeAllSheets(){$('#sheetBackdrop').classList.remove('show');$$('.sheet').forEach(s=>s.classList.remove('show'))}
+$('#sheetBackdrop').addEventListener('click',closeAllSheets);
+// Upload tabs
+$$('.upload-tab').forEach(btn=>btn.addEventListener('click',()=>{
+  $$('.upload-tab').forEach(b=>b.classList.remove('active'));$$('.tab-pane').forEach(p=>p.classList.remove('active'));
+  btn.classList.add('active');$(`.tab-pane[data-pane="${btn.dataset.tab}"]`).classList.add('active');
+}));
+const dropZone=$('#dropZone'),pdfInput=$('#pdfInput');
+dropZone.addEventListener('click',()=>pdfInput.click());
+dropZone.addEventListener('dragover',e=>{e.preventDefault();dropZone.classList.add('dragover')});
+dropZone.addEventListener('dragleave',()=>dropZone.classList.remove('dragover'));
+dropZone.addEventListener('drop',e=>{e.preventDefault();dropZone.classList.remove('dragover');if(e.dataTransfer.files[0]){pdfInput.files=e.dataTransfer.files;handlePdf()}});
+pdfInput.addEventListener('change',handlePdf);
+$('#textSubmitBtn').addEventListener('click',()=>{const txt=$('#textInput').value.trim();if(!txt){toast('Paste text first','error');return}submitParse({sourceType:'text',text:txt})});
+async function handlePdf(){
+  const file=pdfInput.files[0];if(!file)return;
+  try{
+    toast(`Reading ${file.name}…`);
+    const buf=await file.arrayBuffer(),pdf=await pdfjsLib.getDocument(buf).promise;
+    const pages=[];
+    for(let i=1;i<=pdf.numPages;i++){
+      const page=await pdf.getPage(i),content=await page.getTextContent(),vp=page.getViewport({scale:1});
+      const items=content.items.map(it=>({text:it.str,x:it.transform[4],y:vp.height-it.transform[5],width:it.width,height:it.height}));
+      pages.push({items,width:vp.width,height:vp.height,page:i});
+    }
+    const plainText=pages.map(p=>p.items.sort((a,b)=>(a.y-b.y)*1000+(a.x-b.x)).map(i=>i.text).join(' ')).join('\n');
+    submitParse({sourceType:'pdf',pages,plainText});
+  }catch(e){toast('PDF error: '+e.message,'error')}
+}
+async function submitParse(payload){
+  toast('Parsing…');
+  try{
+    const res=await fetch('/api/parse',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(payload)});
+    const j=await res.json();
+    if(!res.ok){toast(j.error||'Parse failed','error');console.error('Parse:',j);return}
+    if(!j.start||!j.end){toast('No period found','error');return}
+    loadData(j);toast(`Loaded ${j.employees.length} staff`,'success');
+  }catch(e){toast('Network error: '+e.message,'error')}
+}
+function loadData(data){
+  state.data=data;state.dates=expandDates(data.start,data.end);
+  state.filter={search:'',roles:new Set(),statuses:new Set()};
+  // migration check
+  const emp0=data.employees[0]||{};
+  if('EON'in emp0){try{localStorage.setItem('schedule_data_v1',JSON.stringify(data))}catch{}}
+  else{try{localStorage.removeItem('schedule_data_v1')}catch{}}
+  try{const n=localStorage.getItem('me_name_v1');swap.me=n?(data.employees.find(e=>e.name===n)||null):null}catch{swap.me=null}
+  swap.dates.clear();
+  try{const m=localStorage.getItem('swap_mode_v1');if(m==='cover'||m==='mutual')swap.mode=m}catch{}
+  $('#infoUnit').textContent=data.unit||'—';$('#infoPeriod').textContent=`${data.start} → ${data.end}`;
+  $('#infoCount').textContent=data.employees.length;$('#infoDays').textContent=state.dates.length;
+  const roles=[...new Set(data.employees.map(e=>e.role).filter(Boolean))].sort();
+  $('#roleChips').innerHTML=roles.length?roles.map(r=>`<button class="chip" data-role="${esc(r)}">${esc(r)}</button>`).join(''):'<span class="empty-hint">No roles</span>';
+  $$('#roleChips .chip').forEach(c=>c.addEventListener('click',()=>{
+    c.classList.toggle('active');const r=c.dataset.role;
+    if(state.filter.roles.has(r))state.filter.roles.delete(r);else state.filter.roles.add(r);
+    render();updateFilterBadge();
+  }));
+  $$('#statusChips .chip').forEach(c=>c.classList.remove('active'));
+  $('#searchInput').value='';updateFilterBadge();
+  $('#uploadScreen').classList.remove('show');$('#scheduleScreen').classList.add('show');
+  $('#todayBtn').style.display=state.dates.includes(state.todayISO)?'':'none';
+  $('#swapBtn').style.display='';$('#summaryBtn').style.display='';
+  $('#appTitleText').textContent=data.unit||'Schedule';
+  render();setTimeout(scrollToToday,80);
+}
+function scrollToToday(){
+  const idx=state.dates.indexOf(state.todayISO);if(idx<0)return;
+  const cells=$$('#gridTable thead .date-cell'),target=cells[idx];if(!target)return;
+  const wrap=$('#gridWrap'),nameW=($('.name-cell')||{}).offsetWidth||130;
+  wrap.scrollTo({left:Math.max(0,target.offsetLeft-nameW-8),behavior:'smooth'});
+}
+$('#todayBtn').addEventListener('click',scrollToToday);
+function getFiltered(){
+  const q=state.filter.search.toLowerCase().trim();
+  return state.data.employees.filter(emp=>{
+    if(q&&!emp.name.toLowerCase().includes(q))return false;
+    if(state.filter.roles.size>0&&!state.filter.roles.has(emp.role))return false;
+    if(state.filter.statuses.size>0){const ok=[...state.filter.statuses].some(s=>emp[s]&&emp[s].length>0);if(!ok)return false}
+    return true;
+  });
+}
+function render(){
+  if(!state.data)return;
+  const employees=getFiltered(),dates=state.dates;
+  let html='<thead><tr>';
+  html+=`<th class="corner-cell">Staff · ${employees.length}</th>`;
+  for(const d of dates){
+    const wknd=isWeekend(d),today=state.ui.showToday&&d===state.todayISO;
+    const cls=['date-cell'];if(wknd)cls.push('weekend');if(today)cls.push('today');
+    html+=`<th class="${cls.join(' ')}" data-date="${d}"><div class="dow">${DOW[getDow(d)]}</div><div class="md">${fmtMd(d)}</div></th>`;
+  }
+  html+='</tr></thead><tbody>';
+  for(const emp of employees){
+    const nm=esc(emp.name),myRow=swap.me&&emp.name===swap.me.name;
+    html+=`<tr${myRow?' class="my-row"':''}>`;
+    html+=`<th class="name-cell" data-emp="${nm}"><div class="nm">${nm}</div>${emp.role?`<div class="rl">${esc(emp.role)}</div>`:''}</th>`;
+    for(const d of dates){
+      const code=statusOf(emp,d),wknd=isWeekend(d),today=state.ui.showToday&&d===state.todayISO;
+      const cls=['stat-cell'];if(wknd)cls.push('weekend');if(today)cls.push('today');
+      if(code)cls.push('s-'+code);else cls.push('empty');
+      html+=`<td class="${cls.join(' ')}" data-emp="${nm}" data-date="${d}" data-code="${code||''}">${code?(STATUS_LETTER[code]||code):'·'}</td>`;
+    }
+    html+='</tr>';
+  }
+  html+='</tbody>';
+  $('#gridTable').innerHTML=html;
+  $('#gridWrap').classList.toggle('compact',state.ui.compact);
+  $$('#gridTable .stat-cell').forEach(c=>c.addEventListener('click',()=>{
+    const code=c.dataset.code,name=c.dataset.emp,date=c.dataset.date;
+    toast(`${name} · ${DOW_FULL[getDow(date)]} ${fmtMd(date)} · ${code?STATUS_NAMES[code]||code:'No entry'}`);
+  }));
+  $$('#gridTable .name-cell').forEach(c=>c.addEventListener('click',()=>openEmployee(c.dataset.emp)));
+}
+function openEmployee(name){
+  const emp=state.data.employees.find(e=>e.name===name);if(!emp)return;
+  $('#empSheetName').textContent=emp.name;$('#empSheetRole').textContent=emp.role||'—';
+  const KEYS=['D','N','AL','RO','X','EON','EOFF'],LBLS={D:'Day',N:'Night',AL:'Annual',RO:'ReqOff',X:'Rest',EON:'Edu ON',EOFF:'Edu OFF'};
+  $('#empStats').innerHTML=KEYS.map(k=>`<div class="emp-stat s-${k}"><div class="v">${(emp[k]||[]).length}</div><div class="l">${LBLS[k]}</div></div>`).join('');
+  const padStart=getDow(state.dates[0]);
+  let cal='';
+  for(const n of DOW)cal+=`<div class="dow-hd">${n}</div>`;
+  for(let i=0;i<padStart;i++)cal+=`<div class="cal-cell pad"></div>`;
+  for(const d of state.dates){
+    const code=statusOf(emp,d),today=d===state.todayISO;
+    const cls=['cal-cell'];if(code)cls.push('s-'+code);if(today)cls.push('today');
+    cal+=`<div class="${cls.join(' ')}"><div class="dn">${d.slice(8)}</div><div class="dc">${code?(STATUS_LETTER[code]||code):''}</div></div>`;
+  }
+  $('#calGrid').innerHTML=cal;openSheet('#empSheet');
+}
+let searchT;
+$('#searchInput').addEventListener('input',e=>{clearTimeout(searchT);searchT=setTimeout(()=>{state.filter.search=e.target.value;render()},100)});
+$('#filterBtn').addEventListener('click',()=>openSheet('#filterSheet'));
+$$('#statusChips .chip').forEach(c=>c.addEventListener('click',()=>{
+  c.classList.toggle('active');const s=c.dataset.status;
+  if(state.filter.statuses.has(s))state.filter.statuses.delete(s);else state.filter.statuses.add(s);
+  render();updateFilterBadge();
+}));
+$('#clearFiltersBtn').addEventListener('click',()=>{
+  state.filter={search:'',roles:new Set(),statuses:new Set()};
+  $('#searchInput').value='';$$('#roleChips .chip.active,#statusChips .chip.active').forEach(c=>c.classList.remove('active'));
+  render();updateFilterBadge();closeAllSheets();
+});
+function updateFilterBadge(){
+  const t=state.filter.roles.size+state.filter.statuses.size;
+  const btn=$('#filterBtn'),b=$('#filterBadge');
+  if(t>0){btn.classList.add('active');b.style.display='';b.textContent=t}else{btn.classList.remove('active');b.style.display='none'}
+}
+$('#settingsBtn').addEventListener('click',()=>openSheet('#settingsSheet'));
+$('#compactToggle').addEventListener('click',e=>{
+  e.currentTarget.classList.toggle('on');state.ui.compact=e.currentTarget.classList.contains('on');
+  $('#gridWrap').classList.toggle('compact',state.ui.compact);saveUI();
+});
+$('#todayToggle').addEventListener('click',e=>{
+  e.currentTarget.classList.toggle('on');state.ui.showToday=e.currentTarget.classList.contains('on');render();saveUI();
+});
+function saveUI(){try{localStorage.setItem('schedule_ui_v1',JSON.stringify(state.ui))}catch{}}
+function loadUI(){try{const u=JSON.parse(localStorage.getItem('schedule_ui_v1')||'{}');state.ui={...state.ui,...u};$('#compactToggle').classList.toggle('on',state.ui.compact);$('#todayToggle').classList.toggle('on',state.ui.showToday)}catch{}}
+$('#resetBtn').addEventListener('click',()=>{
+  if(!confirm('Clear schedule?'))return;
+  try{localStorage.removeItem('schedule_data_v1')}catch{}
+  state.data=null;state.dates=[];state.filter={search:'',roles:new Set(),statuses:new Set()};swap.me=null;swap.dates.clear();
+  $('#scheduleScreen').classList.remove('show');$('#uploadScreen').classList.add('show');
+  $('#todayBtn').style.display='none';$('#swapBtn').style.display='none';$('#summaryBtn').style.display='none';
+  $('#appTitleText').textContent='Schedule';pdfInput.value='';$('#textInput').value='';closeAllSheets();
+});
+// Summary
+$('#summaryBtn').addEventListener('click',()=>{if(!state.data)return;renderSummary();openSheet('#summarySheet')});
+function computeWorkload(emp,dates){
+  const seq=dates.map(d=>statusOf(emp,d));
+  const isWork=s=>s==='D'||s==='N'||s==='EON';
+  let score=100;const issues=[];
+  let maxC=0,curC=0;for(const s of seq){if(isWork(s)){curC++;maxC=Math.max(maxC,curC)}else curC=0}
+  if(maxC>=6){score-=30;issues.push(`${maxC} consecutive shifts`)}else if(maxC>=4){score-=15;issues.push(`${maxC} consecutive shifts`)}
+  let maxN=0,curN=0;for(const s of seq){if(s==='N'){curN++;maxN=Math.max(maxN,curN)}else curN=0}
+  if(maxN>=5){score-=20;issues.push(`${maxN} consecutive nights`)}else if(maxN>=3){score-=8;issues.push(`${maxN} consecutive nights`)}
+  let flips=0;for(let i=1;i<seq.length;i++)if((seq[i-1]==='D'&&seq[i]==='N')||(seq[i-1]==='N'&&seq[i]==='D'))flips++;
+  if(flips>=3){score-=20;issues.push(`${flips} D/N switches`)}else if(flips>=2){score-=10;issues.push(`${flips} D/N switches`)}
+  let quick=0;for(let i=2;i<seq.length;i++){const b=seq[i-2],m=seq[i-1],a=seq[i];const offM=m==='X'||m===null;if(offM&&((b==='N'&&a==='D')||(b==='D'&&a==='N')))quick++}
+  if(quick>=2){score-=15;issues.push(`${quick} quick shift-type changes`)}else if(quick>=1){score-=8;issues.push('Quick shift-type change')}
+  for(let i=1;i<seq.length;i++)if(seq[i-1]==='AL'&&isWork(seq[i])){score-=5;issues.push('Returns from AL into work');break}
+  let iso=0;for(let i=1;i<seq.length-1;i++){if((seq[i]==='X'||seq[i]===null)&&isWork(seq[i-1])&&isWork(seq[i+1]))iso++}
+  if(iso>=5){score-=10;issues.push(`${iso} isolated rest days`)}else if(iso>=3){score-=5;issues.push(`${iso} isolated rest days`)}
+  score=Math.max(0,Math.min(100,Math.round(score)));
+  let label,cls;
+  if(score>=85){label='Easy';cls='easy'}else if(score>=70){label='Normal';cls='normal'}else if(score>=50){label='Heavy';cls='heavy'}else{label='Risky';cls='risky'}
+  return{score,label,cls,issues:issues.slice(0,3)};
+}
+function renderSummary(){
+  const data=state.data,dates=state.dates,diag=data.diagnostics||{},counts=diag.statusCounts||{};
+  const CELLS=[{key:'D',label:'Day',cls:'s-D'},{key:'N',label:'Night',cls:'s-N'},{key:'X',label:'Rest',cls:'s-X'},{key:'AL',label:'Annual',cls:'s-AL'},{key:'RO',label:'ReqOff',cls:'s-RO'},{key:'EON',label:'Edu ON',cls:'s-EON'},{key:'EOFF',label:'Edu OFF',cls:'s-EOFF'},{key:'_total',label:'Total Staff',cls:'s-total'}];
+  $('#summaryGrid').innerHTML=CELLS.map(sc=>{
+    const v=sc.key==='_total'?data.employees.length:(counts[sc.key]||0);
+    return `<div class="sum-cell ${sc.cls}"><div class="sv">${v}</div><div class="sl">${sc.label}</div></div>`;
+  }).join('');
+  const hb=diag.shiftHourBreakdown||{},shortKeys=Object.keys(hb).filter(h=>parseFloat(h)<11).sort((a,b)=>parseFloat(a)-parseFloat(b));
+  if(shortKeys.length>0){$('#shortShiftsSection').style.display='';$('#shortShiftsTable').innerHTML=shortKeys.map(h=>`<tr><td>${h}h shifts</td><td>${hb[h]}</td></tr>`).join('')+`<tr><td style="font-weight:600">Total short shifts</td><td>${diag.shortShiftCount||0}</td></tr>`}else{$('#shortShiftsSection').style.display='none'}
+  const ratings=data.employees.map(emp=>({emp,...computeWorkload(emp,dates)})).sort((a,b)=>a.score-b.score);
+  const risky=ratings.filter(r=>r.cls==='risky').length,heavy=ratings.filter(r=>r.cls==='heavy').length;
+  $('#wlSubtitle').textContent=risky+heavy>0?`${risky} Risky · ${heavy} Heavy`:'All clear ✓';
+  $('#wlList').innerHTML=ratings.map(r=>`<div class="wl-item" data-emp="${esc(r.emp.name)}"><div class="wl-info"><div class="wl-name">${esc(r.emp.name)}</div><div class="wl-issues">${r.issues.length>0?r.issues.join(' · '):'No flagged patterns'}</div></div><div class="wl-badge ${r.cls}">${r.score} · ${r.label}</div></div>`).join('');
+  $$('#wlList .wl-item').forEach(el=>el.addEventListener('click',()=>openEmployee(el.dataset.emp)));
+}
+// Swap Finder
+$('#swapBtn').addEventListener('click',()=>{if(!state.data)return;applySwapMode();renderSwapForm();openSheet('#swapSheet')});
+$$('.mode-tab').forEach(btn=>btn.addEventListener('click',()=>{
+  const m=btn.dataset.mode;if(m===swap.mode)return;swap.mode=m;
+  if(m==='mutual'&&swap.dates.size>1){const first=[...swap.dates][0];swap.dates.clear();swap.dates.add(first)}
+  try{localStorage.setItem('swap_mode_v1',m)}catch{}
+  applySwapMode();renderSwapForm();
+}));
+function applySwapMode(){
+  $$('.mode-tab').forEach(t=>t.classList.toggle('active',t.dataset.mode===swap.mode));
+  const cover=swap.mode==='cover';
+  $('#swapSubtitle').textContent=cover?'Find someone to cover one or more of your shifts.':'Find a person who covers you AND whose shift you can cover back.';
+  $('#swapOptsCover').style.display=cover?'':'none';$('#swapOptsMutual').style.display=cover?'none':'';
+  $('#swapDatesLabel').textContent=cover?'Working days to swap (pick one or more)':'Pick one working day to swap';
+  $('#swapResults').innerHTML='';$('#swapResultsSection').style.display='none';
+}
+function renderSwapForm(){
+  if(swap.me){
+    $('#swapMePickerWrap').style.display='none';$('#swapMeSelected').style.display='';
+    $('#swapMeSelected').innerHTML=`<div class="who"><div class="nm">${esc(swap.me.name)}</div><div class="rl">${esc(swap.me.role||'—')}</div></div><button class="link-btn" id="swapChangeBtn">Change</button>`;
+    $('#swapChangeBtn').addEventListener('click',changeSwapMe);
+    renderSwapDateChips();$('#swapDatesSection').style.display='';$('#swapFindBtn').style.display='';
+  }else{
+    $('#swapMePickerWrap').style.display='';$('#swapMeSearch').value='';$('#swapMeResults').innerHTML='';
+    $('#swapMeSelected').style.display='none';$('#swapDatesSection').style.display='none';
+    $('#swapFindBtn').style.display='none';$('#swapResultsSection').style.display='none';
+  }
+}
+function renderSwapDateChips(){
+  const me=swap.me,working=state.dates.filter(d=>{const s=statusOf(me,d);return s==='D'||s==='N'});
+  if(!working.length){$('#swapDateChips').innerHTML='<span class="empty-hint">No working days found.</span>';return}
+  $('#swapDateChips').innerHTML=working.map(d=>{const s=statusOf(me,d);return `<button class="chip${swap.dates.has(d)?' active':''}" data-date="${d}">${fmtDL(d)} · ${s}</button>`}).join('');
+  $$('#swapDateChips .chip').forEach(c=>c.addEventListener('click',()=>{
+    const d=c.dataset.date;
+    if(swap.mode==='mutual'){$$('#swapDateChips .chip').forEach(o=>o.classList.remove('active'));c.classList.add('active');swap.dates.clear();swap.dates.add(d)}
+    else{c.classList.toggle('active');if(swap.dates.has(d))swap.dates.delete(d);else swap.dates.add(d)}
+  }));
+}
+function changeSwapMe(){swap.me=null;swap.dates.clear();try{localStorage.removeItem('me_name_v1')}catch{};$('#swapResults').innerHTML='';$('#swapResultsSection').style.display='none';renderSwapForm()}
+$('#swapMeSearch').addEventListener('input',e=>{
+  const q=e.target.value.toLowerCase().trim();
+  if(!q){$('#swapMeResults').innerHTML='';return}
+  const matches=state.data.employees.filter(emp=>emp.name.toLowerCase().includes(q)).slice(0,10);
+  if(!matches.length){$('#swapMeResults').innerHTML='<span class="empty-hint">No staff match.</span>';return}
+  $('#swapMeResults').innerHTML=matches.map(emp=>`<div class="emp-result" data-name="${esc(emp.name)}"><div><div class="nm">${esc(emp.name)}</div><div class="rl">${esc(emp.role||'—')}</div></div><span style="color:var(--primary);font-size:18px">→</span></div>`).join('');
+  $$('#swapMeResults .emp-result').forEach(el=>el.addEventListener('click',()=>{
+    const emp=state.data.employees.find(x=>x.name===el.dataset.name);if(!emp)return;
+    swap.me=emp;swap.dates.clear();try{localStorage.setItem('me_name_v1',emp.name)}catch{};renderSwapForm();
+  }));
+});
+function bindToggle(id,getRef,setRef){const el=$('#'+id);el.classList.toggle('on',getRef());el.addEventListener('click',()=>{el.classList.toggle('on');setRef(el.classList.contains('on'))})}
+bindToggle('coverSameRoleToggle',()=>swap.cover.sameRole,v=>swap.cover.sameRole=v);
+bindToggle('coverExcludeAlToggle',()=>swap.cover.excludeAL,v=>swap.cover.excludeAL=v);
+bindToggle('coverShowWeakToggle',()=>swap.cover.showWeak,v=>swap.cover.showWeak=v);
+bindToggle('mutualSameRoleToggle',()=>swap.mutual.sameRole,v=>swap.mutual.sameRole=v);
+bindToggle('mutualSameShiftToggle',()=>swap.mutual.sameShift,v=>swap.mutual.sameShift=v);
+bindToggle('mutualExcludeAlToggle',()=>swap.mutual.excludeAL,v=>swap.mutual.excludeAL=v);
+bindToggle('mutualMultiReturnsToggle',()=>swap.mutual.multiReturns,v=>swap.mutual.multiReturns=v);
+bindToggle('mutualShowWeakToggle',()=>swap.mutual.showWeak,v=>swap.mutual.showWeak=v);
+$('#swapFindBtn').addEventListener('click',()=>{
+  if(!swap.me){toast('Pick yourself first','error');return}
+  if(swap.dates.size===0){toast('Pick at least one date','error');return}
+  const results=swap.mode==='cover'?findCoverCandidates():findMutualCandidates();
+  renderSwapResults(results);
+  setTimeout(()=>$('#swapResultsSection').scrollIntoView({behavior:'smooth',block:'start'}),60);
+});
+// ═══ SWAP FINDER — scoring engine ════════════════════════════════════════
+// Analyses consecutive runs + shift-flip risk when adding one coverage shift.
+function assessCoverageImpact(person,coverDate,coverShift){
+  const all=state.dates,idx=all.indexOf(coverDate);
+  if(idx<0)return{totalConsec:1,bwd:0,fwd:1,flipRisk:null,prevShift:null,nextShift:null};
+  let fwd=1;
+  for(let i=idx+1;i<all.length;i++){const s=statusOf(person,all[i]);if(s==='D'||s==='N'||s==='EON')fwd++;else break}
+  let bwd=0;
+  for(let i=idx-1;i>=0;i--){const s=statusOf(person,all[i]);if(s==='D'||s==='N'||s==='EON')bwd++;else break}
+  const totalConsec=bwd+fwd;
+  const prevShift=idx>0?statusOf(person,all[idx-1]):null;
+  const nextShift=idx<all.length-1?statusOf(person,all[idx+1]):null;
+  let flipRisk=null;
+  if(prevShift==='N'&&coverShift==='D')flipRisk='Night before \u2192 Day coverage (unsafe turnaround)';
+  else if(coverShift==='N'&&nextShift==='D')flipRisk='Night coverage \u2192 Day after (unsafe turnaround)';
+  else if(prevShift==='D'&&coverShift==='N')flipRisk='Day before \u2192 Night coverage';
+  else if(coverShift==='D'&&nextShift==='N')flipRisk='Day coverage \u2192 Night after';
+  return{totalConsec,bwd,fwd,flipRisk,prevShift,nextShift};
+}
+
+// Scores feasibility of one person covering one date.
+// Returns {score:0-100, reasons:string[], blocked:bool, sameRole:bool, impact}
+// Score = availability(35) + role(10) + shiftCompat(15) + feasibility(40).
+function scoreSingleCoverage(person,me,coverDate,opts){
+  const myShift=statusOf(me,coverDate);
+  const coverShift=(myShift==='D'||myShift==='N')?myShift:'D';
+  const pStatus=statusOf(person,coverDate);
+  const reasons=[];
+  // Hard blocks
+  if(pStatus==='D'||pStatus==='N')return{score:0,reasons:[`\u2717 Already working ${pStatus} on ${fmtDL(coverDate)}`],blocked:true,sameRole:false};
+  if(pStatus==='EON'||pStatus==='EOFF')return{score:0,reasons:['\u2717 Education day \u2014 not eligible'],blocked:true,sameRole:false};
+  if(pStatus==='AL'&&opts.excludeAL)return{score:0,reasons:['\u2717 On annual leave'],blocked:true,sameRole:false};
+  // 1. Availability (max 35)
+  let avail;
+  if(pStatus===null){avail=35;reasons.push(`\u2713 Off on ${fmtDL(coverDate)}`);}
+  else if(pStatus==='X'){avail=30;reasons.push(`\u2713 Rest day on ${fmtDL(coverDate)}`);}
+  else if(pStatus==='RO'){avail=22;reasons.push(`\u2713 Requested off on ${fmtDL(coverDate)}`);}
+  else{avail=10;reasons.push(`\u26a0 Annual leave on ${fmtDL(coverDate)}`);}
+  // 2. Role (max 10)
+  const sameRole=(person.role||'')===(me.role||'');
+  const rolePoints=sameRole?10:0;
+  reasons.push(sameRole?'\u2713 Same role':'\u2717 Different role');
+  // 3. Shift compatibility (max 15) — penalise flips
+  const impact=assessCoverageImpact(person,coverDate,coverShift);
+  let shiftPoints=15,flipCap=100;
+  if(impact.flipRisk){
+    const unsafe=impact.flipRisk.includes('unsafe');
+    shiftPoints=0;flipCap=unsafe?40:55;
+    reasons.push(`\u26a0 ${impact.flipRisk}`);
+  }
+  // 4. Feasibility after coverage (max 40) + hard consecutive caps
+  let feasPoints=40,consCap=100;
+  if(impact.totalConsec>=5){feasPoints=0;consCap=25;reasons.push(`\u26a0 Would create ${impact.totalConsec} consecutive shifts — very weak match`);}
+  else if(impact.totalConsec===4){feasPoints=5;consCap=45;reasons.push('\u26a0 Creates 4 consecutive shifts');}
+  else if(impact.totalConsec===3){feasPoints=20;consCap=70;reasons.push('\u26a0 Creates 3 consecutive shifts');}
+  else if(impact.totalConsec===2){feasPoints=35;}
+  else{feasPoints=40;}
+  if(impact.bwd>=3&&impact.totalConsec<5)reasons.push(`\u26a0 Already ${impact.bwd} shifts before this date`);
+  // Hard cap
+  const hardCap=Math.min(consCap,flipCap,pStatus==='AL'?45:100,!sameRole?85:100);
+  const raw=avail+rolePoints+shiftPoints+feasPoints;
+  const score=Math.max(0,Math.min(hardCap,raw));
+  return{score,reasons,blocked:score===0,sameRole,impact,hardCap};
+}
+
+// Feasibility of ME covering a return date (0-100, pure schedule-impact score).
+function assessReturnFeasibility(person,coverDate,coverShift){
+  const impact=assessCoverageImpact(person,coverDate,coverShift);
+  let score=100,hardCap=100;const reasons=[];
+  if(impact.totalConsec>=5){score=25;hardCap=25;reasons.push('\u26a0 Return would create 5+ consecutive shifts for you');}
+  else if(impact.totalConsec===4){hardCap=Math.min(hardCap,45);score=Math.min(score,45);reasons.push('\u26a0 Return creates 4 consecutive shifts for you');}
+  else if(impact.totalConsec===3){hardCap=Math.min(hardCap,70);score=Math.min(score,70);reasons.push('\u26a0 Return creates 3 consecutive shifts for you');}
+  if(impact.flipRisk){const unsafe=impact.flipRisk.includes('unsafe');const cap=unsafe?40:55;hardCap=Math.min(hardCap,cap);score=Math.min(score,cap);reasons.push(`\u26a0 Return: ${impact.flipRisk}`);}
+  return{score,reasons,impact,hardCap};
+}
+
+function findCoverCandidates(){
+  const dates=[...swap.dates],opts=swap.cover,me=swap.me;
+  return state.data.employees
+    .filter(emp=>emp.name!==me.name)
+    .filter(emp=>!opts.sameRole||(emp.role||'')===(me.role||''))
+    .map(p=>analyzeCover(p,me,dates,opts))
+    .filter(r=>r&&r.score>0)
+    .filter(r=>opts.showWeak||r.score>=35)
+    .sort((a,b)=>b.score-a.score);
+}
+function analyzeCover(person,me,dates,opts){
+  const perDate=dates.map(d=>({date:d,...scoreSingleCoverage(person,me,d,opts)}));
+  const eligible=perDate.filter(c=>!c.blocked);
+  if(!eligible.length)return null;
+  const okCount=eligible.length,total=dates.length;
+  const avgScore=eligible.reduce((s,c)=>s+c.score,0)/eligible.length;
+  let score=avgScore;
+  if(okCount<total)score*=(0.5+0.5*okCount/total);
+  const seenR=new Set(),reasons=[];
+  for(const c of perDate)for(const r of c.reasons)if(!seenR.has(r)){seenR.add(r);reasons.push(r);}
+  if(okCount<total&&total>1)reasons.push(`\u26a0 Can only cover ${okCount} of ${total} dates`);
+  const sameRole=(person.role||'')===(me.role||'');
+  return{person,reasons,okCount,total,sameRole,score:Math.max(0,Math.min(100,Math.round(score))),mode:'cover'};
+}
+function findMutualCandidates(){
+  const myDate=[...swap.dates][0],me=swap.me,myShift=statusOf(me,myDate);
+  if(myShift!=='D'&&myShift!=='N'){toast('Pick a working day','error');return[]}
+  const opts=swap.mutual;
+  return state.data.employees
+    .filter(emp=>emp.name!==me.name)
+    .filter(emp=>!opts.sameRole||(emp.role||'')===(me.role||''))
+    .map(p=>analyzeMutual(p,me,myDate,myShift,opts))
+    .filter(r=>r!==null)
+    .filter(r=>opts.showWeak||r.score>=35)
+    .filter(r=>!opts.multiReturns||r.returnDates.length>=2)
+    .sort((a,b)=>b.score-a.score);
+}
+function isMeAvail(me,date){const s=statusOf(me,date);return s===null||s==='X'||s==='RO'}
+function analyzeMutual(person,me,myDate,myShift,opts){
+  const candidateSide=scoreSingleCoverage(person,me,myDate,opts);
+  if(candidateSide.blocked||candidateSide.score===0)return null;
+  const returnAll=state.dates.filter(d=>d!==myDate).map(d=>{
+    const ps=statusOf(person,d);if(ps!=='D'&&ps!=='N')return null;
+    if(!isMeAvail(me,d))return null;
+    const sameShift=ps===myShift;if(opts.sameShift&&!sameShift)return null;
+    return{date:d,shift:ps,sameShift,daysAway:daysBetween(d,myDate)};
+  }).filter(Boolean).sort((a,b)=>{if(a.sameShift!==b.sameShift)return a.sameShift?-1:1;return a.daysAway-b.daysAway});
+  if(!returnAll.length){
+    const score=Math.min(candidateSide.score,40);
+    return{person,pStatus:statusOf(person,myDate),myShift,myDate,returnDates:[],bestReturn:null,
+      reasons:[...candidateSide.reasons,'\u2717 No return date found'],score,sameRole:candidateSide.sameRole,mode:'mutual'};
+  }
+  const best=returnAll[0];
+  // Evaluate MY feasibility on the return date
+  const mySide=assessReturnFeasibility(me,best.date,best.shift);
+  // Bonuses for return quality
+  const sameShiftBonus=best.sameShift?5:0;
+  const closeBonus=best.daysAway<=7?3:(best.daysAway>21?-3:0);
+  const multiBonus=returnAll.length>=3?3:0;
+  // Final = worst side + small bonuses, then apply the strictest cap again.
+  // This prevents bonuses from lifting risky schedules above their fatigue cap.
+  const rawFinal=Math.min(candidateSide.score,mySide.score)+sameShiftBonus+closeBonus+multiBonus;
+  const finalCap=Math.min(candidateSide.hardCap??100,mySide.hardCap??mySide.score??100);
+  const score=Math.max(0,Math.min(100,finalCap,rawFinal));
+  const reasons=[
+    ...candidateSide.reasons,
+    best.sameShift?`\u2713 Same-shift return (${SHIFT_WORD[best.shift]})`:`\u26a0 Return needs shift change (${SHIFT_WORD[myShift]}\u2192${SHIFT_WORD[best.shift]})`,
+    ...(returnAll.length>=3?[`\u2713 ${returnAll.length} possible return dates`]:[]),
+    ...mySide.reasons,
+  ];
+  return{person,pStatus:statusOf(person,myDate),myShift,myDate,returnDates:returnAll,bestReturn:best,
+    score,reasons,sameRole:candidateSide.sameRole,mode:'mutual'};
+}
+function renderSwapResults(results){
+  $('#swapResultCount').textContent=results.length;$('#swapResultsSection').style.display='';
+  if(!results.length){
+    const hint=swap.mode==='cover'?'No candidates. Try turning off filters or pick another date.':'No mutual swap. Try turning off strict filters or pick another date.';
+    $('#swapResults').innerHTML=`<div class="empty-hint">${hint}</div>`;return;
+  }
+  $('#swapResults').innerHTML=results.slice(0,30).map(r=>r.mode==='cover'?renderCoverCard(r):renderMutualCard(r)).join('');
+  // Fix: decode URI + close swap sheet so employee sheet is not hidden behind it
+  $$('#swapResults .view-sched-btn').forEach(btn=>btn.addEventListener('click',e=>{
+    e.preventDefault();e.stopPropagation();
+    const empName=decodeURIComponent(btn.dataset.emp);
+    $('#swapSheet').classList.remove('show');
+    openEmployee(empName);
+  }));
+}
+function renderReasonLine(txt){
+  const cls=txt.startsWith('\u2713')?'ok':txt.startsWith('\u2717')?'no':txt.startsWith('\u26a0')?'warn':'muted';
+  return `<div class="swap-reason ${cls}">${txt}</div>`;
+}
+function renderCoverCard(r){
+  const br=scoreBracket(r.score);
+  const summary=r.okCount===r.total?(r.total>1?`Can cover all ${r.total} days`:'Can cover this day'):`Covers ${r.okCount} of ${r.total} days`;
+  const reasonLines=(r.reasons||[]).map(renderReasonLine).join('');
+  return `<div class="swap-card ${br.cls}"><div class="swap-card-head"><div class="who"><div class="swap-name">${esc(r.person.name)}</div><div class="swap-role">${esc(r.person.role||'\u2014')}</div></div><div class="score-badge ${br.cls}">${r.score} \u00b7 ${br.label}</div></div><div class="swap-reasons"><div class="swap-reason muted">${summary}</div>${reasonLines}</div><button class="view-sched-btn" data-emp="${encodeURIComponent(r.person.name)}">View schedule \u2192</button></div>`;
+}
+function renderMutualCard(r){
+  const br=scoreBracket(r.score);
+  const reasonLines=(r.reasons||[]).map(renderReasonLine).join('');
+  let proposal='';
+  if(r.bestReturn){
+    const others=r.returnDates.slice(1,4).map(rd=>`${fmtDL(rd.date)}(${rd.shift})${rd.sameShift?'':'\u26a0'}`).join(' \u00b7 ');
+    proposal=`<div class="swap-proposal"><div class="proposal-title">Proposed swap</div><div class="proposal-line cov"><div class="arrow">\u2192</div><div><strong>${esc(r.person.name)}</strong> covers your <strong>${SHIFT_WORD[r.myShift]}</strong> shift on <strong>${fmtDL(r.myDate)}</strong></div></div><div class="proposal-line ret"><div class="arrow">\u2190</div><div>You cover ${esc(r.person.name.split(',')[0])}'s <strong>${SHIFT_WORD[r.bestReturn.shift]}</strong> shift on <strong>${fmtDL(r.bestReturn.date)}</strong></div></div>${others?`<div class="proposal-alt">Other return options: ${others}</div>`:''}</div>`;
+  }else{proposal=`<div class="swap-proposal"><div class="proposal-title">Cover only \u2014 no return found</div><div class="proposal-line cov"><div class="arrow">\u2192</div><div><strong>${esc(r.person.name)}</strong> could cover your shift on <strong>${fmtDL(r.myDate)}</strong></div></div></div>`}
+  return `<div class="swap-card ${br.cls}"><div class="swap-card-head"><div class="who"><div class="swap-name">${esc(r.person.name)}</div><div class="swap-role">${esc(r.person.role||'\u2014')}</div></div><div class="score-badge ${br.cls}">${r.score} \u00b7 ${br.label}</div></div><div class="swap-reasons">${reasonLines}</div>${proposal}<button class="view-sched-btn" data-emp="${encodeURIComponent(r.person.name)}">View schedule \u2192</button></div>`;
+}
+// Boot
+loadUI();
+try{
+  const saved=JSON.parse(localStorage.getItem('schedule_data_v1')||'null');
+  if(saved&&saved.employees&&saved.employees.length>0&&('EON'in saved.employees[0])){if(saved.start&&saved.end)loadData(saved)}
+  else if(saved)localStorage.removeItem('schedule_data_v1');
+}catch{}
+</script>
+</body>
+</html>    .grid-wrap{flex:1;min-height:0;overflow:auto;-webkit-overflow-scrolling:touch;background:var(--bg-card);position:relative;isolation:isolate}
     .grid-table{border-collapse:separate;border-spacing:0;font-size:12px}.grid-table th,.grid-table td{padding:0;margin:0;vertical-align:middle;text-align:center;background-color:var(--bg-card);white-space:nowrap;box-shadow:inset -1px -1px 0 var(--border)}
     .grid-table thead th.date-cell{position:-webkit-sticky;position:sticky;top:0;z-index:30;background-color:var(--bg-card);min-width:40px;width:40px;padding:5px 0;font-size:11px;line-height:1.2;font-weight:600}.grid-table thead th.date-cell .dow{font-weight:700}.grid-table thead th.date-cell .md{font-size:10px;color:var(--text-muted);margin-top:1px}.grid-table thead th.date-cell.weekend{background-color:var(--weekend-bg)}.grid-table thead th.date-cell.today{background-color:var(--primary-light);color:var(--primary);box-shadow:inset -1px -1px 0 var(--border),inset 0 -3px 0 var(--today-ring)}.grid-table thead th.date-cell.today .md{color:var(--primary);font-weight:700}
     .grid-table tbody th.name-cell{position:-webkit-sticky;position:sticky;left:0;z-index:20;background-color:var(--bg-card);min-width:130px;max-width:130px;text-align:left;padding:7px 9px;font-weight:500;cursor:pointer;box-shadow:inset -1px -1px 0 var(--border),2px 0 4px -2px rgba(0,0,0,.08)}.grid-table tbody th.name-cell:active{background-color:var(--bg)}.grid-table tbody th.name-cell .nm{font-size:12px;line-height:1.25;white-space:normal;overflow:hidden;text-overflow:ellipsis;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical}.grid-table tbody th.name-cell .rl{font-size:10px;color:var(--text-muted);margin-top:2px;font-weight:400}
