@@ -122,7 +122,7 @@
 <script>
 pdfjsLib.GlobalWorkerOptions.workerSrc='https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
 const state={data:null,dates:[],todayISO:new Date().toISOString().slice(0,10),filter:{search:'',roles:new Set(),statuses:new Set()},ui:{compact:false,showToday:true}};
-const swap={me:null,mode:'cover',dates:new Set(),cover:{sameRole:false,excludeAL:true,showWeak:true},mutual:{sameRole:false,sameShift:true,excludeAL:true,multiReturns:false,showWeak:true}};
+const swap={me:null,mode:'cover',dates:new Set(),cover:{sameRole:true,excludeAL:true,showWeak:true},mutual:{sameRole:true,sameShift:true,excludeAL:true,multiReturns:false,showWeak:true}};
 const $=s=>document.querySelector(s),$$=s=>[...document.querySelectorAll(s)];
 const DOW=['Su','Mo','Tu','We','Th','Fr','Sa'],DOW_FULL=['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'];
 const STATUS_NAMES={D:'Day shift',N:'Night shift',AL:'Annual leave',RO:'Request off',X:'Rest/Off',EON:'Education (on duty)',EOFF:'Education (off duty)'};
@@ -355,10 +355,14 @@ $$('.mode-tab').forEach(btn=>btn.addEventListener('click',()=>{
 function applySwapMode(){
   $$('.mode-tab').forEach(t=>t.classList.toggle('active',t.dataset.mode===swap.mode));
   const cover=swap.mode==='cover';
-  $('#swapSubtitle').textContent=cover?'Find someone to cover one or more of your shifts.':'Find a person who covers you AND whose shift you can cover back.';
+  $('#swapSubtitle').textContent=cover?'Find someone with the same role who can safely cover your shift.':'Find someone who can cover you, then show return options separately.';
   $('#swapOptsCover').style.display=cover?'':'none';$('#swapOptsMutual').style.display=cover?'none':'';
   $('#swapDatesLabel').textContent=cover?'Working days to swap (pick one or more)':'Pick one working day to swap';
   $('#swapResults').innerHTML='';$('#swapResultsSection').style.display='none';
+  // Same role is mandatory by rule. Keep toggles visually ON even if old local state exists.
+  swap.cover.sameRole=true;swap.mutual.sameRole=true;
+  const c=$('#coverSameRoleToggle'),m=$('#mutualSameRoleToggle');
+  if(c)c.classList.add('on');if(m)m.classList.add('on');
 }
 function renderSwapForm(){
   if(swap.me){
@@ -391,15 +395,18 @@ $('#swapMeSearch').addEventListener('input',e=>{
   $('#swapMeResults').innerHTML=matches.map(emp=>`<div class="emp-result" data-name="${esc(emp.name)}"><div><div class="nm">${esc(emp.name)}</div><div class="rl">${esc(emp.role||'—')}</div></div><span style="color:var(--primary);font-size:18px">→</span></div>`).join('');
   $$('#swapMeResults .emp-result').forEach(el=>el.addEventListener('click',()=>{
     const emp=state.data.employees.find(x=>x.name===el.dataset.name);if(!emp)return;
-    swap.me=emp;swap.dates.clear();try{localStorage.setItem('me_name_v1',emp.name)}catch{};renderSwapForm();
+    swap.me=emp;swap.dates.clear();try{localStorage.setItem('me_name_v1',emp.name)}catch{};renderSwapForm();render();
   }));
 });
-function bindToggle(id,getRef,setRef){const el=$('#'+id);el.classList.toggle('on',getRef());el.addEventListener('click',()=>{el.classList.toggle('on');setRef(el.classList.contains('on'))})}
-bindToggle('coverSameRoleToggle',()=>swap.cover.sameRole,v=>swap.cover.sameRole=v);
+function bindToggle(id,getRef,setRef){
+  const el=$('#'+id);if(!el)return;el.classList.toggle('on',getRef());
+  el.addEventListener('click',()=>{const next=!el.classList.contains('on');setRef(next);el.classList.toggle('on',getRef())});
+}
+bindToggle('coverSameRoleToggle',()=>true,()=>{swap.cover.sameRole=true});
 bindToggle('coverExcludeAlToggle',()=>swap.cover.excludeAL,v=>swap.cover.excludeAL=v);
 bindToggle('coverShowWeakToggle',()=>swap.cover.showWeak,v=>swap.cover.showWeak=v);
-bindToggle('mutualSameRoleToggle',()=>swap.mutual.sameRole,v=>swap.mutual.sameRole=v);
-bindToggle('mutualSameShiftToggle',()=>swap.mutual.sameShift,v=>swap.mutual.sameShift=v);
+bindToggle('mutualSameRoleToggle',()=>true,()=>{swap.mutual.sameRole=true});
+bindToggle('mutualSameShiftToggle',()=>swap.mutual.sameShift,v=>swap.mutual.sameShift=v); // kept for UI only; scoring no longer filters by same shift
 bindToggle('mutualExcludeAlToggle',()=>swap.mutual.excludeAL,v=>swap.mutual.excludeAL=v);
 bindToggle('mutualMultiReturnsToggle',()=>swap.mutual.multiReturns,v=>swap.mutual.multiReturns=v);
 bindToggle('mutualShowWeakToggle',()=>swap.mutual.showWeak,v=>swap.mutual.showWeak=v);
@@ -410,163 +417,161 @@ $('#swapFindBtn').addEventListener('click',()=>{
   renderSwapResults(results);
   setTimeout(()=>$('#swapResultsSection').scrollIntoView({behavior:'smooth',block:'start'}),60);
 });
-// ═══ SWAP FINDER — scoring engine ════════════════════════════════════════
-// Analyses consecutive runs + shift-flip risk when adding one coverage shift.
-function assessCoverageImpact(person,coverDate,coverShift){
-  const all=state.dates,idx=all.indexOf(coverDate);
-  if(idx<0)return{totalConsec:1,bwd:0,fwd:1,flipRisk:null,prevShift:null,nextShift:null};
-  let fwd=1;
-  for(let i=idx+1;i<all.length;i++){const s=statusOf(person,all[i]);if(s==='D'||s==='N'||s==='EON')fwd++;else break}
-  let bwd=0;
-  for(let i=idx-1;i>=0;i--){const s=statusOf(person,all[i]);if(s==='D'||s==='N'||s==='EON')bwd++;else break}
-  const totalConsec=bwd+fwd;
-  const prevShift=idx>0?statusOf(person,all[idx-1]):null;
-  const nextShift=idx<all.length-1?statusOf(person,all[idx+1]):null;
-  let flipRisk=null;
-  if(prevShift==='N'&&coverShift==='D')flipRisk='Night before \u2192 Day coverage (unsafe turnaround)';
-  else if(coverShift==='N'&&nextShift==='D')flipRisk='Night coverage \u2192 Day after (unsafe turnaround)';
-  else if(prevShift==='D'&&coverShift==='N')flipRisk='Day before \u2192 Night coverage';
-  else if(coverShift==='D'&&nextShift==='N')flipRisk='Day coverage \u2192 Night after';
-  return{totalConsec,bwd,fwd,flipRisk,prevShift,nextShift};
+
+// ═══ SWAP FINDER — final scheduling rules ════════════════════════════════════
+function isWorkingStatus(s){return s==='D'||s==='N'||s==='EON'}
+function isShiftStatus(s){return s==='D'||s==='N'}
+function isBlockedCoverageStatus(s){return s==='D'||s==='N'||s==='AL'||s==='X'||s==='EON'||s==='EOFF'}
+function coverageBlockReason(s,date){
+  if(s==='D'||s==='N')return `✗ Already working ${s} on ${fmtDL(date)}`;
+  if(s==='AL')return '✗ Annual leave blocked';
+  if(s==='X')return '✗ Rest day blocked';
+  if(s==='EON'||s==='EOFF')return '✗ Education day blocked';
+  return '✗ Not eligible';
+}
+function sameRoleRequired(person,me){return (person.role||'')===(me.role||'')}
+function simulatedStatus(person,date,coverDate,coverShift){return date===coverDate?coverShift:statusOf(person,date)}
+function countConsecutiveAfterCoverage(person,coverDate,coverShift){
+  const all=state.dates,idx=all.indexOf(coverDate);if(idx<0)return{total:1,before:0,after:0};
+  let before=0,after=0;
+  for(let i=idx-1;i>=0;i--){const s=statusOf(person,all[i]);if(isWorkingStatus(s))before++;else break}
+  for(let i=idx+1;i<all.length;i++){const s=statusOf(person,all[i]);if(isWorkingStatus(s))after++;else break}
+  return{total:before+1+after,before,after};
+}
+function nearestShiftWork(person,coverDate,dir){
+  const all=state.dates,idx=all.indexOf(coverDate);if(idx<0)return null;
+  for(let i=idx+dir;i>=0&&i<all.length;i+=dir){
+    const s=statusOf(person,all[i]);
+    if(isWorkingStatus(s))return{date:all[i],status:s,gapDays:Math.abs(i-idx)-1};
+  }
+  return null;
+}
+function assessOppositeShiftRest(person,coverDate,coverShift){
+  const checks=[];
+  const prev=nearestShiftWork(person,coverDate,-1);
+  const next=nearestShiftWork(person,coverDate,1);
+  if(prev&&isShiftStatus(prev.status)&&prev.status!==coverShift)checks.push({...prev,side:'previous'});
+  if(next&&isShiftStatus(next.status)&&next.status!==coverShift)checks.push({...next,side:'next'});
+  let cap=100,blocked=false;const reasons=[];
+  for(const c of checks){
+    if(c.gapDays===0){blocked=true;cap=0;reasons.push('✗ Opposite Day/Night shift with no rest');}
+    else if(c.gapDays===1){cap=Math.min(cap,55);reasons.push('⚠ Opposite Day/Night shift with only 1 off day');}
+    else if(c.gapDays===2){cap=Math.min(cap,85);reasons.push('⚠ Opposite Day/Night shift with 2 off days, acceptable but not ideal');}
+    else{reasons.push('✓ 3+ off days before opposite Day/Night shift');}
+  }
+  return{cap,blocked,reasons,prev,next};
 }
 
-// Scores feasibility of one person covering one date.
-// Returns {score:0-100, reasons:string[], blocked:bool, sameRole:bool, impact}
-// Score = availability(35) + role(10) + shiftCompat(15) + feasibility(40).
-function scoreSingleCoverage(person,me,coverDate,opts){
+// Score one person covering one date. This is intentionally candidate-side focused.
+function scoreSingleCoverage(person,me,coverDate,opts={}){
   const myShift=statusOf(me,coverDate);
-  const coverShift=(myShift==='D'||myShift==='N')?myShift:'D';
+  const coverShift=isShiftStatus(myShift)?myShift:'D';
   const pStatus=statusOf(person,coverDate);
   const reasons=[];
-  // Hard blocks
-  if(pStatus==='D'||pStatus==='N')return{score:0,reasons:[`\u2717 Already working ${pStatus} on ${fmtDL(coverDate)}`],blocked:true,sameRole:false};
-  if(pStatus==='EON'||pStatus==='EOFF')return{score:0,reasons:['\u2717 Education day \u2014 not eligible'],blocked:true,sameRole:false};
-  if(pStatus==='AL'&&opts.excludeAL)return{score:0,reasons:['\u2717 On annual leave'],blocked:true,sameRole:false};
-  // 1. Availability (max 35)
-  let avail;
-  if(pStatus===null){avail=35;reasons.push(`\u2713 Off on ${fmtDL(coverDate)}`);}
-  else if(pStatus==='X'){avail=30;reasons.push(`\u2713 Rest day on ${fmtDL(coverDate)}`);}
-  else if(pStatus==='RO'){avail=22;reasons.push(`\u2713 Requested off on ${fmtDL(coverDate)}`);}
-  else{avail=10;reasons.push(`\u26a0 Annual leave on ${fmtDL(coverDate)}`);}
-  // 2. Role (max 10)
-  const sameRole=(person.role||'')===(me.role||'');
-  const rolePoints=sameRole?10:0;
-  reasons.push(sameRole?'\u2713 Same role':'\u2717 Different role');
-  // 3. Shift compatibility (max 15) — penalise flips
-  const impact=assessCoverageImpact(person,coverDate,coverShift);
-  let shiftPoints=15,flipCap=100;
-  if(impact.flipRisk){
-    const unsafe=impact.flipRisk.includes('unsafe');
-    shiftPoints=0;flipCap=unsafe?40:55;
-    reasons.push(`\u26a0 ${impact.flipRisk}`);
-  }
-  // 4. Feasibility after coverage (max 40) + hard consecutive caps
-  let feasPoints=40,consCap=100;
-  if(impact.totalConsec>=5){feasPoints=0;consCap=25;reasons.push(`\u26a0 Would create ${impact.totalConsec} consecutive shifts — very weak match`);}
-  else if(impact.totalConsec===4){feasPoints=5;consCap=45;reasons.push('\u26a0 Creates 4 consecutive shifts');}
-  else if(impact.totalConsec===3){feasPoints=20;consCap=70;reasons.push('\u26a0 Creates 3 consecutive shifts');}
-  else if(impact.totalConsec===2){feasPoints=35;}
-  else{feasPoints=40;}
-  if(impact.bwd>=3&&impact.totalConsec<5)reasons.push(`\u26a0 Already ${impact.bwd} shifts before this date`);
-  // Hard cap
-  const hardCap=Math.min(consCap,flipCap,pStatus==='AL'?45:100,!sameRole?85:100);
-  const raw=avail+rolePoints+shiftPoints+feasPoints;
-  const score=Math.max(0,Math.min(hardCap,raw));
-  return{score,reasons,blocked:score===0,sameRole,impact,hardCap};
-}
 
-// Feasibility of ME covering a return date (0-100, pure schedule-impact score).
-function assessReturnFeasibility(person,coverDate,coverShift){
-  const impact=assessCoverageImpact(person,coverDate,coverShift);
-  let score=100,hardCap=100;const reasons=[];
-  if(impact.totalConsec>=5){score=25;hardCap=25;reasons.push('\u26a0 Return would create 5+ consecutive shifts for you');}
-  else if(impact.totalConsec===4){hardCap=Math.min(hardCap,45);score=Math.min(score,45);reasons.push('\u26a0 Return creates 4 consecutive shifts for you');}
-  else if(impact.totalConsec===3){hardCap=Math.min(hardCap,70);score=Math.min(score,70);reasons.push('\u26a0 Return creates 3 consecutive shifts for you');}
-  if(impact.flipRisk){const unsafe=impact.flipRisk.includes('unsafe');const cap=unsafe?40:55;hardCap=Math.min(hardCap,cap);score=Math.min(score,cap);reasons.push(`\u26a0 Return: ${impact.flipRisk}`);}
-  return{score,reasons,impact,hardCap};
+  // Same role is mandatory, not a bonus.
+  if(!sameRoleRequired(person,me))return{score:0,reasons:['✗ Different role — hidden by same-role rule'],blocked:true,hardCap:0,coverageScore:0};
+  reasons.push('✓ Same role required and matched');
+
+  // Coverage-date eligibility.
+  if(isBlockedCoverageStatus(pStatus))return{score:0,reasons:[coverageBlockReason(pStatus,coverDate)],blocked:true,hardCap:0,coverageScore:0};
+  let base=100,hardCap=100;
+  if(pStatus===null){reasons.push('✓ Blank day available');base=100;}
+  else if(pStatus==='RO'){reasons.push('⚠ RO day, low priority');base=55;hardCap=Math.min(hardCap,60);}
+  else{reasons.push('⚠ Unknown non-working status, low priority');base=45;hardCap=Math.min(hardCap,50);}
+
+  // Consecutive working days after inserting coverage.
+  const run=countConsecutiveAfterCoverage(person,coverDate,coverShift);
+  if(run.total>=5)return{score:0,reasons:['✗ Creates 5+ consecutive working days'],blocked:true,hardCap:0,coverageScore:0,run};
+  if(run.total===4){hardCap=Math.min(hardCap,55);reasons.push('⚠ Creates 4 consecutive working days');}
+  else if(run.total===3){hardCap=Math.min(hardCap,98);reasons.push('⚠ Creates 3 consecutive working days');}
+  else if(run.total===2){reasons.push('✓ 2 consecutive working days only');}
+  else{reasons.push('✓ No consecutive-work issue');}
+
+  // D/N opposite-shift rest gap rule.
+  const flip=assessOppositeShiftRest(person,coverDate,coverShift);
+  if(flip.blocked)return{score:0,reasons:[...reasons,...flip.reasons],blocked:true,hardCap:0,coverageScore:0,run,flip};
+  hardCap=Math.min(hardCap,flip.cap);
+  reasons.push(...flip.reasons);
+
+  const score=Math.max(0,Math.min(100,hardCap,base));
+  return{score,reasons,blocked:false,sameRole:true,hardCap,coverageScore:score,run,flip,coverShift,pStatus};
 }
 
 function findCoverCandidates(){
   const dates=[...swap.dates],opts=swap.cover,me=swap.me;
   return state.data.employees
     .filter(emp=>emp.name!==me.name)
-    .filter(emp=>!opts.sameRole||(emp.role||'')===(me.role||''))
+    .filter(emp=>sameRoleRequired(emp,me))
     .map(p=>analyzeCover(p,me,dates,opts))
-    .filter(r=>r&&r.score>0)
-    .filter(r=>opts.showWeak||r.score>=35)
+    .filter(Boolean)
     .sort((a,b)=>b.score-a.score);
 }
 function analyzeCover(person,me,dates,opts){
   const perDate=dates.map(d=>({date:d,...scoreSingleCoverage(person,me,d,opts)}));
-  const eligible=perDate.filter(c=>!c.blocked);
+  const eligible=perDate.filter(c=>!c.blocked&&c.score>0);
   if(!eligible.length)return null;
   const okCount=eligible.length,total=dates.length;
   const avgScore=eligible.reduce((s,c)=>s+c.score,0)/eligible.length;
   let score=avgScore;
   if(okCount<total)score*=(0.5+0.5*okCount/total);
-  const seenR=new Set(),reasons=[];
-  for(const c of perDate)for(const r of c.reasons)if(!seenR.has(r)){seenR.add(r);reasons.push(r);}
-  if(okCount<total&&total>1)reasons.push(`\u26a0 Can only cover ${okCount} of ${total} dates`);
-  const sameRole=(person.role||'')===(me.role||'');
-  return{person,reasons,okCount,total,sameRole,score:Math.max(0,Math.min(100,Math.round(score))),mode:'cover'};
+  const seen=new Set(),reasons=[];
+  for(const c of perDate){for(const r of c.reasons){if(!seen.has(r)){seen.add(r);reasons.push(r)}}}
+  if(okCount<total&&total>1)reasons.push(`⚠ Can only cover ${okCount} of ${total} dates`);
+  return{person,reasons,okCount,total,sameRole:true,score:Math.round(Math.max(0,Math.min(100,score))),coverageScore:Math.round(avgScore),mode:'cover'};
 }
+
+function canTryReturn(me,date){const s=statusOf(me,date);return s===null||s==='RO'}
 function findMutualCandidates(){
   const myDate=[...swap.dates][0],me=swap.me,myShift=statusOf(me,myDate);
   if(myShift!=='D'&&myShift!=='N'){toast('Pick a working day','error');return[]}
   const opts=swap.mutual;
   return state.data.employees
     .filter(emp=>emp.name!==me.name)
-    .filter(emp=>!opts.sameRole||(emp.role||'')===(me.role||''))
+    .filter(emp=>sameRoleRequired(emp,me))
     .map(p=>analyzeMutual(p,me,myDate,myShift,opts))
-    .filter(r=>r!==null)
-    .filter(r=>opts.showWeak||r.score>=35)
+    .filter(Boolean)
     .filter(r=>!opts.multiReturns||r.returnDates.length>=2)
     .sort((a,b)=>b.score-a.score);
 }
-function isMeAvail(me,date){const s=statusOf(me,date);return s===null||s==='X'||s==='RO'}
 function analyzeMutual(person,me,myDate,myShift,opts){
   const candidateSide=scoreSingleCoverage(person,me,myDate,opts);
-  if(candidateSide.blocked||candidateSide.score===0)return null;
+  if(candidateSide.blocked||candidateSide.score<=0)return null;
+
   const returnAll=state.dates.filter(d=>d!==myDate).map(d=>{
-    const ps=statusOf(person,d);if(ps!=='D'&&ps!=='N')return null;
-    if(!isMeAvail(me,d))return null;
-    const sameShift=ps===myShift;if(opts.sameShift&&!sameShift)return null;
-    return{date:d,shift:ps,sameShift,daysAway:daysBetween(d,myDate)};
-  }).filter(Boolean).sort((a,b)=>{if(a.sameShift!==b.sameShift)return a.sameShift?-1:1;return a.daysAway-b.daysAway});
+    const ps=statusOf(person,d);
+    if(ps!=='D'&&ps!=='N')return null;       // return only means I cover one of their real shifts
+    if(!canTryReturn(me,d))return null;       // I must be blank or RO; not rest/AL/education/work
+    const side=scoreSingleCoverage(me,person,d,opts);
+    if(side.blocked||side.score<=0)return null;
+    return{date:d,shift:ps,daysAway:daysBetween(d,myDate),score:side.score,reasons:side.reasons,side};
+  }).filter(Boolean).sort((a,b)=>b.score-a.score||a.daysAway-b.daysAway);
+
   if(!returnAll.length){
-    const score=Math.min(candidateSide.score,40);
-    return{person,pStatus:statusOf(person,myDate),myShift,myDate,returnDates:[],bestReturn:null,
-      reasons:[...candidateSide.reasons,'\u2717 No return date found'],score,sameRole:candidateSide.sameRole,mode:'mutual'};
+    const score=Math.min(candidateSide.score,25);
+    return{person,myShift,myDate,returnDates:[],bestReturn:null,score,coverageScore:candidateSide.score,returnScore:0,
+      reasons:[...candidateSide.reasons,'✗ No feasible return date found — swap may not work'],mode:'mutual'};
   }
+
   const best=returnAll[0];
-  // Evaluate MY feasibility on the return date
-  const mySide=assessReturnFeasibility(me,best.date,best.shift);
-  // Bonuses for return quality
-  const sameShiftBonus=best.sameShift?5:0;
-  const closeBonus=best.daysAway<=7?3:(best.daysAway>21?-3:0);
-  const multiBonus=returnAll.length>=3?3:0;
-  // Final = worst side + small bonuses, then apply the strictest cap again.
-  // This prevents bonuses from lifting risky schedules above their fatigue cap.
-  const rawFinal=Math.min(candidateSide.score,mySide.score)+sameShiftBonus+closeBonus+multiBonus;
-  const finalCap=Math.min(candidateSide.hardCap??100,mySide.hardCap??mySide.score??100);
-  const score=Math.max(0,Math.min(100,finalCap,rawFinal));
-  const reasons=[
-    ...candidateSide.reasons,
-    best.sameShift?`\u2713 Same-shift return (${SHIFT_WORD[best.shift]})`:`\u26a0 Return needs shift change (${SHIFT_WORD[myShift]}\u2192${SHIFT_WORD[best.shift]})`,
-    ...(returnAll.length>=3?[`\u2713 ${returnAll.length} possible return dates`]:[]),
-    ...mySide.reasons,
-  ];
-  return{person,pStatus:statusOf(person,myDate),myShift,myDate,returnDates:returnAll,bestReturn:best,
-    score,reasons,sameRole:candidateSide.sameRole,mode:'mutual'};
+  // Main score remains candidate coverage; return has low impact unless very poor.
+  let score=Math.round(candidateSide.score*0.9+best.score*0.1);
+  if(best.score<45)score=Math.min(score,75);
+  if(best.score<30)score=Math.min(score,60);
+  const reasons=[...candidateSide.reasons];
+  if(returnAll.length>=3)reasons.push(`✓ ${returnAll.length} possible return dates`);
+  else reasons.push(`⚠ Only ${returnAll.length} return option${returnAll.length===1?'':'s'}`);
+  if(best.score<60)reasons.push('⚠ My return option is weak');
+
+  return{person,myShift,myDate,returnDates:returnAll,bestReturn:best,score,coverageScore:candidateSide.score,returnScore:best.score,reasons,mode:'mutual'};
 }
 function renderSwapResults(results){
   $('#swapResultCount').textContent=results.length;$('#swapResultsSection').style.display='';
   if(!results.length){
-    const hint=swap.mode==='cover'?'No candidates. Try turning off filters or pick another date.':'No mutual swap. Try turning off strict filters or pick another date.';
+    const hint=swap.mode==='cover'?'No valid same-role candidates for this date. Blocked cases are hidden.':'No practical mutual swap found for this date.';
     $('#swapResults').innerHTML=`<div class="empty-hint">${hint}</div>`;return;
   }
-  $('#swapResults').innerHTML=results.slice(0,30).map(r=>r.mode==='cover'?renderCoverCard(r):renderMutualCard(r)).join('');
-  // Fix: decode URI + close swap sheet so employee sheet is not hidden behind it
+  $('#swapResults').innerHTML=results.slice(0,50).map(r=>r.mode==='cover'?renderCoverCard(r):renderMutualCard(r)).join('');
   $$('#swapResults .view-sched-btn').forEach(btn=>btn.addEventListener('click',e=>{
     e.preventDefault();e.stopPropagation();
     const empName=decodeURIComponent(btn.dataset.emp);
@@ -575,25 +580,28 @@ function renderSwapResults(results){
   }));
 }
 function renderReasonLine(txt){
-  const cls=txt.startsWith('\u2713')?'ok':txt.startsWith('\u2717')?'no':txt.startsWith('\u26a0')?'warn':'muted';
-  return `<div class="swap-reason ${cls}">${txt}</div>`;
+  const cls=txt.startsWith('✓')?'ok':txt.startsWith('✗')?'no':txt.startsWith('⚠')?'warn':'muted';
+  return `<div class="swap-reason ${cls}">${esc(txt)}</div>`;
 }
 function renderCoverCard(r){
   const br=scoreBracket(r.score);
-  const summary=r.okCount===r.total?(r.total>1?`Can cover all ${r.total} days`:'Can cover this day'):`Covers ${r.okCount} of ${r.total} days`;
+  const summary=r.okCount===r.total?(r.total>1?`Can cover all ${r.total} days`:'Can cover this day'):`Covers ${r.okCount} of ${r.total} dates`;
   const reasonLines=(r.reasons||[]).map(renderReasonLine).join('');
-  return `<div class="swap-card ${br.cls}"><div class="swap-card-head"><div class="who"><div class="swap-name">${esc(r.person.name)}</div><div class="swap-role">${esc(r.person.role||'\u2014')}</div></div><div class="score-badge ${br.cls}">${r.score} \u00b7 ${br.label}</div></div><div class="swap-reasons"><div class="swap-reason muted">${summary}</div>${reasonLines}</div><button class="view-sched-btn" data-emp="${encodeURIComponent(r.person.name)}">View schedule \u2192</button></div>`;
+  return `<div class="swap-card ${br.cls}"><div class="swap-card-head"><div class="who"><div class="swap-name">${esc(r.person.name)}</div><div class="swap-role">${esc(r.person.role||'—')}</div></div><div class="score-badge ${br.cls}">${r.score} · ${br.label}</div></div><div class="swap-reasons"><div class="swap-reason muted">${summary}</div>${reasonLines}</div><button class="view-sched-btn" data-emp="${encodeURIComponent(r.person.name)}">View schedule →</button></div>`;
 }
 function renderMutualCard(r){
   const br=scoreBracket(r.score);
   const reasonLines=(r.reasons||[]).map(renderReasonLine).join('');
   let proposal='';
   if(r.bestReturn){
-    const others=r.returnDates.slice(1,4).map(rd=>`${fmtDL(rd.date)}(${rd.shift})${rd.sameShift?'':'\u26a0'}`).join(' \u00b7 ');
-    proposal=`<div class="swap-proposal"><div class="proposal-title">Proposed swap</div><div class="proposal-line cov"><div class="arrow">\u2192</div><div><strong>${esc(r.person.name)}</strong> covers your <strong>${SHIFT_WORD[r.myShift]}</strong> shift on <strong>${fmtDL(r.myDate)}</strong></div></div><div class="proposal-line ret"><div class="arrow">\u2190</div><div>You cover ${esc(r.person.name.split(',')[0])}'s <strong>${SHIFT_WORD[r.bestReturn.shift]}</strong> shift on <strong>${fmtDL(r.bestReturn.date)}</strong></div></div>${others?`<div class="proposal-alt">Other return options: ${others}</div>`:''}</div>`;
-  }else{proposal=`<div class="swap-proposal"><div class="proposal-title">Cover only \u2014 no return found</div><div class="proposal-line cov"><div class="arrow">\u2192</div><div><strong>${esc(r.person.name)}</strong> could cover your shift on <strong>${fmtDL(r.myDate)}</strong></div></div></div>`}
-  return `<div class="swap-card ${br.cls}"><div class="swap-card-head"><div class="who"><div class="swap-name">${esc(r.person.name)}</div><div class="swap-role">${esc(r.person.role||'\u2014')}</div></div><div class="score-badge ${br.cls}">${r.score} \u00b7 ${br.label}</div></div><div class="swap-reasons">${reasonLines}</div>${proposal}<button class="view-sched-btn" data-emp="${encodeURIComponent(r.person.name)}">View schedule \u2192</button></div>`;
+    const others=r.returnDates.slice(1,4).map(rd=>`${fmtDL(rd.date)} (${rd.shift}) · return ${rd.score}`).join(' · ');
+    proposal=`<div class="swap-proposal"><div class="proposal-title">Proposed swap</div><div class="proposal-line cov"><div class="arrow">→</div><div><strong>${esc(r.person.name)}</strong> covers your <strong>${SHIFT_WORD[r.myShift]}</strong> shift on <strong>${fmtDL(r.myDate)}</strong></div></div><div class="proposal-line ret"><div class="arrow">←</div><div>You cover ${esc(r.person.name.split(',')[0])}'s <strong>${SHIFT_WORD[r.bestReturn.shift]}</strong> shift on <strong>${fmtDL(r.bestReturn.date)}</strong></div></div><div class="proposal-alt">Candidate coverage score: ${r.coverageScore} · My return score: ${r.returnScore}${others?`<br>Other return options: ${others}`:''}</div></div>`;
+  }else{
+    proposal=`<div class="swap-proposal"><div class="proposal-title">Not practical yet</div><div class="proposal-line cov"><div class="arrow">→</div><div>${esc(r.person.name)} can cover your date, but no feasible return date was found.</div></div><div class="proposal-alt">Candidate coverage score: ${r.coverageScore} · My return score: 0</div></div>`;
+  }
+  return `<div class="swap-card ${br.cls}"><div class="swap-card-head"><div class="who"><div class="swap-name">${esc(r.person.name)}</div><div class="swap-role">${esc(r.person.role||'—')}</div></div><div class="score-badge ${br.cls}">${r.score} · ${br.label}</div></div><div class="swap-reasons">${reasonLines}</div>${proposal}<button class="view-sched-btn" data-emp="${encodeURIComponent(r.person.name)}">View schedule →</button></div>`;
 }
+
 // Boot
 loadUI();
 try{
